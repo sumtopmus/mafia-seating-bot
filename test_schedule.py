@@ -25,18 +25,6 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(len(s.players), 10)
         self.assertEqual(len(s.rounds), 1)
         self.assertEqual(len(s.games), 1)
-
-
-    @unittest.skip
-    def test_scheduleCreateConfiguration(self):
-        config = Configuration(numPlayers=30, numTables=3, numRounds=10, numGames=30, numAttempts=10)
-        s = Schedule(config)
-        self.assertEqual(s.configuration, config)
-
-        # this code is broken, need to initialize empty schedule first
-        self.assertEqual(len(s.players), 30)
-        self.assertEqual(len(s.rounds), 10)
-        self.assertEqual(len(s.games), 30)
     
     pass
 
