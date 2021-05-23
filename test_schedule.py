@@ -10,6 +10,7 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(s.rounds, [])
         self.assertEqual(s.games, [])
 
+    @unittest.skip
     def test_scheduleCreateConfiguration(self):
         config = Configuration(numPlayers=30, numTables=3, numRounds=10, numGames=30, numAttempts=10)
         s = Schedule(config)
