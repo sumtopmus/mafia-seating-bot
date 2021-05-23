@@ -1,39 +1,43 @@
 import unittest
-from game import Game
-from players import Players
+from game import *
+from player import *
 
 
-class TestGame(unittest.TestCase):
-    def setUp(self):
-        names = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10"]
-        self.allPlayers = Players(names).players
-
-    def tearDown(self):
-        del self.allPlayers
+class TestGame(unittest.TestCase):    
+    def createParticipants(self):
+        names = Participants.generateNames(10)
+        participants = Participants(names)
+        return participants
 
     def test_game_CreateEmpty(self):
-        game = Game([])
+        game = Game(7, [])
+        self.assertEqual(game.id, 7)
         self.assertEqual(len(game.players), 0)
         self.assertFalse(game.isValid())
 
     def test_game_CreateSimple(self):
-        game = Game(self.allPlayers)
+        participants = self.createParticipants()
+        players = participants.all
+        game = Game(1, players)
         self.assertEqual(len(game.players), 10)
         self.assertTrue(game.isValid())
 
     def test_game_isValid_WrongCount(self):
-        players = self.allPlayers[:-1]
-        game = Game(players)
+        participants = self.createParticipants()
+        players = participants.all
+        players = players[:-1]
+        game = Game(1, players)
 
         self.assertEqual(len(game.players), 9)
         self.assertFalse(game.isValid())
 
     def test_game_isValid_NonUnique(self):
         # duplicate the fifth player
-        players = self.allPlayers
+        participants = self.createParticipants()
+        players = participants.all
         players[7] = players[5]
 
-        game = Game(players)
+        game = Game(1, players)
         self.assertEqual(len(game.players), 10)
         self.assertFalse(game.isValid())
 

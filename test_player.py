@@ -1,5 +1,5 @@
 import unittest
-from players import Player
+from player import *
 
 class TestPlayer(unittest.TestCase):
     def setUp(self):
