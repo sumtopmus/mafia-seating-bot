@@ -8,7 +8,7 @@ class TestSchedule(unittest.TestCase):
     def test_schedule_CreateEmpty(self):
         s = Schedule(None)
         self.assertEqual(s.configuration, None)
-        self.assertEqual(s.players, [])
+        self.assertEqual(s.participants, None)
         self.assertEqual(s.rounds, [])
         self.assertEqual(s.games, [])
 
@@ -22,7 +22,7 @@ class TestSchedule(unittest.TestCase):
 
         s = Schedule(conf, participants, rounds, games)
         self.assertEqual(s.configuration, conf)
-        self.assertEqual(len(s.players), 10)
+        self.assertEqual(len(s.participants), 10)
         self.assertEqual(len(s.rounds), 1)
         self.assertEqual(len(s.games), 1)
     

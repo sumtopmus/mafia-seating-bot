@@ -1,11 +1,13 @@
 from configuration import *
+from player import *
+from game import *
 
 class ScheduleException(Exception):
     pass
 
 class Schedule:
     _configuration : Configuration
-    _players = []
+    _participants : Participants
     _rounds = []
     _games = []
 
@@ -14,8 +16,8 @@ class Schedule:
         return self._configuration
 
     @property
-    def players(self):
-        return self._players
+    def participants(self):
+        return self._participants
 
     @property
     def rounds(self):
@@ -25,11 +27,19 @@ class Schedule:
     def games(self):
         return self._games
 
-    def __init__(self, conf : Configuration = None, players : list = [], rounds : list = [], games : list = []):
+    def __init__(self, conf : Configuration = None, participants : Participants = None, rounds : list = [], games : list = []):
         self._configuration = conf
-        self._players = players
+        self._participants = participants
         self._rounds = rounds
         self._games = games
+
+    def toJson(self):
+        d = {}
+        d["configuration"] = _configuration.getJsonDict()
+        d["participants"] = _participantslayers.getJsonDict()
+        _rounds.getRoundDict()
+        _games.getGamesDict()
+
 
     def isValid(self) -> bool:
         try:
@@ -39,8 +49,8 @@ class Schedule:
         return True
 
     def validate(self) -> bool:
-        if len(self._players) != self._configuration.NumPlayers:
-            raise ScheduleException(f"Player count: {self._players} must match configuration: {self._configuration.NumPlayers}")
+        if len(self._participants) != self._configuration.NumPlayers:
+            raise ScheduleException(f"Participant count: {self._players} must match configuration: {self._configuration.NumPlayers}")
         
         if len(self._rounds) != self._configuration.NumRounds:
             raise ScheduleException(f"Round count: {self._rounds} must match configuration: {self._configuration.NumRounds}")
@@ -62,7 +72,7 @@ class Schedule:
             raise ScheduleException(f"All players must play the same number of games")
 
         # every player must play NumAttempts games
-        for player in self._players:
+        for player in self._participants:
             if player.id not in gamesPlayed:
                 raise ScheduleException(f"Player: {player.id} does not play a single game!")
 
