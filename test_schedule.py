@@ -14,13 +14,11 @@ class TestSchedule(unittest.TestCase):
 
     def test_schedule_CreateSimple(self):
         conf = Configuration(numPlayers = 10, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
-        names = Participants.generateNames(10)
-        participants = Participants(names)
+        participants = Participants.create(10)
         game = Game(1, participants.all)
         rounds = [Round(1, [game])]
-        games = [game]
 
-        s = Schedule(conf, participants, rounds, games)
+        s = Schedule(conf, participants, rounds)
         self.assertEqual(s.configuration, conf)
         self.assertEqual(len(s.participants), 10)
         self.assertEqual(len(s.rounds), 1)

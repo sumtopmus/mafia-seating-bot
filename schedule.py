@@ -31,14 +31,26 @@ class Schedule:
         self._configuration = conf
         self._participants = participants
         self._rounds = rounds
-        self._games = games
+
+        # reconstruct plain games list from rounds
+        self._games = []
+        for round in self._rounds:
+            self._games.extend(round.games)
 
     def toJson(self):
         d = {}
-        d["configuration"] = _configuration.getJsonDict()
-        d["participants"] = _participantslayers.getJsonDict()
-        _rounds.getRoundDict()
-        _games.getGamesDict()
+        d["configuration"] = self._configuration.toJson()
+        d["participants"] = self._participants.toJson()
+        d["rounds"] = [round.toJson() for round in self._rounds]
+        # we actually don't need to serialize games, they are in rounds...
+        return d
+    
+    @staticmethod
+    def fromJson(d:dict):
+        conf = Configuration.fromJson(d["configuration"])
+        participants = Participants.fromJson(d["participants"])
+        rounds = [Round.fromJson(d) for d in d["rounds"]]
+        return Schedule(conf, participants, rounds)
 
 
     def isValid(self) -> bool:

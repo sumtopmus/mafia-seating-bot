@@ -12,13 +12,12 @@ class ScheduleFactory:
 
         # create rounds and games
         rounds = []
-        games = []
         gameId = 0
         for roundNum in range(conf.NumRounds):
             gamesInRound = []
             
             for tableNum in range(conf.NumTables):
-                if len(games) >= conf.NumGames:
+                if gameId >= conf.NumGames:
                     break
 
                 # prepare players for game
@@ -37,12 +36,11 @@ class ScheduleFactory:
                 # create next game
                 game = Game(gameId, players)
                 gameId = gameId + 1
-                games.append(game)
                 gamesInRound.append(game)
 
             # create next round            
             round = Round(roundNum, gamesInRound)
             rounds.append(round)
 
-        schedule = Schedule(conf, participants, rounds, games)
+        schedule = Schedule(conf, participants, rounds)
         return schedule

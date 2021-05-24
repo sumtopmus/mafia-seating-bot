@@ -9,7 +9,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Simple schedule: 10 players, just 1 game'''
 
         numPlayers = 10
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -19,7 +19,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Bad schedule: 11 players, just 1 game'''
 
         numPlayers = 11
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -29,7 +29,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Simple 2-round schedule: 10 players 2 attempts per player'''
 
         numPlayers = 10
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 2, numGames = 2, numAttempts = 2)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -39,7 +39,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Simple 2-round schedule: 20 players 1 attempts per player'''
 
         numPlayers = 20
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 2, numGames = 2, numAttempts = 1)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -49,7 +49,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Classic mini-tournament schedule'''
 
         numPlayers = 12
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 6, numGames = 6, numAttempts = 5)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -59,7 +59,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Full schedule for 2 tables'''
 
         numPlayers = 20
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
         conf = Configuration(numPlayers, numTables = 2, numRounds = 10, numGames = 20, numAttempts = 10)
 
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -69,7 +69,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Not-full schedule for 2 tables (VaWaCa-2017)'''
 
         numPlayers = 25
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 2, numRounds = 10, numGames = 20, numAttempts = 8)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -79,7 +79,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Full schedule for 3 tables'''
 
         numPlayers = 30
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 3, numRounds = 10, numGames = 30, numAttempts = 10)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -89,7 +89,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Not-full schedule for 3 tables (11 rounds by 10 attempts per player)'''
 
         numPlayers = 33
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 3, numRounds = 11, numGames = 33, numAttempts = 10)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
@@ -99,7 +99,7 @@ class TestScheduleFactory(unittest.TestCase):
         '''Not-full schedule for 3 tables with not all tables at the last round (12 rounds by 10 attempts per player)'''
 
         numPlayers = 35
-        participants = Participants(Participants.generateNames(numPlayers))
+        participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 3, numRounds = 12, numGames = 35, numAttempts = 10)
         s = ScheduleFactory.createInitialSchedule(conf, participants)
