@@ -7,30 +7,30 @@ from game import *
 
 
 class ScheduleFactory:
-    def createInitialSchedule(conf : Configuration, participants : Participants):
+    def createInitialSchedule(conf: Configuration, participants: Participants):
         playerId = 0
 
         # create rounds and games
         rounds = []
         gameId = 0
-        for roundNum in range(conf.NumRounds):
+        for roundNum in range(conf.numRounds):
             gamesInRound = []
-            
-            for tableNum in range(conf.NumTables):
-                if gameId >= conf.NumGames:
+
+            for tableNum in range(conf.numTables):
+                if gameId >= conf.numGames:
                     break
 
                 # prepare players for game
                 playerIds = [-1] * 10
                 for i in range(10):
                     playerIds[i] = playerId
-                    playerId = (playerId + 1) % conf.NumPlayers
+                    playerId = (playerId + 1) % conf.numPlayers
 
                 players = []
                 for id in playerIds:
                     player = participants.find(id)
                     if not player:
-                        raise RuntimeError(f"Player: {id} not found!")
+                        raise RuntimeError(f'Player: {id} not found!')
                     players.append(player)
 
                 # create next game
@@ -38,7 +38,7 @@ class ScheduleFactory:
                 gameId = gameId + 1
                 gamesInRound.append(game)
 
-            # create next round            
+            # create next round
             round = Round(roundNum, gamesInRound)
             rounds.append(round)
 

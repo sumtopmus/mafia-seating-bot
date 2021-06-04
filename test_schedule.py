@@ -15,7 +15,7 @@ class TestSchedule(unittest.TestCase):
     def test_schedule_CreateSimple(self):
         conf = Configuration(numPlayers = 10, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
         participants = Participants.create(10)
-        game = Game(1, participants.all)
+        game = Game(1, participants.people)
         rounds = [Round(1, [game])]
 
         s = Schedule(conf, participants, rounds)
