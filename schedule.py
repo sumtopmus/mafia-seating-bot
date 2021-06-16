@@ -31,6 +31,22 @@ class Schedule:
     def games(self):
         return self._games
 
+    @property
+    def numPlayers(self):
+        return self._configuration.numPlayers
+
+    @property
+    def numTables(self):
+        return self._configuration.numTables
+
+    @property
+    def numRounds(self):
+        return self._configuration.numRounds
+
+    @property
+    def numAttempts(self):
+        return self._configuration.numAttempts
+
     def __init__(self, conf: Configuration = None, participants: Participants = None, rounds: list = [], games: list = []):
         self._configuration = conf
         self._participants = participants
@@ -62,6 +78,19 @@ class Schedule:
         except ScheduleException:
             return False
         return True
+
+    def generateSlotsFromGames(self):
+        self.slots = {}
+        for game in self.games:
+            self.slots[game.id] = GameSet.create(game)
+
+    def updateGamesfromSlots(self):
+        for id in range(len(self.slots)):
+            slot = self.slots[id]
+            game = self.games[id]
+            for i, playerId in enumerate(slot.players):
+                game.players[i] = self.participants.find(playerId)
+        self.slots = {}
 
     def validate(self) -> bool:
         if len(self._participants) != self._configuration.numPlayers:

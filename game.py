@@ -3,6 +3,14 @@ import dataclasses
 from player import *
 
 
+# forward declaration
+class Game:
+    pass
+
+# forward declaration
+class GameSet:
+    pass
+
 @dataclasses.dataclass()
 class Game:
     '''
@@ -12,6 +20,12 @@ class Game:
     id: int
     players: list[Player] = dataclasses.field(
         default_factory=list, hash=False, compare=False)
+
+    @staticmethod
+    def create(gs : GameSet) -> Game:
+        '''Creates a Game from GameSet'''
+        player_list = [player for player in gs.players]
+        return Game(gs.id, player_list)   
 
     def isValid(self) -> bool:
         # game must have exactly 10 players
@@ -31,6 +45,19 @@ class Game:
         players = [Player(**item) for item in d['players']]
         return Game(d['id'], players)
 
+class GameSet:
+    '''Game for opponents optimization, just set of players, without seat numbers'''
+    id: int
+    players : set = {}
+
+    def __init__(self, id:int, players:set):
+        self.id = id
+        self.players = players
+
+    @staticmethod
+    def create(game : Game) -> GameSet:
+        '''Creates a GameSet from Game'''
+        return GameSet(game.id, {player.id for player in game.players})
 
 @dataclasses.dataclass(frozen=True, order=False)
 class Round:
