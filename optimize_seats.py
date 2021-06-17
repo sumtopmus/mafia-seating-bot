@@ -4,14 +4,15 @@ from schedule import *
 from metrics import *
 from print import *
 
-class OptimizeSeats:
-    schedule : Schedule
 
-    def __init__(self, schedule : Schedule):
+class OptimizeSeats:
+    schedule: Schedule
+
+    def __init__(self, schedule: Schedule):
         self.schedule = schedule
         pass
 
-    def optimize(self, maxIterations : int):
+    def optimize(self, maxIterations: int):
         self.currentScore = self.scoreFunc()
 
         # debug
@@ -27,21 +28,24 @@ class OptimizeSeats:
 
         # debug
         print(f"Final score: {self.currentScore}")
-        print(f"Optimization finished: {goodIterations} / {totalIterations}")
-    
-    def randomSeatChange(self):
+        print(
+            f"Good iterations: {goodIterations} / total iterations: {totalIterations}")
+
+    def randomSeatChange(self) -> bool:
         game = random.choice(self.schedule.games)
         return self.randomSeatChangeInGame(game)
 
-    def randomSeatChangeInGame(self, game : Game):
+    def randomSeatChangeInGame(self, game: Game) -> bool:
         oldPlayers = game.players.copy()
 
+        # TODO: we can also think of just changing 2 players
+        # not full shuffle
         random.shuffle(game.players)
-        
+
         # TODO: optimization, we can only calculate and compare score func in a SINGLE game!
         # as we change only one game!
         score = self.scoreFunc()
-        
+
         if score < self.currentScore:
             # debug
             print(f"New score: {score:8.4f}. Shuffle game: {game.id}")
@@ -52,15 +56,14 @@ class OptimizeSeats:
             game.players = oldPlayers
             return False
 
-    def scoreFunc(self) -> float :
+    def scoreFunc(self) -> float:
         m = Metrics(self.schedule)
-        
+
         target = self.schedule.numAttempts / 10
-        
+
         penalty = 0.0
         for playerId in range(self.schedule.numPlayers):
             seats = m.calcPlayerSeatsHistogram(playerId)
             sd = m.calcSquareDeviation(seats, target)
             penalty += sd
-        
         return penalty
