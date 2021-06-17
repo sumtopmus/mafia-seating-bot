@@ -72,13 +72,6 @@ class Schedule:
         rounds = [Round.fromJson(d) for d in d['rounds']]
         return Schedule(conf, participants, rounds)
 
-    def isValid(self) -> bool:
-        try:
-            self.validate()
-        except ScheduleException:
-            return False
-        return True
-
     def generateSlotsFromGames(self):
         self.slots = {}
         for game in self.games:
@@ -91,6 +84,14 @@ class Schedule:
             for i, playerId in enumerate(slot.players):
                 game.players[i] = self.participants.find(playerId)
         self.slots = {}
+
+
+    def isValid(self) -> bool:
+        try:
+            self.validate()
+        except ScheduleException:
+            return False
+        return True
 
     def validate(self) -> bool:
         if len(self._participants) != self._configuration.numPlayers:
