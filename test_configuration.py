@@ -58,6 +58,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(c.isValid())
 
     def test_configuration_validate_fail_players(self):
+        '''players must be >=10'''
         with self.assertRaises(ConfigurationException):
             c = Configuration(numPlayers=-1, numTables=1, numRounds=10, numGames=10, numAttempts=10)
             c.validate()       
@@ -88,6 +89,7 @@ class TestConfiguration(unittest.TestCase):
             c.validate()
 
     def test_configuration_validate_gamesRoundsMatch(self):
+        '''games must be in range [tables * rounds-1; rables * rounds]'''
         with self.assertRaises(ConfigurationException):
             # rounds must be 12 here
             c = Configuration(numPlayers=35, numTables=3, numRounds=10, numGames=35, numAttempts=10)
@@ -98,7 +100,8 @@ class TestConfiguration(unittest.TestCase):
             c = Configuration(numPlayers=35, numTables=3, numRounds=13, numGames=35, numAttempts=10)
             c.validate()
 
-    def test_configuration_validate_gamesRoundsMatch(self):
+    def test_configuration_validate_attemptsGamesMatch(self):
+        '''players x attempts must be == games * 10'''
         with self.assertRaises(ConfigurationException):
             # attempts must be 10 here
             c = Configuration(numPlayers=35, numTables=3, numRounds=12, numGames=35, numAttempts=8)
