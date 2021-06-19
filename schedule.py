@@ -70,7 +70,7 @@ class Schedule:
 
     @staticmethod
     def fromJson(d: dict):
-        conf = Configuration.fromJson(d['configuration'])
+        conf = Configuration(**d['configuration'])
         participants = Participants.fromJson(d['participants'])
         rounds = [Round.fromJson(d) for d in d['rounds']]
         return Schedule(conf, participants, rounds)
@@ -80,7 +80,7 @@ class Schedule:
         for game in self.games:
             self.slots[game.id] = GameSet.create(game)
 
-    def updateGamesfromSlots(self):
+    def updateGamesFromSlots(self):
         for id in range(len(self.slots)):
             slot = self.slots[id]
             game = self.games[id]

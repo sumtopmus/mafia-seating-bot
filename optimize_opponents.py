@@ -1,3 +1,4 @@
+from schedule_factory import ScheduleFactory
 from schedule import *
 from metrics import *
 from print import *
@@ -9,70 +10,61 @@ import random
 class OptimizeOpponents:
     verbose: bool
 
+    # current score and schedule
     schedule: Schedule
-
-    # slots before optimization
-    originalSlots: dict()
-
-    # score in current stage
     score: float
 
-    # best score and slots across all stages
+    # best score and schedule
+    bestSchedule: Schedule
     bestScore: float
-    bestSlots: dict()
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
             print(*kargs, **kwargs)
 
-    def __init__(self, schedule: Schedule, verbose: bool = True):
-        self.schedule = schedule
+    def __init__(self, verbose: bool = True):
         self.verbose = verbose
 
-    def optimize(self, stages: int, iterations: int):
-        self.schedule.generateSlotsFromGames()
-        self.originalSlots = copy.deepcopy(self.schedule.slots)
+    def optimize(self, conf: Configuration, participants: Participants, stages: int, iterations: int):
+        print("\*** Optimize opponents")
 
-        self.bestScore = self.scoreFunc()
-        self.bestSlots = None
-
+        self.bestSchedule = None
+        self.bestScore = 0
         for stage in range(stages):
             print(f"\n*** Stage: {stage+1}")
-            self.schedule.slots = copy.deepcopy(self.originalSlots)
+            self.schedule = ScheduleFactory.createInitialSchedule(
+                conf, participants)
+            self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
 
-            # optimizes self.schedule.slots()
-            # updates self.score
             self.optimizeStage(iterations)
-            
+            self.schedule.updateGamesFromSlots()
+
             # output current schedule
             Print.printPairsHistogram(self.schedule)
 
-            if self.score < self.bestScore:
-                self.bestSlots = copy.deepcopy(self.schedule.slots)
+            if not self.bestSchedule or self.score < self.bestScore:
+                print("Found best schedule!")
+                self.bestSchedule = self.schedule
+                self.bestScore = self.score
 
-        # final
-        self.schedule.slots = copy.deepcopy(self.bestSlots)
-        self.score = self.bestScore
+        return self.bestSchedule
 
-    def optimizeStage(self, maxIterations: int):
-        print(f"Initial score: {self.score:8.4f}")
-
+    def optimizeStage(self, numIterations: int):
         goodIterations = 0
-        totalIterations = 0
-        for i in range(0, maxIterations):
+        for i in range(0, numIterations):
             # debug
-            if i != 0 and i % 1000 == 0:
-                self.log(f"Iteration: {i:8d}...")
+            if i % 1000 == 0:
+                print(
+                    f"Iteration: {i:8d} of {numIterations} (changes: {goodIterations:4d}, score: {self.score:8.4f})")
 
             success = self.randomOpponentChange()
             if success:
                 goodIterations += 1
-            totalIterations += 1      
 
         # debug
         print(f"Final score: {self.score:8.4f}")
-        print(f"Good iterations: {goodIterations} of {totalIterations}")
+        print(f"Good iterations: {goodIterations} of {numIterations}")
 
     def randomOpponentChange(self) -> bool:
         if self.schedule.configuration.numTables == 1:

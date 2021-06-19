@@ -26,6 +26,7 @@ class Metrics:
         return opponents
 
     def calcOpponentsMatrix(self):
+        '''Calculates opponents histogram for all players'''
         matrix = []
         for playerId in range(self.schedule.numPlayers):
             line = self.calcPlayerOpponentsHistogram(playerId)
@@ -47,6 +48,14 @@ class Metrics:
                     seats[seat_idx] += 1
         return seats
 
+    def calcSeatsMatrix(self):
+        '''Calculates seats histogram for all players'''
+        matrix = []
+        for playerId in range(self.schedule.numPlayers):
+            line = self.calcPlayerSeatsHistogram(playerId)
+            matrix.append(line)
+        return matrix
+
     def calcSquareDeviationExclude(self, data: list, target: float, exclude_idx: int):
         '''
         Calculates standard deviation between values in <data> and <target>, 
@@ -65,4 +74,3 @@ class Metrics:
         for i in range(len(data)):
             sd += (data[i] - target) * (data[i] - target)
         return sd / len(data)
-

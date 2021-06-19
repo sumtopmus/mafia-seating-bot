@@ -24,10 +24,10 @@ class Print:
             s = ''.join([f"{v:3d}" for v in line])
             print(f"{playerId:2d}: {s}")
 
-    def printPairsHistogram(schedule : Schedule):
-        m = Metrics(schedule)               
+    def printPairsHistogram(schedule: Schedule):
+        m = Metrics(schedule)
         matrix = m.calcOpponentsMatrix()
-        
+
         pairs = {}
         for val in range(schedule.numAttempts + 1):
             pairs[val] = 0
@@ -38,23 +38,14 @@ class Print:
                 numGames = line[opponentId]
                 pairs[numGames] += 1
 
-        print("\n*** Pairs histogram:")
+        print("\nPairs histogram:")
         for numGames, count in pairs.items():
             if count > 0:
                 print(f"{numGames:2d} : {count:3d} pairs")
-    
-    @staticmethod
-    def printGames(schedule: Schedule):
-        print("\n***Games:")
-        for game in schedule.games:
-            ids = [player.id for player in game.players]
-            s = [f"{item:3d}" for item in ids]
-            str = ''.join(s)
-            print(f"Game {game.id:2d}: {str}")
 
     @staticmethod
-    def printScheduleByGames(schedule : Schedule):
-        print("\n*** Schedule by games:")
+    def printScheduleByGames(schedule: Schedule):
+        print("\nSchedule by games:")
         for round in schedule.rounds:
             print(f"\nRound: {round.id + 1}")
             for game in round.games:
@@ -63,13 +54,13 @@ class Print:
                 str = ''.join(s)
                 print(f"Game {game.id:2d}: {str}")
 
-
-
     @staticmethod
-    def printSeats(schedule: Schedule):
+    def printSeatsMatrix(schedule: Schedule):
         m = Metrics(schedule)
+
+        matrix = m.calcSeatsMatrix()
         print("\n*** Seats matrix:")
-        for playerId in range(schedule.configuration.numPlayers):
-            seats = m.calcPlayerSeatsHistogram(playerId)
-            s = ''.join([f"{v:3d}" for v in seats])
+        for playerId in range(len(matrix)):
+            line = matrix[playerId]
+            s = ''.join([f"{v:3d}" for v in line])
             print(f"{playerId:2d}: {s}")
