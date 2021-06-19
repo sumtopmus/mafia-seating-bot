@@ -42,11 +42,13 @@ def serializeScheduleDemo():
     d = schedule.toJson()
     print(f"Schedule:\n{json.dumps(d, indent=2)}")
 
+
 def demoInitialSchedule():
     numPlayers = 12
     participants = Participants.create(numPlayers)
 
-    conf = Configuration(numPlayers, numTables = 1, numRounds = 6, numGames = 6, numAttempts = 5)
+    conf = Configuration(numPlayers, numTables=1,
+                         numRounds=6, numGames=6, numAttempts=5)
     s = ScheduleFactory.createInitialSchedule(conf, participants)
 
     s.generateSlotsFromGames()
@@ -55,26 +57,42 @@ def demoInitialSchedule():
     Print.printOpponents(s)
     Print.printSeats(s)
 
+
 def scheduleVaWaCa2017():
     numPlayers = 25
     participants = Participants.create(numPlayers)
 
-    conf = Configuration(numPlayers, numTables = 2, numRounds = 10, numGames = 20, numAttempts = 8)
+    conf = Configuration(numPlayers, numTables=2,
+                         numRounds=10, numGames=20, numAttempts=8)
     return ScheduleFactory.createInitialSchedule(conf, participants)
+
 
 def scheduleWaCa2019():
     numPlayers = 30
     participants = Participants.create(numPlayers)
 
-    conf = Configuration(numPlayers, numTables = 3, numRounds = 10, numGames = 30, numAttempts = 10)
+    conf = Configuration(numPlayers, numTables=3,
+                         numRounds=10, numGames=30, numAttempts=10)
     return ScheduleFactory.createInitialSchedule(conf, participants)
+
 
 def scheduleMini():
     numPlayers = 13
     participants = Participants.create(numPlayers)
-    conf = Configuration(numPlayers, numTables = 1, numRounds = 13, numGames = 13, numAttempts = 10)
+    conf = Configuration(numPlayers, numTables=1,
+                         numRounds=13, numGames=13, numAttempts=10)
     return ScheduleFactory.createInitialSchedule(conf, participants)
 
+
+def scheduleGoldenGate2021():
+    numPlayers = 36
+    participants = Participants.create(numPlayers)
+    conf = Configuration(numPlayers, numTables=3,
+                         numRounds=12, numGames=36, numAttempts=10)
+    return ScheduleFactory.createInitialSchedule(conf, participants)
+
+
+'''
 def demoOptimizeOpponents(s : Schedule):
     s.generateSlotsFromGames()
 
@@ -94,7 +112,9 @@ def demoOptimizeOpponents(s : Schedule):
     print("Final games:")
     s.updateGamesfromSlots()
     Print.printGames(s)
+'''
 
+'''
 def demoOptimizeSeats(s : Schedule):
     s = scheduleWaCa2019()
 
@@ -109,6 +129,23 @@ def demoOptimizeSeats(s : Schedule):
     Print.printGames(s)
     # Print.printOpponents(s)
     Print.printSeats(s)
+'''
+
+
+def demoOptimize(s: Schedule):
+    s.generateSlotsFromGames()
+
+    print("\n*** Initial schedule")
+    Print.printScheduleByGames(s)
+    Print.printPairsHistogram(s)
+
+    solve = OptimizeOpponents(s, verbose = False)
+    solve.optimize(stages=5, iterations=10 * 1000)
+
+    print("\n*** Schedule after opponents optimization:")
+    Print.printScheduleByGames(s)
+    Print.printOpponentsMatrix(s)
+    Print.printPairsHistogram(s)
 
 # serializeDictionaryDemo()
 # serializePlayerDemo()
@@ -116,6 +153,10 @@ def demoOptimizeSeats(s : Schedule):
 
 # demoInitialSchedule()
 
-s = scheduleMini() 
+
+'''s = scheduleMini() 
 demoOptimizeOpponents(s)
-demoOptimizeSeats(s)
+demoOptimizeSeats(s)'''
+
+s = scheduleGoldenGate2021()
+demoOptimize(s)

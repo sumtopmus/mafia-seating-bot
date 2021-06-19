@@ -57,6 +57,9 @@ class Schedule:
         for round in self._rounds:
             self._games.extend(round.games)
 
+    # TODO: make shallow copy, deep copy of Schedule
+    #__copy__(), __deepcopy__()
+
     def toJson(self):
         d = {}
         d['configuration'] = dataclasses.asdict(self._configuration)
@@ -83,8 +86,8 @@ class Schedule:
             game = self.games[id]
             for i, playerId in enumerate(slot.players):
                 game.players[i] = self.participants.find(playerId)
-        self.slots = {}
-
+        # Careful. Now we have both games and slots and they may not match each other...
+        # self.slots = {}
 
     def isValid(self) -> bool:
         try:

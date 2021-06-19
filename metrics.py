@@ -25,6 +25,13 @@ class Metrics:
 
         return opponents
 
+    def calcOpponentsMatrix(self):
+        matrix = []
+        for playerId in range(self.schedule.numPlayers):
+            line = self.calcPlayerOpponentsHistogram(playerId)
+            matrix.append(line)
+        return matrix
+
     def calcPlayerSeatsHistogram(self, thisPlayerId: int):
         '''
         Calculates seats histogram for given <thisPlayerId>
@@ -59,4 +66,3 @@ class Metrics:
             sd += (data[i] - target) * (data[i] - target)
         return sd / len(data)
 
-    pass
