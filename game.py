@@ -18,13 +18,13 @@ class Game:
     '''
 
     id: int
-    players: list[Player] = dataclasses.field(
+    players: list[int] = dataclasses.field(
         default_factory=list, hash=False, compare=False)
 
     @staticmethod
     def create(gs: GameSet) -> Game:
         '''Creates a Game from GameSet'''
-        player_list = [player for player in gs.players]
+        player_list = [id for id in gs.players]
         return Game(gs.id, player_list)
 
     def isValid(self) -> bool:
@@ -33,16 +33,16 @@ class Game:
             return False
 
         # all players must be unique (by id)
-        uniquePlayers = {}
-        for player in self.players:
-            if player.id in uniquePlayers:
+        uniquePlayers = set()
+        for playerId in self.players:
+            if playerId in uniquePlayers:
                 return False
-            uniquePlayers[player.id] = player.name
+            uniquePlayers.add(playerId)
         return True
 
     @staticmethod
     def fromJson(d: dict):
-        players = [Player(**item) for item in d['players']]
+        players = [playerId for playerId in d['players']]
         return Game(d['id'], players)
 
 
@@ -58,7 +58,8 @@ class GameSet:
     @staticmethod
     def create(game: Game) -> GameSet:
         '''Creates a GameSet from Game'''
-        return GameSet(game.id, {player.id for player in game.players})
+        player_set = {id for id in game.players}
+        return GameSet(game.id, player_set)
 
 
 @dataclasses.dataclass(frozen=True, order=False)

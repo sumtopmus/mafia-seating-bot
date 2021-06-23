@@ -34,7 +34,7 @@ class ScheduleFactory:
                     players.append(player)
 
                 # create next game
-                game = Game(gameId, players)
+                game = Game(gameId, playerIds)
                 gameId = gameId + 1
                 gamesInRound.append(game)
 

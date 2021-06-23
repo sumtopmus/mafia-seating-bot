@@ -85,7 +85,7 @@ class Schedule:
             slot = self.slots[id]
             game = self.games[id]
             for i, playerId in enumerate(slot.players):
-                game.players[i] = self.participants.find(playerId)
+                game.players[i] = playerId
         # Careful. Now we have both games and slots and they may not match each other...
         # self.slots = {}
 
@@ -112,9 +112,9 @@ class Schedule:
         # calc number of games played by every player
         gamesPlayed = {}
         for game in self._games:
-            for player in game.players:
-                gamesPlayedById = 1 + gamesPlayed.get(player.id, 0)
-                gamesPlayed[player.id] = gamesPlayedById
+            for playerId in game.players:
+                num = 1 + gamesPlayed.get(playerId, 0)
+                gamesPlayed[playerId] = num
 
         # all players must play the same number of attempts
         counts = gamesPlayed.values()

@@ -19,9 +19,9 @@ class Metrics:
         for game in self.schedule.games:
             slot = self.schedule.slots[game.id]
             if thisPlayerId in slot.players:
-                for player in game.players:
-                    if thisPlayerId != player.id:
-                        opponents[player.id] += 1
+                for id in game.players:
+                    if thisPlayerId != id:
+                        opponents[id] += 1
 
         return opponents
 
@@ -44,7 +44,7 @@ class Metrics:
         # go through all games
         for game in self.schedule.games:
             for seat_idx in range(0, 10):
-                if game.players[seat_idx].id == thisPlayerId:
+                if game.players[seat_idx] == thisPlayerId:
                     seats[seat_idx] += 1
         return seats
 

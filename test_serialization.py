@@ -68,27 +68,23 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(p[2].name, 'Player_2')
 
     def test_game_toJson(self):
-        participants = Participants.create(10)
-        players = participants.people
-        game = Game(525, players)
+        ids = [5, 9, 3, 6, 1, 4, 7, 8, 2, 0]
+        game = Game(525, ids)
         d = dataclasses.asdict(game)
-        expected = {'id': 525, 'players': [dataclasses.asdict(player) for player in players]}
+        expected = {'id': 525, 'players': ids}
         self.assertEqual(d, expected)
 
     def test_game_fromJson(self):
         playerLike = Player(112, 'like')
         playerAman = Player(113, 'aman')
         d = {'id': 525,
-             'players': [
-                 {'id': playerLike.id, 'name': playerLike.name},
-                 {'id': playerAman.id, 'name': playerAman.name}
-             ]}
+             'players': [ 112, 113]}
 
         game = Game.fromJson(d)
         self.assertEqual(game.id, 525)
         self.assertEqual(len(game.players), 2)
-        self.assertEqual(game.players[0], playerLike)
-        self.assertEqual(game.players[1], playerAman)
+        self.assertEqual(game.players[0], playerLike.id)
+        self.assertEqual(game.players[1], playerAman.id)
 
     def test_round_toJson(self):
         participants = Participants.create(10)

@@ -49,8 +49,7 @@ class Print:
         for round in schedule.rounds:
             print(f"\nRound: {round.id + 1}")
             for game in round.games:
-                ids = [player.id for player in game.players]
-                s = [f"{item:3d}" for item in ids]
+                s = [f"{id:3d}" for id in game.players]
                 str = ''.join(s)
                 print(f"Game {game.id:2d}: {str}")
 
