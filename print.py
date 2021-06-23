@@ -63,3 +63,14 @@ class Print:
             line = matrix[playerId]
             s = ''.join([f"{v:3d}" for v in line])
             print(f"{playerId:2d}: {s}")
+
+    @staticmethod
+    def printMwtSchedule(schedule : Schedule):
+        for round in schedule.rounds:
+            for seat in range(10):
+                line = [f"{game.players[seat]:3d}," for game in round.games]
+                str = ''.join(line)
+                # print without last comma
+                print(str[:-1])
+            print("\n")
+
