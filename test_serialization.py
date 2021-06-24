@@ -2,11 +2,13 @@ import dataclasses
 import unittest
 import json
 
+from schedule_factory import *
 from configuration import *
 from schedule import *
-from schedule_factory import *
-from player import *
+from round import *
 from game import *
+from player import *
+
 
 class TestSerialization(unittest.TestCase):
     def test_configuration_toJson(self):

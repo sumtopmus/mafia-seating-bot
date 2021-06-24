@@ -15,6 +15,7 @@ class GameSet:
 class Game:
     '''
     Game is played by exactly 10 players.
+    We store player IDs, not players.
     '''
 
     id: int
@@ -47,7 +48,10 @@ class Game:
 
 
 class GameSet:
-    '''Game for opponents optimization, just set of players, without seat numbers'''
+    '''
+    Game for opponents optimization, just set of players, without seat numbers
+    '''
+    
     id: int
     players: set[int] = {}
 
@@ -62,17 +66,3 @@ class GameSet:
         return GameSet(game.id, player_set)
 
 
-@dataclasses.dataclass(frozen=True, order=False)
-class Round:
-    '''
-    Round is set of games played at the same time.
-    Therefore, any player can be only in one of its games.
-    '''
-    id: int
-    gameIds: list[int] = dataclasses.field(
-        hash=False, compare=False, default_factory=list)
-
-    @staticmethod
-    def fromJson(d: dict):
-        gameIds = [id for id in d['gameIds']]
-        return Round(d['id'], gameIds)

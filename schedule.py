@@ -1,8 +1,9 @@
 import dataclasses
 
 from configuration import *
-from player import *
+from round import *
 from game import *
+from player import *
 
 
 class ScheduleException(Exception):
@@ -110,13 +111,16 @@ class Schedule:
         # check game count in rounds
         for i, round in enumerate(self._rounds):
             fullRoundGames = self.numTables
-            lastRoundGames = self.numGames - (self.numRounds - 1) * self.numTables
+            lastRoundGames = self.numGames - \
+                (self.numRounds - 1) * self.numTables
             if i < len(self.rounds) - 1:
                 if len(round.gameIds) != fullRoundGames:
-                    raise ScheduleException(f"Wrong game count in round: {i}. Expected: {fullRoundGames}, got: {len(round.gameIds)}")
+                    raise ScheduleException(
+                        f"Wrong game count in round: {i}. Expected: {fullRoundGames}, got: {len(round.gameIds)}")
             else:
                 if len(round.gameIds) != lastRoundGames:
-                    raise ScheduleException(f"Wrong game count in last round: {id}. Expected: {lastRoundGames}, got: {len(round.gameIds)}")
+                    raise ScheduleException(
+                        f"Wrong game count in last round: {id}. Expected: {lastRoundGames}, got: {len(round.gameIds)}")
 
         # check that rounds have all games in games
         # check every game is in one and only one round
@@ -125,13 +129,16 @@ class Schedule:
         for round in self._rounds:
             for gameId in round.gameIds:
                 if gameId not in allIds:
-                    raise ScheduleException(f"Wrong game id: {gameId} in round: {round.id}")
+                    raise ScheduleException(
+                        f"Wrong game id: {gameId} in round: {round.id}")
                 if gameId not in leftIds:
-                    raise ScheduleException(f"Duplicate game id: {gameId} in round: {round.id}")
+                    raise ScheduleException(
+                        f"Duplicate game id: {gameId} in round: {round.id}")
                 else:
                     leftIds.remove(gameId)
         if len(leftIds) != 0:
-            raise ScheduleException(f"Some games are not in any round: {leftIds}")
+            raise ScheduleException(
+                f"Some games are not in any round: {leftIds}")
 
         # calc number of games played by every player
         gamesPlayed = {}

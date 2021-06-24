@@ -1,10 +1,9 @@
 
 from configuration import Configuration
 from schedule import *
-
-from player import *
+from round import *
 from game import *
-
+from player import *
 
 class ScheduleFactory:
     def createInitialSchedule(conf: Configuration, participants: Participants):
