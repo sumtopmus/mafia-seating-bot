@@ -96,15 +96,15 @@ def demoOpponents():
     Print.printOpponentsMatrix(s)
     Print.printPairsHistogram(s)
 
+    print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
+
     saveSchedule(s, "schedule_opponents.txt")
 
 
 def demoSeats():
     s = loadSchedule("schedule_opponents.txt")
     s.generateSlotsFromGames()
-
-    Print.printMwtSchedule(s)
 
     print("\n*** Initial schedule")
     Print.printScheduleByGames(s)
@@ -120,7 +120,9 @@ def demoSeats():
     Print.printPairsHistogram(s)
     Print.printSeatsMatrix(s)
 
+    print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
+    
     saveSchedule(s, "schedule_seats.txt")
 
 

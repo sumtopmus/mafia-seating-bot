@@ -72,5 +72,5 @@ class Print:
                 str = ''.join(line)
                 # print without last comma
                 print(str[:-1])
-            print("\n")
+            print()
 

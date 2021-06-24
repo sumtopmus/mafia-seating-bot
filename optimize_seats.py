@@ -85,9 +85,45 @@ class OptimizeSeats:
 
         target = self.schedule.numAttempts / 10
 
+        # additional heuristics
+        calcHalfSimmetry = True
+        calcTrippleSimmetry = True
+        calcFirstLastSimmetry = True
+        factorHalf = 2.0
+        factorTripple = 3.0
+        factorFirstLast = 20.0
+
         penalty = 0.0
         for playerId in range(self.schedule.numPlayers):
             seats = m.calcPlayerSeatsHistogram(playerId)
             sd = m.calcSquareDeviation(seats, target)
             penalty += sd
+            
+            # half simmetry
+            if calcHalfSimmetry:
+                allSeats = sum(seats)
+                k_lo = sum(seats[0:5]) / allSeats
+                k_hi = sum(seats[5:10]) / allSeats
+                penalty_lo = (k_lo - 0.5) ** 2
+                penalty_hi = (k_hi - 0.5) ** 2
+                penalty += factorHalf * (penalty_lo + penalty_hi)
+            # tripple simmetry
+            if calcTrippleSimmetry:
+                allSeats = sum(seats)
+                k_a = sum(seats[0:3]) / allSeats
+                k_b = sum(seats[3:7]) / allSeats
+                k_c = sum(seats[7:10]) / allSeats
+                penalty_a = (k_a - 0.3) ** 2
+                penalty_b = (k_b - 0.4) ** 2
+                penalty_c = (k_c - 0.3) ** 2
+                penalty += factorTripple * (penalty_a + penalty_b + penalty_c)
+            # first and last simmetry
+            if calcFirstLastSimmetry:
+                allSeats = sum(seats)
+                k_first = seats[0] / allSeats
+                k_last = seats[-1] / allSeats
+                penalty_first = (k_first - 0.1) ** 2
+                penalty_last = (k_last - 0.1) ** 2
+                penalty += factorFirstLast * (penalty_first + penalty_last)
+
         return penalty
