@@ -83,8 +83,10 @@ Configurations = {
                       numGames=36, numAttempts=10),
 }
 
+filename_opponents = "schedule_opponents.txt"
+filename_seats = "schedule_seats.txt"
 
-def demoOpponents():
+def demoOptimizeOpponents():
     conf = Configurations["GG-2021"]
     participants = Participants.create(conf.numPlayers)
 
@@ -99,32 +101,41 @@ def demoOpponents():
     print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
 
-    saveSchedule(s, "schedule_opponents.txt")
+    saveSchedule(s, filename_opponents)
 
 
-def demoSeats():
-    s = loadSchedule("schedule_opponents.txt")
+
+def demoOptimizeSeats():
+    s = loadSchedule(filename_opponents)
     s.generateSlotsFromGames()
 
-    print("\n*** Initial schedule")
+    print("\n*** Loaded schedule")
     Print.printScheduleByGames(s)
-    Print.printPairsHistogram(s)
 
     seats = OptimizeSeats(s, verbose=False)
     seats.optimize(iterations=[20 * 1000, 50 * 1000])
 
     print("\n*** Schedule after seats optimization:")
     Print.printScheduleByGames(s)
-
-    # sanity check
-    Print.printPairsHistogram(s)
     Print.printSeatsMatrix(s)
 
     print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
     
-    saveSchedule(s, "schedule_seats.txt")
+    saveSchedule(s, filename_seats)
+
+def demoLoadSeats():
+    s = loadSchedule(filename_seats)
+
+    print("\n*** Loaded schedule")
+    Print.printScheduleByGames(s)
+    Print.printPairsHistogram(s)
+    Print.printSeatsMatrix(s)
+
+    print("\n*** MWT-compatible schedule")
+    Print.printMwtSchedule(s)
 
 
-# demoOpponents()
-demoSeats()
+demoOptimizeOpponents()
+demoOptimizeSeats()
+demoLoadSeats()
