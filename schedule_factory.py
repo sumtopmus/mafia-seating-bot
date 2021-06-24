@@ -7,12 +7,14 @@ from player import *
 
 class ScheduleFactory:
     def createInitialSchedule(conf: Configuration, participants: Participants):
-        playerId = 0
+        if not conf.isValid():
+            return None
 
         # create rounds and games
         rounds = []
         games = []
         gameId = 0
+        playerId = 0
         for roundNum in range(conf.numRounds):
             gamesInRound = []
 
@@ -25,13 +27,6 @@ class ScheduleFactory:
                 for i in range(10):
                     playerIds[i] = playerId
                     playerId = (playerId + 1) % conf.numPlayers
-
-                players = []
-                for id in playerIds:
-                    player = participants.find(id)
-                    if not player:
-                        raise RuntimeError(f'Player: {id} not found!')
-                    players.append(player)
 
                 # create next game
                 game = Game(gameId, playerIds)
