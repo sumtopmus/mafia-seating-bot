@@ -69,10 +69,10 @@ class Round:
     Therefore, any player can be only in one of its games.
     '''
     id: int
-    games: list[Game] = dataclasses.field(
+    gameIds: list[int] = dataclasses.field(
         hash=False, compare=False, default_factory=list)
 
     @staticmethod
     def fromJson(d: dict):
-        games = [Game.fromJson(item) for item in d['games']]
-        return Round(d['id'], games)
+        gameIds = [id for id in d['gameIds']]
+        return Round(d['id'], gameIds)

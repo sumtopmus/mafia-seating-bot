@@ -90,26 +90,26 @@ class TestSerialization(unittest.TestCase):
         participants = Participants.create(10)
         players = participants.people
         game1 = Game(525, players)
-        games = [game1]
+        games = [525]
         round = Round(727, games)
         d = dataclasses.asdict(round)
         self.assertEqual(
-            d, {'id': 727, 'games': [dataclasses.asdict(game) for game in games]})
+            d, {'id': 727, 'gameIds': [525]})
 
     def test_round_fromJson(self):
         participants = Participants.create(10)
         players = participants.people
         game1 = Game(525, players)
         game2 = Game(727, players)
-        games = [game1, game2]
+        gameIds = [game1.id, game2.id]
 
-        d = {'id': 100, 'games': [dataclasses.asdict(game) for game in games]}
+        d = {'id': 100, 'gameIds': [525, 727]}
         round = Round.fromJson(d)
 
         self.assertEqual(round.id, 100)
-        self.assertEqual(len(round.games), 2)
-        self.assertEqual(round.games[0].id, 525)
-        self.assertEqual(round.games[1].id, 727)
+        self.assertEqual(len(round.gameIds), 2)
+        self.assertEqual(round.gameIds[0], 525)
+        self.assertEqual(round.gameIds[1], 727)
 
     def test_schedule_toJson(self):
         numPlayers = 10
@@ -121,7 +121,8 @@ class TestSerialization(unittest.TestCase):
         d = schedule.toJson()
         self.assertEqual(d, {'configuration': dataclasses.asdict(conf),
                              'participants': dataclasses.asdict(participants),
-                             'rounds': [dataclasses.asdict(round) for round in schedule.rounds]})
+                             'rounds': [dataclasses.asdict(round) for round in schedule.rounds],
+                             'games': [dataclasses.asdict(game) for game in schedule.games]})
 
     pass
 

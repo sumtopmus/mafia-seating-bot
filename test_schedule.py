@@ -16,9 +16,10 @@ class TestSchedule(unittest.TestCase):
         conf = Configuration(numPlayers = 10, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
         participants = Participants.create(10)
         game = Game(1, participants.people)
-        rounds = [Round(1, [game])]
+        games = [game]
+        rounds = [Round(1, [game.id])]
 
-        s = Schedule(conf, participants, rounds)
+        s = Schedule(conf, participants, rounds, games)
         self.assertEqual(s.configuration, conf)
         self.assertEqual(len(s.participants), 10)
         self.assertEqual(len(s.rounds), 1)

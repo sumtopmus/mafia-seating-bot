@@ -12,6 +12,7 @@ class ScheduleFactory:
 
         # create rounds and games
         rounds = []
+        games = []
         gameId = 0
         for roundNum in range(conf.numRounds):
             gamesInRound = []
@@ -35,12 +36,13 @@ class ScheduleFactory:
 
                 # create next game
                 game = Game(gameId, playerIds)
-                gameId = gameId + 1
-                gamesInRound.append(game)
+                games.append(game)
+                gamesInRound.append(gameId)
+                gameId = gameId + 1                
 
             # create next round
             round = Round(roundNum, gamesInRound)
             rounds.append(round)
 
-        schedule = Schedule(conf, participants, rounds)
+        schedule = Schedule(conf, participants, rounds, games)
         return schedule

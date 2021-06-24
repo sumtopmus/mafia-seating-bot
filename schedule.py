@@ -44,6 +44,10 @@ class Schedule:
         return self._configuration.numRounds
 
     @property
+    def numGames(self):
+        return self._configuration.numGames
+
+    @property
     def numAttempts(self):
         return self._configuration.numAttempts
 
@@ -51,11 +55,7 @@ class Schedule:
         self._configuration = conf
         self._participants = participants
         self._rounds = rounds
-
-        # reconstruct plain games list from rounds
-        self._games = []
-        for round in self._rounds:
-            self._games.extend(round.games)
+        self._games = games
 
     # TODO: make shallow copy, deep copy of Schedule
     #__copy__(), __deepcopy__()
@@ -65,15 +65,16 @@ class Schedule:
         d['configuration'] = dataclasses.asdict(self._configuration)
         d['participants'] = dataclasses.asdict(self._participants)
         d['rounds'] = [dataclasses.asdict(round) for round in self._rounds]
-        # we actually don't need to serialize games, they are in rounds...
+        d['games'] = [dataclasses.asdict(game) for game in self._games]
         return d
 
     @staticmethod
     def fromJson(d: dict):
         conf = Configuration(**d['configuration'])
         participants = Participants.fromJson(d['participants'])
-        rounds = [Round.fromJson(d) for d in d['rounds']]
-        return Schedule(conf, participants, rounds)
+        rounds = [Round.fromJson(item) for item in d['rounds']]
+        games = [Game.fromJson(item) for item in d['games']]
+        return Schedule(conf, participants, rounds, games)
 
     def generateSlotsFromGames(self):
         self.slots = {}
@@ -97,17 +98,43 @@ class Schedule:
         return True
 
     def validate(self) -> bool:
-        if len(self._participants) != self._configuration.numPlayers:
+        if len(self._participants) != self.numPlayers:
             raise ScheduleException(
-                f"Participant count: {self._players} must match configuration: {self._configuration.numPlayers}")
+                f"Participant count: {self._players} must match configuration: {self.numPlayers}")
 
-        if len(self._rounds) != self._configuration.numRounds:
+        if len(self._rounds) != self.numRounds:
             raise ScheduleException(
-                f"Round count: {self._rounds} must match configuration: {self._configuration.numRounds}")
+                f"Round count: {self._rounds} must match configuration: {self.numRounds}")
 
-        if len(self._games) != self._configuration.numGames:
+        if len(self._games) != self.numGames:
             raise ScheduleException(
-                f"Game count: {self._games} must match configuration: {self._configuration.numGames}")
+                f"Game count: {self._games} must match configuration: {self.numGames}")
+
+        # check game count in rounds
+        for i, round in enumerate(self._rounds):
+            fullRoundGames = self.numTables
+            lastRoundGames = self.numGames - (self.numRounds - 1) * self.numTables
+            if i < len(self.rounds) - 1:
+                if len(round.gameIds) != fullRoundGames:
+                    raise ScheduleException(f"Wrong game count in round: {i}. Expected: {fullRoundGames}, got: {len(round.gameIds)}")
+            else:
+                if len(round.gameIds) != lastRoundGames:
+                    raise ScheduleException(f"Wrong game count in last round: {id}. Expected: {lastRoundGames}, got: {len(round.gameIds)}")
+
+        # check that rounds have all games in games
+        # check every game is in one and only one round
+        allIds = {game.id for game in self._games}
+        leftIds = allIds.copy()
+        for round in self._rounds:
+            for gameId in round.gameIds:
+                if gameId not in allIds:
+                    raise ScheduleException(f"Wrong game id: {gameId} in round: {round.id}")
+                if gameId not in leftIds:
+                    raise ScheduleException(f"Duplicate game id: {gameId} in round: {round.id}")
+                else:
+                    leftIds.remove(gameId)
+        if len(leftIds) != 0:
+            raise ScheduleException(f"Some games are not in any round: {leftIds}")
 
         # calc number of games played by every player
         gamesPlayed = {}
