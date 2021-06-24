@@ -9,6 +9,7 @@ class OptimizeSeats:
     verbose: bool
     schedule: Schedule
 
+
     shuffleGameFunc = None
 
     def log(self, *kargs, **kwargs):
@@ -18,21 +19,37 @@ class OptimizeSeats:
     def __init__(self, schedule: Schedule, verbose: bool = True):
         self.schedule = schedule
         self.verbose = verbose
-        pass
 
-    def optimize(self, iterations: list()):
+    def optimize(self, numRuns: int, iterations: list()):
         print("\n*** Optimize seats")
 
-        func = [
-            self.swapAllPlayers,
-            self.swapTwoPlayers,
-        ]
+        gamePlayers = self.schedule.saveGamePlayers()
+        self.currentScore = None
+        self.bestScore = None
+        self.bestGamePlayers = None
 
-        for i in range(len(iterations)):
-            numIterations = iterations[i]
-            print(f"\n*** Stage: {i+1} (iterations: {numIterations})")
-            self.shuffleGameFunc = func[i % len(func)]
-            self.optimizeStage(numIterations)
+        for i in range(numRuns):
+            print(f"\n*** Seating optimization run: {i+1}")
+            self.schedule.updateGamePlayers(gamePlayers)
+
+            func = [
+                self.swapAllPlayers,
+                self.swapTwoPlayers]
+
+            for stage in range(len(iterations)):
+                numIterations = iterations[stage]
+                print(f"\nStage: {stage+1} (iterations: {numIterations})")
+                self.shuffleGameFunc = func[i % len(func)]
+                self.optimizeStage(numIterations)
+                if self.bestScore != None and self.bestScore < self.currentScore:
+                    print("We have better best score, so... don't continue")
+
+            if self.bestGamePlayers == None or self.currentScore < self.bestScore:
+                print(f"Found best seating, score : {self.currentScore:8.4f}")
+                self.bestScore = self.currentScore
+                self.bestGamePlayers = self.schedule.saveGamePlayers()
+        
+        self.schedule.updateGamePlayers(self.bestGamePlayers)
 
     def optimizeStage(self, iterations: int):
         self.currentScore = self.scoreFunc()

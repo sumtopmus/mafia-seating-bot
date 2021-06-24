@@ -25,25 +25,22 @@ class OptimizeOpponents:
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
 
-    def optimize(self, conf: Configuration, participants: Participants, stages: int, iterations: int):
+    def optimize(self, conf: Configuration, participants: Participants, numRuns: int, numIterations: int):
         print("\n*** Optimize opponents")
 
         self.bestSchedule = None
         self.bestScore = 0
-        for stage in range(stages):
-            print(f"\n*** Stage: {stage+1}")
+        for i in range(numRuns):
+            print(f"\n*** Opponents optimization run: {i+1}")
             self.schedule = ScheduleFactory.createInitialSchedule(
                 conf, participants)
             self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
-            self.optimizeStage(iterations)
-
-            # print right after optimize - just for test
-            Print.printPairsMatrix(self.schedule)
+            self.optimizeStage(numIterations)
 
             self.schedule.updateGamesFromSlots()
 
-            # print right after - just for test - should be identical
+            # debug output
             Print.printPairsMatrix(self.schedule)
 
             if not self.bestSchedule or self.score < self.bestScore:

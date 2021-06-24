@@ -88,6 +88,27 @@ class Schedule:
         # Careful. Now we have both games and slots and they may not match each other...
         # self.slots = {}
 
+    def saveGamePlayers(self) -> dict[int, list[int]]:
+        '''
+        Saves players of all games to dictionary.
+        This function is used by multi-run seats optimization.
+        '''
+        gamePlayers = {}
+        for game in self.games:
+            gamePlayers[game.id] = list(game.players)
+        return gamePlayers
+    
+    def updateGamePlayers(self, gamePlayers : dict[int, list[int]]):
+        '''
+        Loads game players from external dictionary.
+        This function is used by multi-run seats optimization.
+        '''
+        for game in self.games:
+            if game.id not in gamePlayers.keys():
+                raise RuntimeError(f"UpdatePlayers. Game: {game.id} is not specified in gamePlayers!")
+            players = gamePlayers[game.id]
+            game.players = list(players)
+
     def isValid(self) -> bool:
         try:
             self.validate()

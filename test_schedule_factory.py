@@ -24,8 +24,9 @@ class TestScheduleFactory(unittest.TestCase):
         participants = Participants.create(numPlayers)
 
         conf = Configuration(numPlayers, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
+        self.assertFalse(conf.isValid())
         s = ScheduleFactory.createInitialSchedule(conf, participants)
-        self.assertFalse(s.isValid())
+        self.assertTrue(s == None)
 
     def test_factory_rounds2_players10_attempts2(self):
         '''Simple 2-round schedule: 10 players 2 attempts per player'''
