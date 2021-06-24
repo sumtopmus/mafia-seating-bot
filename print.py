@@ -48,7 +48,8 @@ class Print:
         print("\nSchedule by games:")
         for round in schedule.rounds:
             print(f"\nRound: {round.id + 1}")
-            for game in round.games:
+            for gameId in round.gameIds:
+                game = schedule.games[gameId]
                 s = [f"{id:3d}" for id in game.players]
                 str = ''.join(s)
                 print(f"Game {game.id:2d}: {str}")
@@ -68,7 +69,7 @@ class Print:
     def printMwtSchedule(schedule : Schedule):
         for round in schedule.rounds:
             for seat in range(10):
-                line = [f"{game.players[seat]:3d}," for game in round.games]
+                line = [f"{schedule.games[gameId].players[seat]:3d}," for gameId in round.gameIds]
                 str = ''.join(line)
                 # print without last comma
                 print(str[:-1])

@@ -75,17 +75,17 @@ class OptimizeOpponents:
             return self.randomOpponentChangeInRounds(roundOne.id, roundTwo.id)
 
         r = random.choice(self.schedule.rounds)
-        gameOne = random.choice(r.games)
-        gameTwo = gameOne
-        while gameTwo == gameOne:
-            gameTwo = random.choice(r.games)
-        return self.randomOpponentChangeInGames(gameOne.id, gameTwo.id)
+        gameOneId = random.choice(r.gameIds)
+        gameTwoId = gameOneId
+        while gameTwoId == gameOneId:
+            gameTwoId = random.choice(r.gameIds)
+        return self.randomOpponentChangeInGames(gameOneId, gameTwoId)
 
-    def randomOpponentChangeInRounds(self, roundOne: int, roundTwo: int) -> bool:
+    def randomOpponentChangeInRounds(self, roundOneId: int, roundTwoId: int) -> bool:
         # in this special case every round has one and only one game
         # that's why game index is equal to round index
-        gameOneId = self.schedule.games[roundOne].id
-        gameTwoId = self.schedule.games[roundTwo].id
+        gameOneId = self.schedule.games[roundOneId].id
+        gameTwoId = self.schedule.games[roundTwoId].id
 
         slotOne = self.schedule.slots[gameOneId]
         slotTwo = self.schedule.slots[gameTwoId]
@@ -120,7 +120,7 @@ class OptimizeOpponents:
             self.score = currentScore
             self.log(
                 f"Score: {self.score:8.4f}. " +
-                f"Swap in rounds: {roundOne:2d} x {roundTwo:2d}, players: {playerA:2d} x {playerB:2d}")
+                f"Swap in rounds: {roundOneId:2d} x {roundTwoId:2d}, players: {playerA:2d} x {playerB:2d}")
             return True
         else:
             slotOne.players.remove(playerB)
@@ -129,9 +129,9 @@ class OptimizeOpponents:
             slotTwo.players.add(playerB)
             return False
 
-    def randomOpponentChangeInGames(self, gameOne: int, gameTwo: int) -> bool:
-        slotOne = self.schedule.slots[gameOne]
-        slotTwo = self.schedule.slots[gameTwo]
+    def randomOpponentChangeInGames(self, gameOneId: int, gameTwoId: int) -> bool:
+        slotOne = self.schedule.slots[gameOneId]
+        slotTwo = self.schedule.slots[gameTwoId]
 
         busyOne = slotOne.players
         busyTwo = slotTwo.players
@@ -158,7 +158,7 @@ class OptimizeOpponents:
         if currentScore < self.score:
             self.score = currentScore
             self.log(f"Score: {self.score:8.4f}. " +
-                     f"Swap in games: {gameOne:2d} x {gameTwo:2d}, players: {playerA:2d} x {playerB:2d}")
+                     f"Swap in games: {gameOneId:2d} x {gameTwoId:2d}, players: {playerA:2d} x {playerB:2d}")
             return True
         else:
             slotOne.players.remove(playerB)
@@ -170,8 +170,7 @@ class OptimizeOpponents:
     def scoreFunc(self) -> float:
         metrics = Metrics(self.schedule)
 
-        target = 9 * self.schedule.configuration.numAttempts / \
-            (self.schedule.configuration.numPlayers-1)
+        target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
 
         penalty = 0.0
         for playerId in range(self.schedule.numPlayers):
