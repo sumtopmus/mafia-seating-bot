@@ -24,24 +24,45 @@ class Print:
             s = ''.join([f"{v:3d}" for v in line])
             print(f"{playerId:2d}: {s}")
 
+    @staticmethod
+    def printPairsMatrix(schedule : Schedule):
+        m = Metrics(schedule)
+
+        print("\nPairs matrix:")
+        for playerId in range(schedule.numPlayers):
+            pairs = m.calcPlayerPairsHistogram(playerId)
+            beg,end = m.pairsHistogramRange(pairs)
+            centerIdx = m.pairsHistogramCenter(pairs)
+            penalty = m.penaltyPlayer(playerId)
+            header = f"Player: {playerId:3d} r=[{beg:2d},{end:2d}] err={penalty:4.2f} :"
+            str = ''.join([f"{numPairs:4d}" for numPairs in pairs.values()])
+            
+            print(f"{header:40s}{str}")
+
+        # last line
+        allPairs = m.calcPairsHistogram()
+        beg,end = m.pairsHistogramRange(allPairs)
+        header = f"*** Overall r=[{beg:2d},{end:2d}] :"
+        str = ''.join([f"{numPairs:4d}" for numPairs in allPairs.values()])
+        print(f"{header:40s}{str}")
+        
+
+        # last line
+        hist = m.penaltyIdealHistogram()
+        beg,end = m.pairsHistogramRange(hist)
+        header = f"*** Ideal r=[{beg:2d},{end:2d}] :"
+        str = ''.join([f"{round(numPairs):4d}" for numPairs in hist.values()])
+        print(f"{header:40s}{str}")
+
+    @staticmethod
     def printPairsHistogram(schedule: Schedule):
         m = Metrics(schedule)
-        matrix = m.calcOpponentsMatrix()
-
-        pairs = {}
-        for val in range(schedule.numAttempts + 1):
-            pairs[val] = 0
-
-        for playerId in range(len(matrix)):
-            line = matrix[playerId]
-            for opponentId in range(playerId):
-                numGames = line[opponentId]
-                pairs[numGames] += 1
+        allPairs = m.calcPairsHistogram()
 
         print("\nPairs histogram:")
-        for numGames, count in pairs.items():
-            if count > 0:
-                print(f"{numGames:2d} : {count:3d} pairs")
+        for numGames, numPairs in allPairs.items():
+            if numPairs > 0:
+                print(f"{numGames:2d} : {numPairs:3d} pairs")
 
     @staticmethod
     def printScheduleByGames(schedule: Schedule):

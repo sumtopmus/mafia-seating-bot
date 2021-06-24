@@ -24,8 +24,8 @@ class Game:
     @staticmethod
     def create(gs: GameSet) -> Game:
         '''Creates a Game from GameSet'''
-        player_list = [id for id in gs.players]
-        return Game(gs.id, player_list)
+        players_list = [id for id in gs.players]
+        return Game(gs.id, players_list)
 
     def isValid(self) -> bool:
         # game must have exactly 10 players
@@ -49,7 +49,7 @@ class Game:
 class GameSet:
     '''Game for opponents optimization, just set of players, without seat numbers'''
     id: int
-    players: set = {}
+    players: set[int] = {}
 
     def __init__(self, id: int, players: set):
         self.id = id

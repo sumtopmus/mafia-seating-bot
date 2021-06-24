@@ -82,11 +82,8 @@ class Schedule:
             self.slots[game.id] = GameSet.create(game)
 
     def updateGamesFromSlots(self):
-        for id in range(len(self.slots)):
-            slot = self.slots[id]
-            game = self.games[id]
-            for i, playerId in enumerate(slot.players):
-                game.players[i] = playerId
+        for slotId in self.slots:
+            self.games[slotId] = Game.create(self.slots[slotId])
         # Careful. Now we have both games and slots and they may not match each other...
         # self.slots = {}
 

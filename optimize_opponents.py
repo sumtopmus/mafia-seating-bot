@@ -26,7 +26,7 @@ class OptimizeOpponents:
         self.verbose = verbose
 
     def optimize(self, conf: Configuration, participants: Participants, stages: int, iterations: int):
-        print("\*** Optimize opponents")
+        print("\n*** Optimize opponents")
 
         self.bestSchedule = None
         self.bestScore = 0
@@ -36,17 +36,23 @@ class OptimizeOpponents:
                 conf, participants)
             self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
-
             self.optimizeStage(iterations)
+
+            # print right after optimize - just for test
+            Print.printPairsMatrix(self.schedule)
+
             self.schedule.updateGamesFromSlots()
 
-            # output current schedule
-            Print.printPairsHistogram(self.schedule)
+            # print right after - just for test - should be identical
+            Print.printPairsMatrix(self.schedule)
 
             if not self.bestSchedule or self.score < self.bestScore:
                 print("Found best schedule!")
                 self.bestSchedule = self.schedule
                 self.bestScore = self.score
+            
+            self.schedule = None
+            self.score = 0
 
         return self.bestSchedule
 
@@ -91,7 +97,7 @@ class OptimizeOpponents:
         slotTwo = self.schedule.slots[gameTwoId]
 
         # figure out what players can be switched
-        all = {player.id for player in self.schedule.participants}
+        all = {playerId for playerId in range(self.schedule.numPlayers)}
         busyOne = slotOne.players
         freeOne = all.difference(busyOne)
         busyTwo = slotTwo.players
@@ -167,15 +173,27 @@ class OptimizeOpponents:
             slotTwo.players.add(playerB)
             return False
 
+    '''
+    # old score func
     def scoreFunc(self) -> float:
         metrics = Metrics(self.schedule)
 
         target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
-
         penalty = 0.0
         for playerId in range(self.schedule.numPlayers):
-            opponents = metrics.calcPlayerOpponentsHistogram(playerId)
+            opponents = metrics.calcPlayerOpponents(playerId)
             sd = metrics.calcSquareDeviationExclude(
                 opponents, target, playerId)
             penalty += sd
         return penalty
+    '''
+
+    # new score function
+    def scoreFunc(self) -> float:
+        metrics = Metrics(self.schedule)
+
+        penalty = 0.0
+        for playerId in range(self.schedule.numPlayers):
+            penalty += metrics.penaltyPlayer(playerId)
+        return penalty
+

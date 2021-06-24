@@ -86,23 +86,23 @@ Configurations = {
 filename_opponents = "schedule_opponents.txt"
 filename_seats = "schedule_seats.txt"
 
+
 def demoOptimizeOpponents():
     conf = Configurations["GG-2021"]
     participants = Participants.create(conf.numPlayers)
 
     opponents = OptimizeOpponents(verbose=False)
-    s = opponents.optimize(conf, participants, stages=5, iterations=25 * 1000)
+    s = opponents.optimize(conf, participants, stages=3, iterations=10 * 1000)
 
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
     Print.printOpponentsMatrix(s)
-    Print.printPairsHistogram(s)
+    Print.printPairsMatrix(s)
 
     print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
 
     saveSchedule(s, filename_opponents)
-
 
 
 def demoOptimizeSeats():
@@ -111,6 +111,8 @@ def demoOptimizeSeats():
 
     print("\n*** Loaded schedule")
     Print.printScheduleByGames(s)
+    Print.printOpponentsMatrix(s)
+    Print.printPairsMatrix(s)
 
     seats = OptimizeSeats(s, verbose=False)
     seats.optimize(iterations=[20 * 1000, 50 * 1000])
@@ -118,11 +120,12 @@ def demoOptimizeSeats():
     print("\n*** Schedule after seats optimization:")
     Print.printScheduleByGames(s)
     Print.printSeatsMatrix(s)
-
+    
     print("\n*** MWT-compatible schedule")
     Print.printMwtSchedule(s)
-    
+
     saveSchedule(s, filename_seats)
+
 
 def demoLoadSeats():
     s = loadSchedule(filename_seats)

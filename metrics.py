@@ -2,12 +2,14 @@ from game import *
 from player import *
 from schedule import Schedule
 
+import math
 
 class Metrics:
     def __init__(self, schedule: Schedule):
         self.schedule = schedule
+        self.idealHist = None
 
-    def calcPlayerOpponentsHistogram(self, thisPlayerId: int):
+    def calcPlayerOpponents(self, thisPlayerId: int):
         '''
         Calculates opponents histogram for given <thisPlayerId>
         Returns a list of size <numPlayers>,
@@ -16,10 +18,9 @@ class Metrics:
         opponents = [0] * self.schedule.numPlayers
 
         # go through all games
-        for game in self.schedule.games:
-            slot = self.schedule.slots[game.id]
+        for slotId, slot in self.schedule.slots.items():
             if thisPlayerId in slot.players:
-                for id in game.players:
+                for id in slot.players:
                     if thisPlayerId != id:
                         opponents[id] += 1
 
@@ -29,15 +30,101 @@ class Metrics:
         '''Calculates opponents histogram for all players'''
         matrix = []
         for playerId in range(self.schedule.numPlayers):
-            line = self.calcPlayerOpponentsHistogram(playerId)
+            line = self.calcPlayerOpponents(playerId)
             matrix.append(line)
         return matrix
+
+    def calcPlayerPairsHistogram(self, thisPlayerId: int):
+        '''
+        Calculates pairs histogram for current player.
+        Histogram is dictionary <numGames>:<numPairs>
+        '''
+        pairs = {}
+        for val in range(self.schedule.numAttempts + 1):
+            pairs[val] = 0
+
+        opponents = self.calcPlayerOpponents(thisPlayerId)
+        for numGames in opponents:
+            pairs[numGames] += 1
+        return pairs
+
+    def calcPairsHistogram(self):
+        '''
+        Calculates pairs histogram for all players.
+        Histogram is dictionary <numGames> : <numPairs>
+        '''
+        allPairs = {}
+        for val in range(self.schedule.numAttempts + 1):
+            allPairs[val] = 0
+        
+        for playerId in range(self.schedule.numPlayers):
+            pairs = self.calcPlayerPairsHistogram(playerId)
+
+            for numGames, numPairs in pairs.items():
+                allPairs[numGames] += numPairs
+        return allPairs
+
+    def pairsHistogramSum(self, pairs : dict):
+        result = 0
+        for numGames, numPairs in pairs.items():
+            result += numPairs      
+        return result
+
+    def pairsHistogramCenter(self, pairs : dict):
+        totalMult = 0
+        totalPairs = 0
+        for numGames, numPairs in pairs.items():
+            totalMult += (numGames + 1) * numPairs * numPairs
+            totalPairs += numPairs * numPairs
+        
+        center = totalMult / totalPairs
+        return center
+
+    def pairsHistogramRange(self, pairs : dict):
+        beg = None
+        for idx in sorted(pairs):
+            if beg == None and pairs[idx] > 0:
+                beg = idx
+        
+        end = None
+        for idx in reversed(sorted(pairs)):
+            if end == None and pairs[idx] > 0:
+                end = idx
+        return beg, end
+
+    def penaltyIdealHistogram(self):
+        hist = {}
+        for val in range(self.schedule.numAttempts + 1):
+            hist[val] = 0
+        
+        numPairs = self.schedule.numPlayers - 1
+        target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
+
+        idxLow = math.floor(target)
+        idxHi = math.ceil(target)
+        hist[idxLow] = numPairs * (idxHi - target) 
+        hist[idxHi] = numPairs - hist[idxLow]
+        return hist
+
+    def penaltyPlayer(self, playerId : int):
+        target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
+        if self.idealHist == None:
+            self.idealHist = self.penaltyIdealHistogram()
+
+        hist = self.calcPlayerPairsHistogram(playerId)
+
+        penalty = 0.0
+        for idx in hist:
+            idxDist = (idx - target) ** 2
+            valueDist = abs(self.idealHist[idx] - hist[idx]) # ** 2
+            penalty += idxDist * valueDist
+        return penalty
 
     def calcPlayerSeatsHistogram(self, thisPlayerId: int):
         '''
         Calculates seats histogram for given <thisPlayerId>
         Returns a list of size 10,
-        where value of a[i] - total numbe of games where player sits on seat number <i>
+        where value of a[i] - total number of games where player sits on seat number <i>
         '''
         seats = [0] * 10
 
