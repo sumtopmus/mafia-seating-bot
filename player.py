@@ -15,8 +15,7 @@ class Participants:
     ''' Participants of tournament. Automatically assigns ids to players in constructor'''
 
     people: list[Player] = dataclasses.field(default_factory=list)
-    #_peopleDict : dict[int, Player] = field(init = False, repr = False, hash = False, compare = False, default_factory=dict)
-
+    
     def __len__(self):
         return len(self.people)
 
@@ -35,8 +34,8 @@ class Participants:
             self._peopleDict[player.id] = player
 
     @staticmethod
-    def create(count: int):
-        names = Participants.generateNames(count)
+    def create(count: int, prefix : str = None):
+        names = Participants.generateNames(count, prefix)
         return Participants.createFromNames(names)
 
     @staticmethod
@@ -53,11 +52,11 @@ class Participants:
 
     @staticmethod
     def generateNames(count: int, prefix: str = None):
-        s = prefix if prefix is not None else 'Player_'
+        s = prefix if prefix is not None else 'p'
 
         names = []
         for id in range(count):
-            name = f"{s}{id}"
+            name = f"{s}{id:02d}"
             names.append(name)
         return names
 

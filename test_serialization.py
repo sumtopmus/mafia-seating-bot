@@ -46,12 +46,12 @@ class TestSerialization(unittest.TestCase):
         self.assertEqual(player.name, 'like')
 
     def test_participants_toJson(self):
-        participants = Participants.create(3)
+        participants = Participants.create(3, "Player_")
         d = dataclasses.asdict(participants)
         self.assertEqual(d, {'people': [
-            {'id': 0, 'name': 'Player_0'},
-            {'id': 1, 'name': 'Player_1'},
-            {'id': 2, 'name': 'Player_2'}]
+            {'id': 0, 'name': 'Player_00'},
+            {'id': 1, 'name': 'Player_01'},
+            {'id': 2, 'name': 'Player_02'}]
         })
 
     def test_participants_fromJson(self):
@@ -115,14 +115,11 @@ class TestSerialization(unittest.TestCase):
 
     def test_schedule_toJson(self):
         numPlayers = 10
-        participants = Participants.create(numPlayers)
-
         conf = Configuration(numPlayers, numTables=1,
                              numRounds=1, numGames=1, numAttempts=1)
-        schedule = ScheduleFactory.createInitialSchedule(conf, participants)
+        schedule = ScheduleFactory.createInitialSchedule(conf)
         d = schedule.toJson()
         self.assertEqual(d, {'configuration': dataclasses.asdict(conf),
-                             'participants': dataclasses.asdict(participants),
                              'rounds': [dataclasses.asdict(round) for round in schedule.rounds],
                              'games': [dataclasses.asdict(game) for game in schedule.games]})
 

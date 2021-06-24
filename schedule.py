@@ -12,10 +12,10 @@ class ScheduleException(Exception):
 
 class Schedule:
     _configuration: Configuration
-    _participants: Participants
+    _participants : Participants
     _rounds = []
     _games = []
-
+    
     @property
     def configuration(self):
         return self._configuration
@@ -23,7 +23,7 @@ class Schedule:
     @property
     def participants(self):
         return self._participants
-
+    
     @property
     def rounds(self):
         return self._rounds
@@ -52,19 +52,15 @@ class Schedule:
     def numAttempts(self):
         return self._configuration.numAttempts
 
-    def __init__(self, conf: Configuration = None, participants: Participants = None, rounds: list = [], games: list = []):
+    def __init__(self, conf: Configuration = None, rounds: list = [], games: list = []):
         self._configuration = conf
-        self._participants = participants
+        self._participants = None
         self._rounds = rounds
         self._games = games
-
-    # TODO: make shallow copy, deep copy of Schedule
-    #__copy__(), __deepcopy__()
 
     def toJson(self):
         d = {}
         d['configuration'] = dataclasses.asdict(self._configuration)
-        d['participants'] = dataclasses.asdict(self._participants)
         d['rounds'] = [dataclasses.asdict(round) for round in self._rounds]
         d['games'] = [dataclasses.asdict(game) for game in self._games]
         return d
@@ -72,10 +68,9 @@ class Schedule:
     @staticmethod
     def fromJson(d: dict):
         conf = Configuration(**d['configuration'])
-        participants = Participants.fromJson(d['participants'])
         rounds = [Round.fromJson(item) for item in d['rounds']]
         games = [Game.fromJson(item) for item in d['games']]
-        return Schedule(conf, participants, rounds, games)
+        return Schedule(conf, rounds, games)
 
     def generateSlotsFromGames(self):
         self.slots = {}
@@ -117,7 +112,7 @@ class Schedule:
         return True
 
     def validate(self) -> bool:
-        if len(self._participants) != self.numPlayers:
+        if self._participants != None and len(self._participants) != self.numPlayers:
             raise ScheduleException(
                 f"Participant count: {self._players} must match configuration: {self.numPlayers}")
 
@@ -176,12 +171,12 @@ class Schedule:
                 f"All players must play the same number of games")
 
         # every player must play NumAttempts games
-        for player in self._participants:
-            if player.id not in gamesPlayed:
+        for playerId in range(self.numPlayers):
+            if playerId not in gamesPlayed:
                 raise ScheduleException(
-                    f"Player: {player.id} does not play a single game!")
+                    f"Player: {playerId} does not play a single game!")
 
-            gamesPlayedById = gamesPlayed[player.id]
-            if gamesPlayed[player.id] != self._configuration.numAttempts:
+            gamesPlayedById = gamesPlayed[playerId]
+            if gamesPlayed[playerId] != self.numAttempts:
                 raise ScheduleException(
-                    f"Player: {player.id} game count: {gamesPlayedById} must match configuration: {self._configuration.numAttempts}")
+                    f"Player: {player.id} game count: {gamesPlayedById} must match configuration: {self.numAttempts}")

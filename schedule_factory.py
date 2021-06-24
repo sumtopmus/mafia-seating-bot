@@ -6,7 +6,7 @@ from game import *
 from player import *
 
 class ScheduleFactory:
-    def createInitialSchedule(conf: Configuration, participants: Participants):
+    def createInitialSchedule(conf: Configuration):
         if not conf.isValid():
             return None
 
@@ -38,5 +38,5 @@ class ScheduleFactory:
             round = Round(roundNum, gamesInRound)
             rounds.append(round)
 
-        schedule = Schedule(conf, participants, rounds, games)
+        schedule = Schedule(conf, rounds, games)
         return schedule

@@ -89,10 +89,10 @@ filename_seats = "schedule_seats.txt"
 
 def demoOptimizeOpponents():
     conf = Configurations["GG-2021"]
-    participants = Participants.create(conf.numPlayers)
+    conf.validate()
 
     opponents = OptimizeOpponents(verbose=False)
-    s = opponents.optimize(conf, participants, numRuns=5, numIterations=10 * 1000)
+    s = opponents.optimize(conf, numRuns=3, numIterations=10 * 1000)
 
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
@@ -115,7 +115,7 @@ def demoOptimizeSeats():
     Print.printPairsMatrix(s)
 
     seats = OptimizeSeats(s, verbose=False)
-    seats.optimize(numRuns = 10, iterations=[20 * 1000, 30 * 1000])
+    seats.optimize(numRuns = 3, iterations=[20 * 1000, 30 * 1000])
 
     print("\n*** Schedule after seats optimization:")
     Print.printScheduleByGames(s)

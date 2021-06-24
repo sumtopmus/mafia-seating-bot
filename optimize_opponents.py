@@ -25,15 +25,14 @@ class OptimizeOpponents:
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
 
-    def optimize(self, conf: Configuration, participants: Participants, numRuns: int, numIterations: int):
+    def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
         print("\n*** Optimize opponents")
 
         self.bestSchedule = None
         self.bestScore = 0
         for i in range(numRuns):
             print(f"\n*** Opponents optimization run: {i+1}")
-            self.schedule = ScheduleFactory.createInitialSchedule(
-                conf, participants)
+            self.schedule = ScheduleFactory.createInitialSchedule(conf)
             self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
             self.optimizeStage(numIterations)
