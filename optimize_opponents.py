@@ -188,8 +188,18 @@ class OptimizeOpponents:
     def scoreFunc(self) -> float:
         metrics = Metrics(self.schedule)
 
-        penalty = 0.0
+        basePenalty = 0.0
         for playerId in range(self.schedule.numPlayers):
-            penalty += metrics.penaltyPlayer(playerId)
-        return penalty
+            basePenalty += metrics.penaltyPlayer(playerId)
+
+        zeroPlayers = 0
+        for playerId in range(self.schedule.numPlayers):
+            pairs = metrics.calcPlayerPairsHistogram(playerId)
+            if pairs[0] == 1:
+                zeroPlayers +=1
+        
+        expectedZeroPlayers = 6 * 2
+        zeroPenalty = 100 * (zeroPlayers - expectedZeroPlayers) ** 2
+
+        return basePenalty + zeroPenalty
 

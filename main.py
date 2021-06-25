@@ -42,8 +42,8 @@ def demoOptimizeOpponents():
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
     Print.printOpponentsMatrix(s)
-    Print.printMinMaxPairs(s, [0, 1, 5, 6, 7, 8, 9])
     Print.printPairsMatrix(s)
+    Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
 
     saveSchedule(s, filename_opponents)
 
@@ -58,7 +58,7 @@ def demoOptimizeSeats():
     Print.printPairsMatrix(s)
 
     seats = OptimizeSeats(s, verbose=False)
-    seats.optimize(numRuns=3, iterations=[20 * 1000, 30 * 1000])
+    seats.optimize(numRuns=50, iterations=[30 * 1000, 30 * 1000])
 
     print("\n*** Schedule after seats optimization:")
     Print.printScheduleByGames(s)
@@ -76,12 +76,15 @@ def demoParticipants():
     saveParticipants(p, filename_participants)
 
 
-def demoMwt():
-    s = loadSchedule(filename_seats)
+def demoMwt(filename):
+    s = loadSchedule(filename)
 
     print("\n*** Loaded schedule")
     Print.printScheduleByGames(s)
-    Print.printPairsHistogram(s)
+    Print.printOpponentsMatrix(s)
+    Print.printPairsMatrix(s)
+    Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
+    
     Print.printSeatsMatrix(s)
 
     print("\n*** MWT-compatible schedule with IDs:")
@@ -95,11 +98,11 @@ def demoMwt():
 
 
 def main():
-    demoOptimizeOpponents()
-    # demoOptimizeSeats()
+    # demoOptimizeOpponents()
+    demoOptimizeSeats()
 
     # demoParticipants()
-    # demoMwt()
+    # demoMwt("schedule_opponents_good.txt")
 
 
 if __name__ == '__main__':

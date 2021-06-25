@@ -41,8 +41,9 @@ class OptimizeSeats:
                 print(f"\nStage: {stage+1} (iterations: {numIterations})")
                 self.shuffleGameFunc = func[i % len(func)]
                 self.optimizeStage(numIterations)
-                if self.bestScore != None and self.bestScore < self.currentScore:
+                if self.bestScore != None and 2 * self.bestScore < self.currentScore:
                     print("We have better best score, so... don't continue")
+                    break
 
             if self.bestGamePlayers == None or self.currentScore < self.bestScore:
                 print(f"Found best seating, score : {self.currentScore:8.4f}")
@@ -117,30 +118,31 @@ class OptimizeSeats:
             penalty += sd
             
             # half simmetry
-            if calcHalfSimmetry:
+            '''if calcHalfSimmetry:
                 allSeats = sum(seats)
                 k_lo = sum(seats[0:5]) / allSeats
                 k_hi = sum(seats[5:10]) / allSeats
                 penalty_lo = (k_lo - 0.5) ** 2
                 penalty_hi = (k_hi - 0.5) ** 2
                 penalty += factorHalf * (penalty_lo + penalty_hi)
+            '''
             # tripple simmetry
             if calcTrippleSimmetry:
                 allSeats = sum(seats)
                 k_a = sum(seats[0:3]) / allSeats
                 k_b = sum(seats[3:7]) / allSeats
                 k_c = sum(seats[7:10]) / allSeats
-                penalty_a = (k_a - 0.3) ** 2
-                penalty_b = (k_b - 0.4) ** 2
-                penalty_c = (k_c - 0.3) ** 2
+                penalty_a = (10 * k_a - 3) ** 2
+                penalty_b = (10 * k_b - 4) ** 2
+                penalty_c = (10 * k_c - 3) ** 2
                 penalty += factorTripple * (penalty_a + penalty_b + penalty_c)
             # first and last simmetry
             if calcFirstLastSimmetry:
                 allSeats = sum(seats)
                 k_first = seats[0] / allSeats
                 k_last = seats[-1] / allSeats
-                penalty_first = (k_first - 0.1) ** 2
-                penalty_last = (k_last - 0.1) ** 2
+                penalty_first = (10 * k_first - 1) ** 2
+                penalty_last = (10 * k_last - 1) ** 2
                 penalty += factorFirstLast * (penalty_first + penalty_last)
 
         return penalty
