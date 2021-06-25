@@ -65,15 +65,6 @@ class Print:
                 str += f"g = {idx} with: [{s}]; "
             print(header, str)
 
-
-                
-
-
-
-        
-
-        
-
     @staticmethod
     def printPairsHistogram(schedule: Schedule):
         m = Metrics(schedule)
@@ -88,12 +79,31 @@ class Print:
     def printScheduleByGames(schedule: Schedule):
         print("\nSchedule by games:")
         for round in schedule.rounds:
-            print(f"\nRound: {round.id + 1}")
+            print(f"\nRound: {round.id}")
             for gameId in round.gameIds:
                 game = schedule.games[gameId]
                 s = [f"{id:3d}" for id in game.players]
                 str = ''.join(s)
                 print(f"Game {game.id:2d}: {str}")
+
+    @staticmethod
+    def printScheduleByPlayers(schedule: Schedule):
+        print("\nSchedule by players:")
+        for playerId in range(schedule.numPlayers):
+            str = ""
+            for round in schedule.rounds:
+                roundStr = f"{' *:* '}"
+                for table, gameId in enumerate(round.gameIds):
+                    game = schedule.games[gameId]
+                    tableStr = chr(ord('A') + table)
+                    for seat,id in enumerate(game.players):
+                        if id == playerId:
+                            roundStr = f" {tableStr}:{(seat+1):<2d}"
+                            break
+                str += roundStr
+
+            header = f"Player {playerId:2d}: "
+            print(f"{header}{str}")
 
     @staticmethod
     def printSeatsMatrix(schedule: Schedule):

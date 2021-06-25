@@ -13,43 +13,43 @@ class ScheduleException(Exception):
 class Schedule:
     _configuration: Configuration
     _participants : Participants
-    _rounds = []
-    _games = []
+    _rounds = list[Round]
+    _games = list[Game]
     
     @property
-    def configuration(self):
+    def configuration(self) -> Configuration:
         return self._configuration
 
     @property
-    def participants(self):
+    def participants(self) -> Participants:
         return self._participants
     
     @property
-    def rounds(self):
+    def rounds(self) -> list[Round]:
         return self._rounds
 
     @property
-    def games(self):
+    def games(self) -> list[Game]:
         return self._games
 
     @property
-    def numPlayers(self):
+    def numPlayers(self) -> int:
         return self._configuration.numPlayers
 
     @property
-    def numTables(self):
+    def numTables(self) -> int:
         return self._configuration.numTables
 
     @property
-    def numRounds(self):
+    def numRounds(self) -> int:
         return self._configuration.numRounds
 
     @property
-    def numGames(self):
+    def numGames(self) -> int:
         return self._configuration.numGames
 
     @property
-    def numAttempts(self):
+    def numAttempts(self) -> int:
         return self._configuration.numAttempts
 
     def __init__(self, conf: Configuration = None, rounds: list = [], games: list = []):

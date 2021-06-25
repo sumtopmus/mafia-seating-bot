@@ -41,6 +41,7 @@ def demoOptimizeOpponents():
 
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
+    Print.printScheduleByPlayers(s)
     Print.printOpponentsMatrix(s)
     Print.printPairsMatrix(s)
     Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
@@ -54,6 +55,7 @@ def demoOptimizeSeats():
 
     print("\n*** Loaded schedule")
     Print.printScheduleByGames(s)
+    Print.printScheduleByPlayers(s)
     Print.printOpponentsMatrix(s)
     Print.printPairsMatrix(s)
 
@@ -81,6 +83,7 @@ def demoMwt(filename):
 
     print("\n*** Loaded schedule")
     Print.printScheduleByGames(s)
+    Print.printScheduleByPlayers(s)
     Print.printOpponentsMatrix(s)
     Print.printPairsMatrix(s)
     Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
@@ -99,11 +102,11 @@ def demoMwt(filename):
 
 def main():
     # demoOptimizeOpponents()
-    demoOptimizeSeats()
-
+    # demoOptimizeSeats()
     # demoParticipants()
-    # demoMwt("schedule_opponents_good.txt")
+    # demoMwt("schedule_seats_great.txt")
 
-
+    demoMwt("schedule_seats_great_noc3.txt")
+    
 if __name__ == '__main__':
     main()
