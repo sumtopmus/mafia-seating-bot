@@ -42,10 +42,8 @@ def demoOptimizeOpponents():
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
     Print.printOpponentsMatrix(s)
+    Print.printMinMaxPairs(s, [0, 1, 5, 6, 7, 8, 9])
     Print.printPairsMatrix(s)
-
-    print("\n*** MWT-compatible schedule")
-    Print.printMwtSchedule(s)
 
     saveSchedule(s, filename_opponents)
 
@@ -97,11 +95,11 @@ def demoMwt():
 
 
 def main():
-    # demoOptimizeOpponents()
+    demoOptimizeOpponents()
     # demoOptimizeSeats()
 
-    demoParticipants()
-    demoMwt()
+    # demoParticipants()
+    # demoMwt()
 
 
 if __name__ == '__main__':

@@ -44,8 +44,26 @@ class Metrics:
             pairs[val] = 0
 
         opponents = self.calcPlayerOpponents(thisPlayerId)
-        for numGames in opponents:
-            pairs[numGames] += 1
+        for id in range(len(opponents)):
+            if id != thisPlayerId:
+                numGames = opponents[id]
+                pairs[numGames] += 1
+        return pairs
+
+    def calcPlayerPairs(self, thisPlayerId : int):
+        '''
+        Calculates pairs for current user.
+        This is dictionary <numGames>:[opponents]
+        '''
+        pairs = {}
+        for numGames in range(0, self.schedule.numAttempts + 1):
+            pairs[numGames] = []
+        
+        opponents = self.calcPlayerOpponents(thisPlayerId)
+        for id in range(len(opponents)):
+            if id != thisPlayerId:
+                numGames = opponents[id]
+                pairs[numGames].append(id)
         return pairs
 
     def calcPairsHistogram(self):

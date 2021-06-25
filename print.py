@@ -31,28 +31,48 @@ class Print:
         print("\nPairs matrix:")
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairsHistogram(playerId)
-            beg,end = m.pairsHistogramRange(pairs)
-            centerIdx = m.pairsHistogramCenter(pairs)
             penalty = m.penaltyPlayer(playerId)
-            header = f"Player: {playerId:3d} r=[{beg:2d},{end:2d}] err={penalty:4.2f} :"
+            header = f"Player {playerId:2d}: err={penalty:6.2f}: "
             str = ''.join([f"{numPairs:4d}" for numPairs in pairs.values()])
             
-            print(f"{header:40s}{str}")
+            print(f"{header:25s}{str}")
+
+        # ideal line
+        hist = m.penaltyIdealHistogram()
+        header = f"*** Ideal: "
+        str = ''.join([f"{round(numPairs):4d}" for numPairs in hist.values()])
+        print(f"{header:25s}{str}")
 
         # last line
         allPairs = m.calcPairsHistogram()
-        beg,end = m.pairsHistogramRange(allPairs)
-        header = f"*** Overall r=[{beg:2d},{end:2d}] :"
+        header = f"*** Overall: "
         str = ''.join([f"{numPairs:4d}" for numPairs in allPairs.values()])
-        print(f"{header:40s}{str}")
+        print(f"{header:25s}{str}")
+
+    def printMinMaxPairs(schedule : Schedule, numGames: list[int]):
+        m = Metrics(schedule)
+        
+        print("\n*** Min-Max opponents")
+        for playerId in range(schedule.numPlayers):         
+            pairs = m.calcPlayerPairs(playerId)
+            
+            header = f"Player {playerId:2d}: "
+            str = ""
+            for idx in numGames:
+                if len(pairs[idx]) == 0:
+                    continue
+                s = ''.join([f"{id:2d} " for id in pairs[idx]]) if len(pairs[idx]) < 5 else "..."
+                str += f"g = {idx} with: [{s}]; "
+            print(header, str)
+
+
+                
+
+
+
         
 
-        # last line
-        hist = m.penaltyIdealHistogram()
-        beg,end = m.pairsHistogramRange(hist)
-        header = f"*** Ideal r=[{beg:2d},{end:2d}] :"
-        str = ''.join([f"{round(numPairs):4d}" for numPairs in hist.values()])
-        print(f"{header:40s}{str}")
+        
 
     @staticmethod
     def printPairsHistogram(schedule: Schedule):
