@@ -58,6 +58,9 @@ class Schedule:
         self._rounds = rounds
         self._games = games
 
+    def setParticipants(self, people : Participants):
+        self._participants = people
+
     def toJson(self):
         d = {}
         d['configuration'] = dataclasses.asdict(self._configuration)

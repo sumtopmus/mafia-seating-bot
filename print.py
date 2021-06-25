@@ -90,9 +90,16 @@ class Print:
     def printMwtSchedule(schedule : Schedule):
         for round in schedule.rounds:
             for seat in range(10):
-                line = [f"{schedule.games[gameId].players[seat]:3d}," for gameId in round.gameIds]
-                str = ''.join(line)
+                ids = [schedule.games[gameId].players[seat] for gameId in round.gameIds]
+
+                # output player IDs or player names
+                if not schedule.participants:
+                    line = [f"{id:>3d}," for id in ids]
+                else:
+                    line = [f" {schedule.participants.find(id).name}," for id in ids]
+                
                 # print without last comma
+                str = ''.join(line)
                 print(str[:-1])
             print()
 

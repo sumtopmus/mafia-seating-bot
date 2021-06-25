@@ -47,7 +47,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_participants_toJson(self):
         participants = Participants.create(3, "Player_")
-        d = dataclasses.asdict(participants)
+        d = participants.toJson()
         self.assertEqual(d, {'people': [
             {'id': 0, 'name': 'Player_00'},
             {'id': 1, 'name': 'Player_01'},

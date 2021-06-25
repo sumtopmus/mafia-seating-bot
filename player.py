@@ -16,13 +16,16 @@ class Participants:
 
     people: list[Player] = dataclasses.field(default_factory=list)
     
+    # don't declare as it will be included into JSON
+    #_peopleDict: dict[int, Player] = None
+
     def __len__(self):
         return len(self.people)
 
     def __getitem__(self, index):
         return self.people[index]
 
-    def find(self, id):
+    def find(self, id) -> Player:
         return self._peopleDict.get(id)
 
     def __post_init__(self):
@@ -34,7 +37,7 @@ class Participants:
             self._peopleDict[player.id] = player
 
     @staticmethod
-    def create(count: int, prefix : str = None):
+    def create(count: int, prefix: str = None):
         names = Participants.generateNames(count, prefix)
         return Participants.createFromNames(names)
 
@@ -59,6 +62,9 @@ class Participants:
             name = f"{s}{id:02d}"
             names.append(name)
         return names
+
+    def toJson(self):
+        return dataclasses.asdict(self)
 
     @staticmethod
     def fromJson(d: dict):
