@@ -198,7 +198,8 @@ class OptimizeOpponents:
             if pairs[0] == 1:
                 zeroPlayers +=1
         
-        expectedZeroPlayers = 6 * 2
+        expectedZeroPairs = 2
+        expectedZeroPlayers = 2 * expectedZeroPairs
         zeroPenalty = 100 * (zeroPlayers - expectedZeroPlayers) ** 2
 
         return basePenalty + zeroPenalty

@@ -126,6 +126,7 @@ class OptimizeSeats:
                 penalty_hi = (k_hi - 0.5) ** 2
                 penalty += factorHalf * (penalty_lo + penalty_hi)
             '''
+            
             # tripple simmetry
             if calcTrippleSimmetry:
                 allSeats = sum(seats)
@@ -136,6 +137,7 @@ class OptimizeSeats:
                 penalty_b = (10 * k_b - 4) ** 2
                 penalty_c = (10 * k_c - 3) ** 2
                 penalty += factorTripple * (penalty_a + penalty_b + penalty_c)
+            
             # first and last simmetry
             if calcFirstLastSimmetry:
                 allSeats = sum(seats)

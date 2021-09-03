@@ -11,10 +11,7 @@ from optimize_seats import *
 
 from helpers import *
 
-
-filename_opponents = "schedule_opponents.txt"
-filename_seats = "schedule_seats.txt"
-filename_participants = "participants.txt"
+import sys
 
 Configurations = {
     "VaWaCa-2017":
@@ -29,15 +26,18 @@ Configurations = {
     "GG-2021":
         Configuration(numPlayers=36, numTables=3, numRounds=12,
                       numGames=36, numAttempts=10),
+
+    "VaWaCa-2021":
+        Configuration(numPlayers=36, numTables=3, numRounds=12,
+                      numGames=36, numAttempts=10),
 }
 
 
-def demoOptimizeOpponents():
-    conf = Configurations["GG-2021"]
+def demoOptimizeOpponents(conf, filename):
     conf.validate()
 
     opponents = OptimizeOpponents(verbose=False)
-    s = opponents.optimize(conf, numRuns=3, numIterations=10 * 1000)
+    s = opponents.optimize(conf, numRuns=20, numIterations=20 * 1000)
 
     print("\n*** Schedule after opponents optimization:")
     Print.printScheduleByGames(s)
@@ -46,10 +46,10 @@ def demoOptimizeOpponents():
     Print.printPairsMatrix(s)
     Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
 
-    saveSchedule(s, filename_opponents)
+    saveSchedule(s, filename)
 
 
-def demoOptimizeSeats():
+def demoOptimizeSeats(filename_opponents, filename_seats):
     s = loadSchedule(filename_opponents)
     s.generateSlotsFromGames()
 
@@ -60,7 +60,7 @@ def demoOptimizeSeats():
     Print.printPairsMatrix(s)
 
     seats = OptimizeSeats(s, verbose=False)
-    seats.optimize(numRuns=50, iterations=[30 * 1000, 30 * 1000])
+    seats.optimize(numRuns=10, iterations=[30 * 1000, 30 * 1000])
 
     print("\n*** Schedule after seats optimization:")
     Print.printScheduleByGames(s)
@@ -72,13 +72,13 @@ def demoOptimizeSeats():
     saveSchedule(s, filename_seats)
 
 
-def demoParticipants():
+def demoParticipants(filename_participants):
     numPlayers = 36
     p = Participants.create(numPlayers)
     saveParticipants(p, filename_participants)
 
 
-def demoMwt(filename):
+def demoMwt(filename, filename_participants):
     s = loadSchedule(filename)
 
     print("\n*** Loaded schedule")
@@ -101,12 +101,30 @@ def demoMwt(filename):
 
 
 def main():
-    # demoOptimizeOpponents()
-    # demoOptimizeSeats()
-    # demoParticipants()
-    # demoMwt("schedule_seats_great.txt")
+    if len(sys.argv) < 2:
+        print("Expected opponents|seats|show")
+        return
 
-    demoMwt("schedule_seats_great_noc3.txt")
+    conf = Configurations["VaWaCa-2021"]
+    filename_opponents = "vawaca2021_opponents.txt"
+    filename_seats = "vawaca2021_seats.txt"
+    filename_participants = "participants.txt"
+
+    command = sys.argv[1]
+    print(f"Command: {command}")
+
+    if command == "opponents":
+        demoOptimizeOpponents(conf, filename_opponents)
+
+    if command == "seats":
+        demoOptimizeSeats(filename_opponents, filename_seats)
+    
+    if command == "participants":
+        demoParticipants(filename_participants)
+
+    if command == "show":
+        filename = sys.argv[2] if len(sys.argv) >=3 else filename_seats
+        demoMwt(filename_seats, filename_participants)
     
 if __name__ == '__main__':
     main()
