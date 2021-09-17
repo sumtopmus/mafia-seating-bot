@@ -1,18 +1,7 @@
-from schedule import *
-from schedule_factory import *
-
-from player import *
-from game import *
-from metrics import *
-from print import *
-
-from optimize_opponents import *
-from optimize_seats import *
-
-from helpers import *
-
 import sys
-
+from commands import *
+from schedule import *
+ 
 Configurations = {
     "VaWaCa-2017":
         Configuration(numPlayers=25, numTables=2, numRounds=10,
@@ -30,74 +19,12 @@ Configurations = {
     "VaWaCa-2021":
         Configuration(numPlayers=36, numTables=3, numRounds=12,
                       numGames=36, numAttempts=10),
+
+    "mlm2021":
+        Configuration(numPlayers=20, numTables=2, numRounds=10,
+                      numGames=20, numAttempts=10),
 }
 
-
-def demoOptimizeOpponents(conf, filename):
-    conf.validate()
-
-    opponents = OptimizeOpponents(verbose=False)
-    s = opponents.optimize(conf, numRuns=20, numIterations=20 * 1000)
-
-    print("\n*** Schedule after opponents optimization:")
-    Print.printScheduleByGames(s)
-    Print.printScheduleByPlayers(s)
-    Print.printOpponentsMatrix(s)
-    Print.printPairsMatrix(s)
-    Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
-
-    saveSchedule(s, filename)
-
-
-def demoOptimizeSeats(filename_opponents, filename_seats):
-    s = loadSchedule(filename_opponents)
-    s.generateSlotsFromGames()
-
-    print("\n*** Loaded schedule")
-    Print.printScheduleByGames(s)
-    Print.printScheduleByPlayers(s)
-    Print.printOpponentsMatrix(s)
-    Print.printPairsMatrix(s)
-
-    seats = OptimizeSeats(s, verbose=False)
-    seats.optimize(numRuns=10, iterations=[30 * 1000, 30 * 1000])
-
-    print("\n*** Schedule after seats optimization:")
-    Print.printScheduleByGames(s)
-    Print.printSeatsMatrix(s)
-
-    print("\n*** MWT-compatible schedule")
-    Print.printMwtSchedule(s)
-
-    saveSchedule(s, filename_seats)
-
-
-def demoParticipants(filename_participants):
-    numPlayers = 36
-    p = Participants.create(numPlayers)
-    saveParticipants(p, filename_participants)
-
-
-def demoMwt(filename, filename_participants):
-    s = loadSchedule(filename)
-
-    print("\n*** Loaded schedule")
-    Print.printScheduleByGames(s)
-    Print.printScheduleByPlayers(s)
-    Print.printOpponentsMatrix(s)
-    Print.printPairsMatrix(s)
-    Print.printMinMaxPairs(s, [0, 6, 7, 8, 9])
-    
-    Print.printSeatsMatrix(s)
-
-    print("\n*** MWT-compatible schedule with IDs:")
-    Print.printMwtSchedule(s)
-
-    participants = loadParticipants(filename_participants)
-
-    s.setParticipants(participants)
-    print("\n*** MWT-compatible schedule with names:")
-    Print.printMwtSchedule(s)
 
 
 def main():
@@ -105,26 +32,58 @@ def main():
         print("Expected opponents|seats|show")
         return
 
-    conf = Configurations["VaWaCa-2021"]
-    filename_opponents = "vawaca2021_opponents.txt"
-    filename_seats = "vawaca2021_seats.txt"
-    filename_participants = "participants.txt"
+    conf_name = "mlm2021"
+    conf = Configurations[conf_name]
+    print(f"Configuration name: {conf_name}\n{conf}")
+
+    default_opponents = f"{conf_name}_opponents.txt"
+    default_seats = f"{conf_name}_seats.txt"
+    default_participants = f"{conf_name}_participants.txt"
 
     command = sys.argv[1]
     print(f"Command: {command}")
 
     if command == "opponents":
-        demoOptimizeOpponents(conf, filename_opponents)
+        filename_opponents = sys.argv[2] if len(sys.argv) > 2 else default_opponents
+        print(f"Output opponents: {filename_opponents}")
+        
+        default_numRuns = 10
+        default_numIterations = 10 * 1000
+        numRuns = int(sys.argv[3]) if len(sys.argv) > 3 else default_numRuns
+        numIterations = int(sys.argv[4]) if len(sys.argv) > 4 else default_numIterations
+        print(f"numRuns: {numRuns}, numIterations: {numIterations}")
+
+        default_zeroPairs = 0
+        expectedZeroPairs = int(sys.argv[5]) if len(sys.argv) > 5 else default_zeroPairs
+        print(f"ExpectedZeroPairs: {expectedZeroPairs}")
+
+        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, expectedZeroPairs)
 
     if command == "seats":
-        demoOptimizeSeats(filename_opponents, filename_seats)
+        filename_opponents = sys.argv[2] if len(sys.argv) > 2 else default_opponents
+        filename_seats = sys.argv[3] if len(sys.argv) > 3 else default_seats
+        print(f"Input opponents: {filename_opponents}")
+        print(f"Output seats: {filename_seats}")
+
+        default_numRuns = 10 
+        default_numIterationsStageOne = 10 * 1000
+        default_numIterationsStageTwo = 10 * 1000
+        numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns
+        numIterationsStageOne = int(sys.argv[5]) if len(sys.argv) > 5 else default_numIterationsStageOne
+        numIterationsStageTwo = int(sys.argv[6]) if len(sys.argv) > 6 else default_numIterationsStageTwo
+        listIterations = [numIterationsStageOne, numIterationsStageTwo]
+        print(f"numRuns: {numRuns}, iterations: {listIterations}")
+
+        optimizeSeats(filename_opponents, filename_seats, numRuns, listIterations)
     
     if command == "participants":
-        demoParticipants(filename_participants)
+        filename_participants = sys.argv[2] if len(sys.argv) > 2 else default_participants
+        generateParticipants(conf, filename_participants)
 
     if command == "show":
-        filename = sys.argv[2] if len(sys.argv) >=3 else filename_seats
-        demoMwt(filename_seats, filename_participants)
+        filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
+        filename_participants = sys.argv[3] if len(sys.argv) > 3 else default_participants
+        showSchedule(filename_schedule, filename_participants)
     
 if __name__ == '__main__':
     main()

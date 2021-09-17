@@ -18,15 +18,27 @@ class OptimizeOpponents:
     bestSchedule: Schedule
     bestScore: float
 
+    expectedZeroPairs: int
+    
+    # this callback is for every Schedule generated on iteration if it is not that good
+    callbackCurrSchedule = None
+
+    # this callback is for Schedule that is the best at the current moment
+    callbackBetterSchedule = None
+
     def log(self, *kargs, **kwargs):
         if self.verbose:
             print(*kargs, **kwargs)
 
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
+        
 
-    def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
+    def optimize(self, conf: Configuration, numRuns: int, numIterations: int, expectedZeroPairs : int = 0):
         print("\n*** Optimize opponents")
+
+        print(f"Expected zero pairs: {expectedZeroPairs}")
+        self.expectedZeroPairs = expectedZeroPairs
 
         self.bestSchedule = None
         self.bestScore = 0
@@ -39,13 +51,19 @@ class OptimizeOpponents:
 
             self.schedule.updateGamesFromSlots()
 
-            # debug output
-            Print.printPairsMatrix(self.schedule)
+            
 
             if not self.bestSchedule or self.score < self.bestScore:
-                print("Found best schedule!")
                 self.bestSchedule = self.schedule
                 self.bestScore = self.score
+                
+                # callback for better schedule
+                if self.callbackBetterSchedule:
+                    self.callbackBetterSchedule(self.bestSchedule)        
+            else:
+                # callback for every schedule
+                if self.callbackCurrSchedule:
+                    self.callbackCurrSchedule(self.schedule)
             
             self.schedule = None
             self.score = 0
@@ -198,9 +216,10 @@ class OptimizeOpponents:
             if pairs[0] == 1:
                 zeroPlayers +=1
         
-        expectedZeroPairs = 2
-        expectedZeroPlayers = 2 * expectedZeroPairs
-        zeroPenalty = 100 * (zeroPlayers - expectedZeroPlayers) ** 2
-
+        zeroPenalty = 0
+        if self.expectedZeroPairs > 0: 
+            expectedZeroPlayers = 2 * self.expectedZeroPairs
+            zeroPenalty = 100 * (zeroPlayers - expectedZeroPlayers) ** 2
+        
         return basePenalty + zeroPenalty
 

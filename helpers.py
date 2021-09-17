@@ -10,7 +10,7 @@ def saveSchedule(schedule: Schedule, fname: str):
     home = os.path.expanduser("~")
     filename = os.path.join(home, fname)
     print(f"Saving schedule to: {filename}")
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(jsonStr)
 
 def saveParticipants(participants : Participants, fname : str):
@@ -20,14 +20,14 @@ def saveParticipants(participants : Participants, fname : str):
     home = os.path.expanduser("~")
     filename = os.path.join(home, fname)
     print(f"Saving participants to: {filename}")
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(jsonStr)
 
 def loadSchedule(fname: str) -> Schedule:
     home = os.path.expanduser("~")
     filename = os.path.join(home, fname)
     print(f"Loading schedule from: {filename}")
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         s = f.read()
     d = json.loads(s)
 
@@ -39,7 +39,7 @@ def loadParticipants(fname: str) -> Participants:
     home = os.path.expanduser("~")
     filename = os.path.join(home, fname)
     print(f"Loading participants from: {filename}")
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         s = f.read()
     d = json.loads(s)
 

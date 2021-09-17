@@ -9,8 +9,11 @@ class OptimizeSeats:
     verbose: bool
     schedule: Schedule
 
+    # this callback is for Schedule that is the best at the current moment
+    callbackBetterSchedule : None
 
     shuffleGameFunc = None
+
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
@@ -49,6 +52,10 @@ class OptimizeSeats:
                 print(f"Found best seating, score : {self.currentScore:8.4f}")
                 self.bestScore = self.currentScore
                 self.bestGamePlayers = self.schedule.saveGamePlayers()
+                
+                if self.callbackBetterSchedule:
+                  self.schedule.updateGamePlayers(self.bestGamePlayers)
+                  self.callbackBetterSchedule(self.schedule)
         
         self.schedule.updateGamePlayers(self.bestGamePlayers)
 
