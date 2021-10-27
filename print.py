@@ -102,7 +102,11 @@ class Print:
                             break
                 str += roundStr
 
-            header = f"Player {playerId:2d}: "
+            if schedule.participants is None: 
+                header = f"Player {playerId:2d}: "
+            else:
+                playerName = schedule.participants[playerId].name
+                header = f"{playerName:20}:"
             print(f"{header}{str}")
 
     @staticmethod

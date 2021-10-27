@@ -20,9 +20,21 @@ Configurations = {
         Configuration(numPlayers=36, numTables=3, numRounds=12,
                       numGames=36, numAttempts=10),
 
-    "mlm2021":
+    "mlm2021-20":
         Configuration(numPlayers=20, numTables=2, numRounds=10,
                       numGames=20, numAttempts=10),
+
+    "mlm2021-16":
+        Configuration(numPlayers=16, numTables=1, numRounds=16,
+                      numGames=16, numAttempts=10),
+
+    "chicago2021":
+        Configuration(numPlayers=28, numTables=2, numRounds=14,
+                      numGames=28, numAttempts=10),
+
+    "sacramento2021":
+        Configuration(numPlayers=28, numTables=2, numRounds=14,
+                      numGames=28, numAttempts=10),
 }
 
 
@@ -32,13 +44,13 @@ def main():
         print("Expected opponents|seats|show")
         return
 
-    conf_name = "mlm2021"
+    conf_name = "sacramento2021"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
     default_opponents = f"{conf_name}_opponents.txt"
     default_seats = f"{conf_name}_seats.txt"
-    default_participants = f"{conf_name}_participants.txt"
+    default_participants = None # f"{conf_name}_participants.txt"
 
     command = sys.argv[1]
     print(f"Command: {command}")
@@ -54,10 +66,13 @@ def main():
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
         default_zeroPairs = 0
+        default_singlePairs = 0
         expectedZeroPairs = int(sys.argv[5]) if len(sys.argv) > 5 else default_zeroPairs
+        expectedSinglePairs = int(sys.argv[6]) if len(sys.argv) > 6 else default_singlePairs
         print(f"ExpectedZeroPairs: {expectedZeroPairs}")
+        print(f"ExpectedSinglePairs: {expectedSinglePairs}")
 
-        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, expectedZeroPairs)
+        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [expectedZeroPairs, expectedSinglePairs])
 
     if command == "seats":
         filename_opponents = sys.argv[2] if len(sys.argv) > 2 else default_opponents

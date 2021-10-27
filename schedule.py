@@ -114,7 +114,25 @@ class Schedule:
             return False
         return True
 
-    def validate(self) -> bool:
+    def validateGame(self, game):
+        players = set[int]()
+        for playerId in game.players:
+            if playerId < 0 or playerId > self.numPlayers:
+                raise ScheduleException(f"Invalid player id: {player.id}")
+            if playerId in players:
+                raise ScheduleException(f"Player: {playerId} can not play in a single game #{game.id} twice!")
+            players.add(playerId)
+
+    def validateRound(self, round):
+        players = set[int]()
+        for gameId in round.gameIds:
+            game = self.games[gameId]
+            for playerId in game.players:
+                if playerId in players:
+                    raise ScheduleException(f"Player: {playerId} can not play in a single round #{round.id} twice!")
+                players.add(playerId)
+
+    def validate(self):
         if self._participants != None and len(self._participants) != self.numPlayers:
             raise ScheduleException(
                 f"Participant count: {self._players} must match configuration: {self.numPlayers}")
@@ -158,6 +176,15 @@ class Schedule:
         if len(leftIds) != 0:
             raise ScheduleException(
                 f"Some games are not in any round: {leftIds}")
+
+        # validate game
+        for game in self._games:
+            self.validateGame(game)
+
+        # validate round
+        for round in self._rounds:
+            self.validateRound(round)
+
 
         # calc number of games played by every player
         gamesPlayed = {}

@@ -18,7 +18,9 @@ class OptimizeOpponents:
     bestSchedule: Schedule
     bestScore: float
 
+    # TODO: refactor into expectedPairs list, -1 means no constraint
     expectedZeroPairs: int
+    expectedSinglePairs : int
     
     # this callback is for every Schedule generated on iteration if it is not that good
     callbackCurrSchedule = None
@@ -32,14 +34,11 @@ class OptimizeOpponents:
 
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
-        
+        # self.expectedZeroPairs = expectedZeroPairs
 
-    def optimize(self, conf: Configuration, numRuns: int, numIterations: int, expectedZeroPairs : int = 0):
+    def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
         print("\n*** Optimize opponents")
-
-        print(f"Expected zero pairs: {expectedZeroPairs}")
-        self.expectedZeroPairs = expectedZeroPairs
-
+        
         self.bestSchedule = None
         self.bestScore = 0
         for i in range(numRuns):
@@ -50,8 +49,6 @@ class OptimizeOpponents:
             self.optimizeStage(numIterations)
 
             self.schedule.updateGamesFromSlots()
-
-            
 
             if not self.bestSchedule or self.score < self.bestScore:
                 self.bestSchedule = self.schedule
@@ -211,15 +208,29 @@ class OptimizeOpponents:
             basePenalty += metrics.penaltyPlayer(playerId)
 
         zeroPlayers = 0
+        singlePlayers = 0
         for playerId in range(self.schedule.numPlayers):
             pairs = metrics.calcPlayerPairsHistogram(playerId)
             if pairs[0] == 1:
                 zeroPlayers +=1
+            if pairs[1] == 1:
+                singlePlayers += 1
         
+        # big number to affect basePenalty
+        penaltyCoefficient = 100
+
         zeroPenalty = 0
         if self.expectedZeroPairs > 0: 
             expectedZeroPlayers = 2 * self.expectedZeroPairs
-            zeroPenalty = 100 * (zeroPlayers - expectedZeroPlayers) ** 2
+            zeroPenalty = penaltyCoefficient * (zeroPlayers - expectedZeroPlayers) ** 2
+
+        singlePenalty = 0
+        if self.expectedSinglePairs > 0: 
+            expectedSinglePlayers = 2 * self.expectedSinglePairs
+            singlePenalty = penaltyCoefficient * (singlePlayers - expectedSinglePlayers) ** 2
+
         
-        return basePenalty + zeroPenalty
+        return basePenalty + zeroPenalty + singlePenalty
+
+
 

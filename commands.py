@@ -19,7 +19,8 @@ def callbackPrintOpponents(s : Schedule, filename : str):
     Print.printScheduleByPlayers(s)
     Print.printOpponentsMatrix(s)
     Print.printPairsMatrix(s)
-    Print.printMinMaxPairs(s, [0, 1, 2, 7, 8, 9])
+    Print.printMinMaxPairs(s, [0, 1])
+    Print.printMinMaxPairs(s, [6, 7, 8, 9])
 
     if filename is not None:
         saveSchedule(s, filename)
@@ -31,19 +32,24 @@ def callbackPrintSeats(s : Schedule, filename : str):
     if filename is not None:
         saveSchedule(s, filename)
 
-def optimizeOpponents(conf, filename_opponents, numRuns : int, numIterations : int, expectedZeroPairs : int = 0):
+def optimizeOpponents(conf, filename_opponents, numRuns : int, numIterations : int, expectedPairs : list[int] = [0, 0]):
     conf.validate()
     
     solver = OptimizeOpponents(verbose=False)
     solver.callbackCurrSchedule = lambda s : callbackPrintShortOpponents(s)
     solver.callbackBetterSchedule = lambda s: callbackPrintOpponents(s, filename_opponents)
-    s = solver.optimize(conf, numRuns, numIterations, expectedZeroPairs)
+
+    # TODO: refactor into expectedPairs list, -1 means no constraint
+    solver.expectedZeroPairs = expectedPairs[0]
+    solver.expectedSinglePairs = expectedPairs[1]
+    s = solver.optimize(conf, numRuns, numIterations)
 
     print("\n*** Schedule after opponents optimization:")
     callbackPrintOpponents(s, filename_opponents)  
 
 def optimizeSeats(filename_opponents, filename_seats, numRuns, iterations: list[int]):
     s = loadSchedule(filename_opponents)
+    s.validate()
     s.generateSlotsFromGames()
 
     # callbackPrintOpponents(s, None)
@@ -64,19 +70,20 @@ def generateParticipants(conf : Configuration, filename_participants):
 
 def showSchedule(filename, filename_participants):
     s = loadSchedule(filename)
-
-    Print.printScheduleByGames(s)
-    Print.printScheduleByPlayers(s)
-    Print.printOpponentsMatrix(s)
-    Print.printPairsMatrix(s)
-    Print.printMinMaxPairs(s, [0, 1, 2, 7, 8, 9])
-    Print.printSeatsMatrix(s)
-
-    print("\n*** MWT-compatible schedule with IDs:")
-    Print.printMwtSchedule(s)
+    s.validate()
 
     if filename_participants is not None:
         participants = loadParticipants(filename_participants)
         s.setParticipants(participants)
-        print("\n*** MWT-compatible schedule with names:")
-        Print.printMwtSchedule(s)
+    
+    # Print.printScheduleByGames(s)
+    Print.printScheduleByPlayers(s)
+    Print.printOpponentsMatrix(s)
+    Print.printPairsMatrix(s)
+    Print.printMinMaxPairs(s, [0, 1])
+    Print.printMinMaxPairs(s, [6, 7, 8, 9])
+    Print.printSeatsMatrix(s)
+
+    
+    print("\n*** MWT-compatible schedule:")
+    Print.printMwtSchedule(s)
