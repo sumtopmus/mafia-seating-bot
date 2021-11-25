@@ -91,7 +91,12 @@ class OptimizeOpponents:
                 roundTwo = random.choice(self.schedule.rounds)
             return self.randomOpponentChangeInRounds(roundOne.id, roundTwo.id)
 
-        r = random.choice(self.schedule.rounds)
+        # special case - last round is NOT full and only contains 1 table
+        # so we back up to
+        r = None 
+        while (r is None) or (len(r.gameIds) == 1):
+            r = random.choice(self.schedule.rounds)
+
         gameOneId = random.choice(r.gameIds)
         gameTwoId = gameOneId
         while gameTwoId == gameOneId:
