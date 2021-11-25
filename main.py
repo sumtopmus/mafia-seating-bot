@@ -35,6 +35,14 @@ Configurations = {
     "sacramento2021":
         Configuration(numPlayers=28, numTables=2, numRounds=14,
                       numGames=28, numAttempts=10),
+
+    "blackfriday2021-20p":
+        Configuration(numPlayers=20, numTables=2, numRounds=10,
+                      numGames=20, numAttempts=10),
+
+    "blackfriday2021-21p":
+        Configuration(numPlayers=21, numTables=2, numRounds=11,
+                      numGames=21, numAttempts=10),
 }
 
 
@@ -44,7 +52,7 @@ def main():
         print("Expected opponents|seats|show")
         return
 
-    conf_name = "sacramento2021"
+    conf_name = "blackfriday2021-21p"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
