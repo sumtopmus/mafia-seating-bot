@@ -1,9 +1,10 @@
 
-from configuration import Configuration
-from schedule import *
-from round import *
-from game import *
-from player import *
+from .configuration import Configuration
+from .schedule import *
+from .round import *
+from .game import *
+from .player import *
+
 
 class ScheduleFactory:
     def createInitialSchedule(conf: Configuration):
@@ -32,7 +33,7 @@ class ScheduleFactory:
                 game = Game(gameId, playerIds)
                 games.append(game)
                 gamesInRound.append(gameId)
-                gameId = gameId + 1                
+                gameId = gameId + 1
 
             # create next round
             round = Round(roundNum, gamesInRound)

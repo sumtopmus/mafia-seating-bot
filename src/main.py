@@ -1,7 +1,7 @@
 import sys
 from commands import *
-from schedule import *
- 
+from mafia_schedule import Configuration
+
 Configurations = {
     "VaWaCa-2017":
         Configuration(numPlayers=25, numTables=2, numRounds=10,
@@ -46,7 +46,6 @@ Configurations = {
 }
 
 
-
 def main():
     if len(sys.argv) < 2:
         print("Expected opponents|seats|show")
@@ -58,55 +57,67 @@ def main():
 
     default_opponents = f"{conf_name}_opponents.txt"
     default_seats = f"{conf_name}_seats.txt"
-    default_participants = None # f"{conf_name}_participants.txt"
+    default_participants = None  # f"{conf_name}_participants.txt"
 
     command = sys.argv[1]
     print(f"Command: {command}")
 
     if command == "opponents":
-        filename_opponents = sys.argv[2] if len(sys.argv) > 2 else default_opponents
+        filename_opponents = sys.argv[2] if len(
+            sys.argv) > 2 else default_opponents
         print(f"Output opponents: {filename_opponents}")
-        
+
         default_numRuns = 10
         default_numIterations = 10 * 1000
         numRuns = int(sys.argv[3]) if len(sys.argv) > 3 else default_numRuns
-        numIterations = int(sys.argv[4]) if len(sys.argv) > 4 else default_numIterations
+        numIterations = int(sys.argv[4]) if len(
+            sys.argv) > 4 else default_numIterations
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
         default_zeroPairs = 0
         default_singlePairs = 0
-        expectedZeroPairs = int(sys.argv[5]) if len(sys.argv) > 5 else default_zeroPairs
-        expectedSinglePairs = int(sys.argv[6]) if len(sys.argv) > 6 else default_singlePairs
+        expectedZeroPairs = int(sys.argv[5]) if len(
+            sys.argv) > 5 else default_zeroPairs
+        expectedSinglePairs = int(sys.argv[6]) if len(
+            sys.argv) > 6 else default_singlePairs
         print(f"ExpectedZeroPairs: {expectedZeroPairs}")
         print(f"ExpectedSinglePairs: {expectedSinglePairs}")
 
-        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [expectedZeroPairs, expectedSinglePairs])
+        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [
+                          expectedZeroPairs, expectedSinglePairs])
 
     if command == "seats":
-        filename_opponents = sys.argv[2] if len(sys.argv) > 2 else default_opponents
+        filename_opponents = sys.argv[2] if len(
+            sys.argv) > 2 else default_opponents
         filename_seats = sys.argv[3] if len(sys.argv) > 3 else default_seats
         print(f"Input opponents: {filename_opponents}")
         print(f"Output seats: {filename_seats}")
 
-        default_numRuns = 10 
+        default_numRuns = 10
         default_numIterationsStageOne = 10 * 1000
         default_numIterationsStageTwo = 10 * 1000
         numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns
-        numIterationsStageOne = int(sys.argv[5]) if len(sys.argv) > 5 else default_numIterationsStageOne
-        numIterationsStageTwo = int(sys.argv[6]) if len(sys.argv) > 6 else default_numIterationsStageTwo
+        numIterationsStageOne = int(sys.argv[5]) if len(
+            sys.argv) > 5 else default_numIterationsStageOne
+        numIterationsStageTwo = int(sys.argv[6]) if len(
+            sys.argv) > 6 else default_numIterationsStageTwo
         listIterations = [numIterationsStageOne, numIterationsStageTwo]
         print(f"numRuns: {numRuns}, iterations: {listIterations}")
 
-        optimizeSeats(filename_opponents, filename_seats, numRuns, listIterations)
-    
+        optimizeSeats(filename_opponents, filename_seats,
+                      numRuns, listIterations)
+
     if command == "participants":
-        filename_participants = sys.argv[2] if len(sys.argv) > 2 else default_participants
+        filename_participants = sys.argv[2] if len(
+            sys.argv) > 2 else default_participants
         generateParticipants(conf, filename_participants)
 
     if command == "show":
         filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
-        filename_participants = sys.argv[3] if len(sys.argv) > 3 else default_participants
+        filename_participants = sys.argv[3] if len(
+            sys.argv) > 3 else default_participants
         showSchedule(filename_schedule, filename_participants)
-    
+
+
 if __name__ == '__main__':
     main()

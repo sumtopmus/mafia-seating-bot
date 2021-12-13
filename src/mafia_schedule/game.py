@@ -1,11 +1,12 @@
 import dataclasses
 
-from player import *
+from .player import *
 
 
 # forward declarations
 class Game:
     pass
+
 
 class GameSet:
     pass
@@ -51,7 +52,7 @@ class GameSet:
     '''
     Game for opponents optimization, just set of players, without seat numbers
     '''
-    
+
     id: int
     players: set[int] = {}
 
@@ -64,5 +65,3 @@ class GameSet:
         '''Creates a GameSet from Game'''
         player_set = {id for id in game.players}
         return GameSet(game.id, player_set)
-
-

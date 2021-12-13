@@ -1,9 +1,9 @@
 import dataclasses
 
-from configuration import *
-from round import *
-from game import *
-from player import *
+from .configuration import *
+from .round import *
+from .game import *
+from .player import *
 
 
 class ScheduleException(Exception):
@@ -12,10 +12,10 @@ class ScheduleException(Exception):
 
 class Schedule:
     _configuration: Configuration
-    _participants : Participants
+    _participants: Participants
     _rounds = list[Round]
     _games = list[Game]
-    
+
     @property
     def configuration(self) -> Configuration:
         return self._configuration
@@ -23,7 +23,7 @@ class Schedule:
     @property
     def participants(self) -> Participants:
         return self._participants
-    
+
     @property
     def rounds(self) -> list[Round]:
         return self._rounds
@@ -58,7 +58,7 @@ class Schedule:
         self._rounds = rounds
         self._games = games
 
-    def setParticipants(self, people : Participants):
+    def setParticipants(self, people: Participants):
         self._participants = people
 
     def toJson(self):
@@ -95,15 +95,16 @@ class Schedule:
         for game in self.games:
             gamePlayers[game.id] = list(game.players)
         return gamePlayers
-    
-    def updateGamePlayers(self, gamePlayers : dict[int, list[int]]):
+
+    def updateGamePlayers(self, gamePlayers: dict[int, list[int]]):
         '''
         Loads game players from external dictionary.
         This function is used by multi-run seats optimization.
         '''
         for game in self.games:
             if game.id not in gamePlayers.keys():
-                raise RuntimeError(f"UpdatePlayers. Game: {game.id} is not specified in gamePlayers!")
+                raise RuntimeError(
+                    f"UpdatePlayers. Game: {game.id} is not specified in gamePlayers!")
             players = gamePlayers[game.id]
             game.players = list(players)
 
@@ -120,7 +121,8 @@ class Schedule:
             if playerId < 0 or playerId > self.numPlayers:
                 raise ScheduleException(f"Invalid player id: {player.id}")
             if playerId in players:
-                raise ScheduleException(f"Player: {playerId} can not play in a single game #{game.id} twice!")
+                raise ScheduleException(
+                    f"Player: {playerId} can not play in a single game #{game.id} twice!")
             players.add(playerId)
 
     def validateRound(self, round):
@@ -129,7 +131,8 @@ class Schedule:
             game = self.games[gameId]
             for playerId in game.players:
                 if playerId in players:
-                    raise ScheduleException(f"Player: {playerId} can not play in a single round #{round.id} twice!")
+                    raise ScheduleException(
+                        f"Player: {playerId} can not play in a single round #{round.id} twice!")
                 players.add(playerId)
 
     def validate(self):
@@ -184,7 +187,6 @@ class Schedule:
         # validate round
         for round in self._rounds:
             self.validateRound(round)
-
 
         # calc number of games played by every player
         gamesPlayed = {}

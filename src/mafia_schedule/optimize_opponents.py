@@ -1,10 +1,9 @@
-from schedule_factory import ScheduleFactory
-from schedule import *
-from metrics import *
-from print import *
-
-import copy
 import random
+
+from .configuration import Configuration
+from .schedule_factory import ScheduleFactory
+from .schedule import Schedule
+from .metrics import Metrics
 
 
 class OptimizeOpponents:
@@ -20,8 +19,8 @@ class OptimizeOpponents:
 
     # TODO: refactor into expectedPairs list, -1 means no constraint
     expectedZeroPairs: int
-    expectedSinglePairs : int
-    
+    expectedSinglePairs: int
+
     # this callback is for every Schedule generated on iteration if it is not that good
     callbackCurrSchedule = None
 
@@ -38,7 +37,7 @@ class OptimizeOpponents:
 
     def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
         print("\n*** Optimize opponents")
-        
+
         self.bestSchedule = None
         self.bestScore = 0
         for i in range(numRuns):
@@ -53,15 +52,15 @@ class OptimizeOpponents:
             if not self.bestSchedule or self.score < self.bestScore:
                 self.bestSchedule = self.schedule
                 self.bestScore = self.score
-                
+
                 # callback for better schedule
                 if self.callbackBetterSchedule:
-                    self.callbackBetterSchedule(self.bestSchedule)        
+                    self.callbackBetterSchedule(self.bestSchedule)
             else:
                 # callback for every schedule
                 if self.callbackCurrSchedule:
                     self.callbackCurrSchedule(self.schedule)
-            
+
             self.schedule = None
             self.score = 0
 
@@ -93,7 +92,7 @@ class OptimizeOpponents:
 
         # special case - last round is NOT full and only contains 1 table
         # so we back up to
-        r = None 
+        r = None
         while (r is None) or (len(r.gameIds) == 1):
             r = random.choice(self.schedule.rounds)
 
@@ -217,25 +216,23 @@ class OptimizeOpponents:
         for playerId in range(self.schedule.numPlayers):
             pairs = metrics.calcPlayerPairsHistogram(playerId)
             if pairs[0] == 1:
-                zeroPlayers +=1
+                zeroPlayers += 1
             if pairs[1] == 1:
                 singlePlayers += 1
-        
+
         # big number to affect basePenalty
         penaltyCoefficient = 100
 
         zeroPenalty = 0
-        if self.expectedZeroPairs > 0: 
+        if self.expectedZeroPairs > 0:
             expectedZeroPlayers = 2 * self.expectedZeroPairs
-            zeroPenalty = penaltyCoefficient * (zeroPlayers - expectedZeroPlayers) ** 2
+            zeroPenalty = penaltyCoefficient * \
+                (zeroPlayers - expectedZeroPlayers) ** 2
 
         singlePenalty = 0
-        if self.expectedSinglePairs > 0: 
+        if self.expectedSinglePairs > 0:
             expectedSinglePlayers = 2 * self.expectedSinglePairs
-            singlePenalty = penaltyCoefficient * (singlePlayers - expectedSinglePlayers) ** 2
+            singlePenalty = penaltyCoefficient * \
+                (singlePlayers - expectedSinglePlayers) ** 2
 
-        
         return basePenalty + zeroPenalty + singlePenalty
-
-
-

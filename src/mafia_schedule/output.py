@@ -1,6 +1,7 @@
 from typing import Callable
-from schedule import *
-from metrics import *
+
+from .schedule import Schedule
+from .metrics import Metrics
 
 
 class Print:

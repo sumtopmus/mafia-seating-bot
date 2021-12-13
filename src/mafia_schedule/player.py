@@ -15,7 +15,7 @@ class Participants:
     ''' Participants of tournament. Automatically assigns ids to players in constructor'''
 
     people: list[Player] = dataclasses.field(default_factory=list)
-    
+
     # don't declare as it will be included into JSON
     #_peopleDict: dict[int, Player] = None
 

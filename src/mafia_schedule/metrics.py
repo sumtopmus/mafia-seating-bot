@@ -1,8 +1,9 @@
-from game import *
-from player import *
-from schedule import Schedule
-
 import math
+
+from .game import Game
+from .player import Player
+from .schedule import Schedule
+
 
 class Metrics:
     def __init__(self, schedule: Schedule):
@@ -50,7 +51,7 @@ class Metrics:
                 pairs[numGames] += 1
         return pairs
 
-    def calcPlayerPairs(self, thisPlayerId : int):
+    def calcPlayerPairs(self, thisPlayerId: int):
         '''
         Calculates pairs for current user.
         This is dictionary <numGames>:[opponents]
@@ -58,7 +59,7 @@ class Metrics:
         pairs = {}
         for numGames in range(0, self.schedule.numAttempts + 1):
             pairs[numGames] = []
-        
+
         opponents = self.calcPlayerOpponents(thisPlayerId)
         for id in range(len(opponents)):
             if id != thisPlayerId:
@@ -74,7 +75,7 @@ class Metrics:
         allPairs = {}
         for val in range(self.schedule.numAttempts + 1):
             allPairs[val] = 0
-        
+
         for playerId in range(self.schedule.numPlayers):
             pairs = self.calcPlayerPairsHistogram(playerId)
 
@@ -82,28 +83,28 @@ class Metrics:
                 allPairs[numGames] += numPairs
         return allPairs
 
-    def pairsHistogramSum(self, pairs : dict):
+    def pairsHistogramSum(self, pairs: dict):
         result = 0
         for numGames, numPairs in pairs.items():
-            result += numPairs      
+            result += numPairs
         return result
 
-    def pairsHistogramCenter(self, pairs : dict):
+    def pairsHistogramCenter(self, pairs: dict):
         totalMult = 0
         totalPairs = 0
         for numGames, numPairs in pairs.items():
             totalMult += (numGames + 1) * numPairs * numPairs
             totalPairs += numPairs * numPairs
-        
+
         center = totalMult / totalPairs
         return center
 
-    def pairsHistogramRange(self, pairs : dict):
+    def pairsHistogramRange(self, pairs: dict):
         beg = None
         for idx in sorted(pairs):
             if beg == None and pairs[idx] > 0:
                 beg = idx
-        
+
         end = None
         for idx in reversed(sorted(pairs)):
             if end == None and pairs[idx] > 0:
@@ -114,17 +115,17 @@ class Metrics:
         hist = {}
         for val in range(self.schedule.numAttempts + 1):
             hist[val] = 0
-        
+
         numPairs = self.schedule.numPlayers - 1
         target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
 
         idxLow = math.floor(target)
         idxHi = math.ceil(target)
-        hist[idxLow] = numPairs * (idxHi - target) 
+        hist[idxLow] = numPairs * (idxHi - target)
         hist[idxHi] = numPairs - hist[idxLow]
         return hist
 
-    def penaltyPlayer(self, playerId : int):
+    def penaltyPlayer(self, playerId: int):
         target = 9 * self.schedule.numAttempts / (self.schedule.numPlayers-1)
         if self.idealHist == None:
             self.idealHist = self.penaltyIdealHistogram()
@@ -134,7 +135,7 @@ class Metrics:
         penalty = 0.0
         for idx in hist:
             idxDist = (idx - target) ** 2
-            valueDist = abs(self.idealHist[idx] - hist[idx]) # ** 2
+            valueDist = abs(self.idealHist[idx] - hist[idx])  # ** 2
             penalty += idxDist * valueDist
         return penalty
 

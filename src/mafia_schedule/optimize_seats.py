@@ -1,8 +1,8 @@
 import random
 
-from schedule import *
-from metrics import *
-from print import *
+from .schedule import Schedule
+from .metrics import Metrics
+from .game import Game
 
 
 class OptimizeSeats:
@@ -10,10 +10,9 @@ class OptimizeSeats:
     schedule: Schedule
 
     # this callback is for Schedule that is the best at the current moment
-    callbackBetterSchedule : None
+    callbackBetterSchedule: None
 
     shuffleGameFunc = None
-
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
@@ -52,11 +51,11 @@ class OptimizeSeats:
                 print(f"Found best seating, score : {self.currentScore:8.4f}")
                 self.bestScore = self.currentScore
                 self.bestGamePlayers = self.schedule.saveGamePlayers()
-                
+
                 if self.callbackBetterSchedule:
-                  self.schedule.updateGamePlayers(self.bestGamePlayers)
-                  self.callbackBetterSchedule(self.schedule)
-        
+                    self.schedule.updateGamePlayers(self.bestGamePlayers)
+                    self.callbackBetterSchedule(self.schedule)
+
         self.schedule.updateGamePlayers(self.bestGamePlayers)
 
     def optimizeStage(self, iterations: int):
@@ -123,7 +122,7 @@ class OptimizeSeats:
             seats = m.calcPlayerSeatsHistogram(playerId)
             sd = m.calcSquareDeviation(seats, target)
             penalty += sd
-            
+
             # half simmetry
             '''if calcHalfSimmetry:
                 allSeats = sum(seats)
@@ -133,7 +132,7 @@ class OptimizeSeats:
                 penalty_hi = (k_hi - 0.5) ** 2
                 penalty += factorHalf * (penalty_lo + penalty_hi)
             '''
-            
+
             # tripple simmetry
             if calcTrippleSimmetry:
                 allSeats = sum(seats)
@@ -144,7 +143,7 @@ class OptimizeSeats:
                 penalty_b = (10 * k_b - 4) ** 2
                 penalty_c = (10 * k_c - 3) ** 2
                 penalty += factorTripple * (penalty_a + penalty_b + penalty_c)
-            
+
             # first and last simmetry
             if calcFirstLastSimmetry:
                 allSeats = sum(seats)

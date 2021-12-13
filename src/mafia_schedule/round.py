@@ -1,5 +1,6 @@
 import dataclasses
 
+
 @dataclasses.dataclass(frozen=True, order=False)
 class Round:
     '''
@@ -14,4 +15,3 @@ class Round:
     def fromJson(d: dict):
         gameIds = [id for id in d['gameIds']]
         return Round(d['id'], gameIds)
-

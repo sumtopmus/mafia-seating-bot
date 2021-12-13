@@ -1,7 +1,9 @@
 import json
 import os.path
 
-from schedule import *
+from .schedule import Schedule
+from .player import Player, Participants
+
 
 def saveSchedule(schedule: Schedule, fname: str):
     jsonDict = schedule.toJson()
@@ -13,7 +15,8 @@ def saveSchedule(schedule: Schedule, fname: str):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(jsonStr)
 
-def saveParticipants(participants : Participants, fname : str):
+
+def saveParticipants(participants: Participants, fname: str):
     jsonDict = participants.toJson()
     jsonStr = json.dumps(jsonDict, indent=2)
 
@@ -22,6 +25,7 @@ def saveParticipants(participants : Participants, fname : str):
     print(f"Saving participants to: {filename}")
     with open(filename, "w", encoding="utf-8") as f:
         f.write(jsonStr)
+
 
 def loadSchedule(fname: str) -> Schedule:
     home = os.path.expanduser("~")
@@ -34,6 +38,7 @@ def loadSchedule(fname: str) -> Schedule:
     s = Schedule.fromJson(d)
     s.generateSlotsFromGames()
     return s
+
 
 def loadParticipants(fname: str) -> Participants:
     home = os.path.expanduser("~")

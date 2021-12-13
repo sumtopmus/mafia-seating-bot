@@ -1,15 +1,5 @@
-from schedule import *
-from schedule_factory import *
-
-from player import *
-from game import *
-from metrics import *
-from print import *
-
-from optimize_opponents import *
-from optimize_seats import *
-
-from helpers import *
+from mafia_schedule import *
+from mafia_schedule.helpers import *
 
 
 def callbackPrintShortOpponents(s: Schedule):
