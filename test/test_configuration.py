@@ -60,58 +60,68 @@ class TestConfiguration(unittest.TestCase):
     def test_configuration_validate_fail_players(self):
         '''players must be >=10'''
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=-1, numTables=1, numRounds=10, numGames=10, numAttempts=10)
-            c.validate()       
+            c = Configuration(numPlayers=-1, numTables=1,
+                              numRounds=10, numGames=10, numAttempts=10)
+            c.validate()
 
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=9, numTables=1, numRounds=10, numGames=10, numAttempts=10)
+            c = Configuration(numPlayers=9, numTables=1,
+                              numRounds=10, numGames=10, numAttempts=10)
             c.validate()
 
     def test_configuration_validate_fail_zeroValues(self):
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=0, numTables=1, numRounds=10, numGames=10, numAttempts=10)
+            c = Configuration(numPlayers=0, numTables=1,
+                              numRounds=10, numGames=10, numAttempts=10)
             c.validate()
 
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=10, numTables=0, numRounds=10, numGames=10, numAttempts=10)
+            c = Configuration(numPlayers=10, numTables=0,
+                              numRounds=10, numGames=10, numAttempts=10)
             c.validate()
 
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=10, numTables=1, numRounds=0, numGames=10, numAttempts=10)
+            c = Configuration(numPlayers=10, numTables=1,
+                              numRounds=0, numGames=10, numAttempts=10)
             c.validate()
 
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=10, numTables=1, numRounds=10, numGames=0, numAttempts=10)
+            c = Configuration(numPlayers=10, numTables=1,
+                              numRounds=10, numGames=0, numAttempts=10)
             c.validate()
-        
+
         with self.assertRaises(ConfigurationException):
-            c = Configuration(numPlayers=10, numTables=1, numRounds=10, numGames=10, numAttempts=0)
+            c = Configuration(numPlayers=10, numTables=1,
+                              numRounds=10, numGames=10, numAttempts=0)
             c.validate()
 
     def test_configuration_validate_gamesRoundsMatch(self):
         '''games must be in range [tables * rounds-1; rables * rounds]'''
         with self.assertRaises(ConfigurationException):
             # rounds must be 12 here
-            c = Configuration(numPlayers=35, numTables=3, numRounds=10, numGames=35, numAttempts=10)
+            c = Configuration(numPlayers=35, numTables=3,
+                              numRounds=10, numGames=35, numAttempts=10)
             c.validate()
 
         with self.assertRaises(ConfigurationException):
             # rounds must be 12 here
-            c = Configuration(numPlayers=35, numTables=3, numRounds=13, numGames=35, numAttempts=10)
+            c = Configuration(numPlayers=35, numTables=3,
+                              numRounds=13, numGames=35, numAttempts=10)
             c.validate()
 
     def test_configuration_validate_attemptsGamesMatch(self):
         '''players x attempts must be == games * 10'''
         with self.assertRaises(ConfigurationException):
             # attempts must be 10 here
-            c = Configuration(numPlayers=35, numTables=3, numRounds=12, numGames=35, numAttempts=8)
+            c = Configuration(numPlayers=35, numTables=3,
+                              numRounds=12, numGames=35, numAttempts=8)
             c.validate()
 
         with self.assertRaises(ConfigurationException):
             # attempts must be 10 here
-            c = Configuration(numPlayers=35, numTables=3, numRounds=12, numGames=35, numAttempts=12)
+            c = Configuration(numPlayers=35, numTables=3,
+                              numRounds=12, numGames=35, numAttempts=12)
             c.validate()
-        
 
 
 if __name__ == '__main__':
