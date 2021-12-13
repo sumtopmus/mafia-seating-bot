@@ -1,5 +1,6 @@
 import unittest
-from player import *
+
+from player import Player, Participants
 
 
 class TestParticipants(unittest.TestCase):

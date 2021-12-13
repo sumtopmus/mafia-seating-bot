@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 
-from player import *
+from player import Player
 
 
 class TestPlayer(unittest.TestCase):

@@ -1,8 +1,10 @@
 import unittest
-from schedule import Configuration
-from schedule import *
-from player import *
-from game import *
+
+from configuration import Configuration
+from schedule import Schedule
+from round import Round
+from game import Game
+
 
 class TestSchedule(unittest.TestCase):
     def test_schedule_CreateEmpty(self):
@@ -14,7 +16,8 @@ class TestSchedule(unittest.TestCase):
 
     def test_schedule_CreateSimple(self):
         numPlayers = 10
-        conf = Configuration(numPlayers, numTables = 1, numRounds = 1, numGames = 1, numAttempts = 1)
+        conf = Configuration(numPlayers, numTables=1,
+                             numRounds=1, numGames=1, numAttempts=1)
         game = Game(1, list(range(numPlayers)))
         games = [game]
         rounds = [Round(1, [game.id])]
@@ -24,8 +27,9 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(s.participants, None)
         self.assertEqual(len(s.rounds), 1)
         self.assertEqual(len(s.games), 1)
-    
+
     pass
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 
-from configuration import *
+from configuration import Configuration, ConfigurationException
 
 
 class TestConfiguration(unittest.TestCase):

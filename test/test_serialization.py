@@ -2,12 +2,12 @@ import dataclasses
 import unittest
 import json
 
-from schedule_factory import *
-from configuration import *
-from schedule import *
-from round import *
-from game import *
-from player import *
+from mafia_schedule.configuration import Configuration
+from mafia_schedule.schedule_factory import ScheduleFactory
+from mafia_schedule.schedule import Schedule
+from mafia_schedule.round import Round
+from mafia_schedule.game import Game
+from mafia_schedule.player import Player, Participants
 
 
 class TestSerialization(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestSerialization(unittest.TestCase):
         playerLike = Player(112, 'like')
         playerAman = Player(113, 'aman')
         d = {'id': 525,
-             'players': [ 112, 113]}
+             'players': [112, 113]}
 
         game = Game.fromJson(d)
         self.assertEqual(game.id, 525)

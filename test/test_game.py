@@ -1,6 +1,7 @@
 import unittest
-from game import *
-from player import *
+
+from game import Game
+from player import Player, Participants
 
 
 class TestGame(unittest.TestCase):

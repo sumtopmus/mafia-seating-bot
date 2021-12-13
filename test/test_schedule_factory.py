@@ -1,10 +1,8 @@
 import unittest
 
-from schedule_factory import *
-from schedule import *
-from round import *
-from game import *
-from player import *
+from configuration import Configuration
+from schedule_factory import ScheduleFactory
+from schedule import Schedule
 
 
 class TestScheduleFactory(unittest.TestCase):
