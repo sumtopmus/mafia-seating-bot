@@ -6,5 +6,5 @@ sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 
 # we turn off formatting here as we need to import src AFTER changing sys.path
 # fmt: off
-import mafia_schedule
+import src.mafia_schedule
 # fmt: on
