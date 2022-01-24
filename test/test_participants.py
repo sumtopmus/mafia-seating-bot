@@ -1,6 +1,6 @@
 import unittest
 
-from player import Player, Participants
+from mafia_schedule.player import Player, Participants
 
 
 class TestParticipants(unittest.TestCase):

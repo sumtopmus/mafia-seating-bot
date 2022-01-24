@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 
-from player import Player
+from mafia_schedule.player import Player
 
 
 class TestPlayer(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 
-from game import Game
-from player import Player, Participants
+from mafia_schedule.game import Game
+from mafia_schedule.player import Player, Participants
 
 
 class TestGame(unittest.TestCase):

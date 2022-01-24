@@ -1,8 +1,8 @@
 import unittest
 
-from configuration import Configuration
-from schedule_factory import ScheduleFactory
-from schedule import Schedule
+from mafia_schedule.configuration import Configuration
+from mafia_schedule.schedule_factory import ScheduleFactory
+from mafia_schedule.schedule import Schedule
 
 
 class TestScheduleFactory(unittest.TestCase):

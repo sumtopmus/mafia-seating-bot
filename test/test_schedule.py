@@ -1,9 +1,9 @@
 import unittest
 
-from configuration import Configuration
-from schedule import Schedule
-from round import Round
-from game import Game
+from mafia_schedule.configuration import Configuration
+from mafia_schedule.schedule import Schedule
+from mafia_schedule.round import Round
+from mafia_schedule.game import Game
 
 
 class TestSchedule(unittest.TestCase):
