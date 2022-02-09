@@ -8,6 +8,7 @@ from .configuration import Configuration
 from .game import Game
 from .player import Player
 from .round import Round
+from .output import Print
 
 
 def saveSchedule(schedule: Schedule, path: str):
@@ -101,3 +102,11 @@ def loadScheduleFromMwt(conf: Configuration, path: str) -> Schedule:
 
     schedule = Schedule(conf, rounds, games)
     return schedule
+
+
+def saveScheduleToMwt(schedule: Schedule, path: str):
+    print(f"Saving schedule to: {path}")
+    with open(path, "w", encoding="utf-8") as f:
+        for line in Print.mwtSchedule(schedule):
+            f.write(line)
+            f.write("\n")

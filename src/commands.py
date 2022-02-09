@@ -104,6 +104,31 @@ def showSchedule(filename, filename_participants):
     Print.print(Print.mwtSchedule(s))
 
 
+def showTeamSchedule(filename, filename_participants):
+    path_schedule = getFilePath(filename)
+    s = loadSchedule(path_schedule)
+    s.validate()
+
+    # TODO: implement!
+    # s.validateTeams(teams = 20)
+
+    # Print.print(Print.scheduleByTeams(s))
+
+
+def showMwt(filename_schedule: str, filename_participants: str):
+    path_schedule = getFilePath(filename_schedule)
+    s = loadSchedule(path_schedule)
+    s.validate()
+
+    if filename_participants is not None:
+        path_participants = getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+        s.setParticipants(participants)
+
+    print("\n*** MWT-compatible schedule:")
+    Print.print(Print.mwtSchedule(s))
+
+
 def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
     path_mwt = getFilePath(filename_mwt)
     path_schedule = getFilePath(filename_schedule)
@@ -111,3 +136,13 @@ def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
     schedule = loadScheduleFromMwt(conf, path_mwt)
     schedule.validate()
     saveSchedule(schedule, path_schedule)
+
+
+def saveMwt(filename_schedule: str, filename_mwt):
+    path_schedule = getFilePath(filename_schedule)
+    path_mwt = getFilePath(filename_mwt)
+
+    s = loadSchedule(path_schedule)
+    s.validate()
+
+    saveScheduleToMwt(s, path_mwt)

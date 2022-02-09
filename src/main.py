@@ -45,8 +45,8 @@ Configurations = {
                       numGames=21, numAttempts=10),
 
     "rendezvouz-2022":
-        Configuration(numPlayers=40, numTables=4, numRounds=15,
-                      numGames=60, numAttempts=15),
+        Configuration(numPlayers=40, numTables=4, numRounds=2,
+                      numGames=8, numAttempts=2),
 }
 
 
@@ -125,11 +125,31 @@ def main():
             sys.argv) > 3 else default_participants
         commands.showSchedule(filename_schedule, filename_participants)
 
-    if command == "load_mwt":
+    if command == "show_mwt":
+        filename_schedule = sys.argv[2] if len(
+            sys.argv) > 2 else default_schedule
+        filename_participants = sys.argv[3] if len(
+            sys.argv) > 3 else default_participants
+        commands.showMwt(filename_schedule, filename_participants)
+
+    if command == "show_team":
+        filename_schedule = sys.argv[2] if len(
+            sys.argv) > 2 else default_schedule
+        filename_participants = sys.argv[3] if len(
+            sys.argv) > 3 else default_participants
+        commands.showTeamSchedule(filename_schedule, filename_participants)
+
+    if command == "mwt_to_schedule":
         filename_mwt = sys.argv[2] if len(sys.argv) > 2 else default_mwt
         filename_schedule = sys.argv[3] if len(
             sys.argv) > 3 else default_schedule
         commands.loadMwt(conf, filename_mwt, filename_schedule)
+
+    if command == "schedule_to_mwt":
+        filename_schedule = sys.argv[2] if len(
+            sys.argv) > 2 else default_schedule
+        filename_mwt = sys.argv[3] if len(sys.argv) > 3 else default_mwt
+        commands.saveMwt(filename_schedule, filename_mwt)
 
 
 if __name__ == '__main__':
