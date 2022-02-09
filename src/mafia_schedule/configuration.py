@@ -25,6 +25,9 @@ class Configuration:
     # Total number of games for every player
     numAttempts: int
 
+    # Total number of teams. O means - no teams
+    numTeams: int = 0
+
     def isValid(self) -> bool:
         try:
             self.validate()
@@ -52,6 +55,10 @@ class Configuration:
         if self.numAttempts < 1:
             raise ConfigurationException(
                 f"numAttempts must be >=1 (value: {self.numAttempts})")
+
+        if self.numTeams > 0 and (self.numPlayers % self.numTeams) != 0:
+            raise ConfigurationException(
+                f"Every team must have the same number of players (players: {self.numPlayers} teams: {self.numTeams})")
 
         numGamesLo = self.numTables * (self.numRounds - 1)
         numGamesHi = self.numTables * self.numRounds

@@ -119,11 +119,20 @@ class Schedule:
         players = set[int]()
         for playerId in game.players:
             if playerId < 0 or playerId > self.numPlayers:
-                raise ScheduleException(f"Invalid player id: {player.id}")
+                raise ScheduleException(f"Invalid player id: {playerId}")
             if playerId in players:
                 raise ScheduleException(
                     f"Player: {playerId} can not play in a single game #{game.id} twice!")
             players.add(playerId)
+
+        if self.configuration.numTeams > 0:
+            teams = set[int]()
+            for player_id in game.players:
+                team_id = player_id % self.configuration.numTeams
+                if team_id in teams:
+                    raise ScheduleException(
+                        f"Players of the same team: {team_id} can not play in a single game #{game.id}!")
+            teams.add(team_id)
 
     def validateRound(self, round):
         players = set[int]()
