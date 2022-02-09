@@ -52,6 +52,8 @@ Configurations = {
 
 def main():
     if len(sys.argv) < 2:
+        # TODO: implement dictionary with function pointer to every command
+        # Output all command in a generic way: from dictionary keys, not manually like here
         print("Expected opponents|seats|show|load_mwt")
         return
 
