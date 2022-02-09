@@ -69,7 +69,7 @@ class Print:
             header = f"Player {playerId:2d}: "
             str = ""
             for idx in numGames:
-                if len(pairs[idx]) == 0:
+                if idx >= len(pairs) or len(pairs[idx]) == 0:
                     continue
                 s = ''.join([f"{id:2d} " for id in pairs[idx]]
                             ) if len(pairs[idx]) < 5 else "..."
