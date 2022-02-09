@@ -45,8 +45,8 @@ Configurations = {
                       numGames=21, numAttempts=10),
 
     "rendezvouz-2022":
-        Configuration(numPlayers=40, numTables=4, numRounds=2,
-                      numGames=8, numAttempts=2),
+        Configuration(numPlayers=40, numTables=4, numRounds=15,
+                      numGames=60, numAttempts=15, numTeams=20),
 }
 
 
@@ -150,6 +150,11 @@ def main():
             sys.argv) > 2 else default_schedule
         filename_mwt = sys.argv[3] if len(sys.argv) > 3 else default_mwt
         commands.saveMwt(filename_schedule, filename_mwt)
+
+    if command == "rv":
+        filename_schedule = sys.argv[2] if len(
+            sys.argv) > 2 else default_schedule
+        commands.createRendezVouz(conf, filename_schedule)
 
 
 if __name__ == '__main__':

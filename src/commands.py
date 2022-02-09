@@ -2,6 +2,7 @@ import os
 
 from mafia_schedule import *
 from mafia_schedule.helpers import *
+import rendezvouz
 
 
 def getFilePath(filename: str) -> str:
@@ -92,27 +93,20 @@ def showSchedule(filename, filename_participants):
         participants = loadParticipants(path_participants)
         s.setParticipants(participants)
 
-    # Print.printScheduleByGames(s)
+    Print.print(Print.scheduleByGames(s))
     Print.print(Print.scheduleByPlayers(s))
+
+    Print.print(Print.playerTableHistogram(s))
     Print.print(Print.opponentsMatrix(s))
+
     Print.print(Print.pairsMatrix(s))
     Print.print(Print.minMaxPairs(s, [0, 1]))
     Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
+
     Print.print(Print.seatsMatrix(s))
 
     print("\n*** MWT-compatible schedule:")
     Print.print(Print.mwtSchedule(s))
-
-
-def showTeamSchedule(filename, filename_participants):
-    path_schedule = getFilePath(filename)
-    s = loadSchedule(path_schedule)
-    s.validate()
-
-    # TODO: implement!
-    # s.validateTeams(teams = 20)
-
-    # Print.print(Print.scheduleByTeams(s))
 
 
 def showMwt(filename_schedule: str, filename_participants: str):
@@ -138,7 +132,7 @@ def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
     saveSchedule(schedule, path_schedule)
 
 
-def saveMwt(filename_schedule: str, filename_mwt):
+def saveMwt(filename_schedule: str, filename_mwt: str):
     path_schedule = getFilePath(filename_schedule)
     path_mwt = getFilePath(filename_mwt)
 
@@ -146,3 +140,29 @@ def saveMwt(filename_schedule: str, filename_mwt):
     s.validate()
 
     saveScheduleToMwt(s, path_mwt)
+
+
+def createRendezVouz(conf: Configuration, filename_schedule: str):
+    path_schedule = getFilePath(filename_schedule)
+    schedule = rendezvouz.createRendezVouzSchedule(conf)
+
+    # required for opponents matrix
+    schedule.generateSlotsFromGames()
+
+    schedule.validate()
+
+    Print.print(Print.scheduleByPlayers(schedule))
+    # Print.print(Print.scheduleByGames(schedule))
+
+    Print.print(Print.scheduleByGender(schedule))
+    Print.print(Print.playerTableHistogram(schedule))
+
+    Print.print(Print.opponentsMatrix(schedule))
+    Print.print(Print.pairsMatrix(schedule))
+
+    opt = OptimizeOpponents(schedule)
+    opt.schedule = schedule
+    opt.expectedZeroPairs = 0
+    opt.expectedSinglePairs = 0
+    print(f"\nScore: {opt.scoreFunc():.2f}")
+    saveSchedule(schedule, path_schedule)
