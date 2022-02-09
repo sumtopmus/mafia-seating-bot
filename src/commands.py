@@ -1,3 +1,5 @@
+import os
+
 from mafia_schedule import *
 from mafia_schedule.helpers import *
 
@@ -100,3 +102,12 @@ def showSchedule(filename, filename_participants):
 
     print("\n*** MWT-compatible schedule:")
     Print.print(Print.mwtSchedule(s))
+
+
+def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
+    path_mwt = getFilePath(filename_mwt)
+    path_schedule = getFilePath(filename_schedule)
+
+    schedule = loadScheduleFromMwt(conf, path_mwt)
+    schedule.validate()
+    saveSchedule(schedule, path_schedule)

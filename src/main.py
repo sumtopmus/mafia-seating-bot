@@ -1,5 +1,5 @@
 import sys
-from commands import *
+import commands
 from mafia_schedule import Configuration
 
 Configurations = {
@@ -43,21 +43,28 @@ Configurations = {
     "blackfriday2021-21p":
         Configuration(numPlayers=21, numTables=2, numRounds=11,
                       numGames=21, numAttempts=10),
+
+    "rendezvouz-2022":
+        Configuration(numPlayers=40, numTables=4, numRounds=15,
+                      numGames=60, numAttempts=15),
 }
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Expected opponents|seats|show")
+        print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "blackfriday2021-21p"
+    conf_name = "rendezvouz-2022"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
     default_opponents = f"{conf_name}_opponents.txt"
     default_seats = f"{conf_name}_seats.txt"
     default_participants = None  # f"{conf_name}_participants.txt"
+
+    default_schedule = f"{conf_name}.txt"
+    default_mwt = f"{conf_name}_mwt.txt"
 
     command = sys.argv[1]
     print(f"Command: {command}")
@@ -83,8 +90,8 @@ def main():
         print(f"ExpectedZeroPairs: {expectedZeroPairs}")
         print(f"ExpectedSinglePairs: {expectedSinglePairs}")
 
-        optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [
-                          expectedZeroPairs, expectedSinglePairs])
+        commands.optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [
+            expectedZeroPairs, expectedSinglePairs])
 
     if command == "seats":
         filename_opponents = sys.argv[2] if len(
@@ -104,19 +111,25 @@ def main():
         listIterations = [numIterationsStageOne, numIterationsStageTwo]
         print(f"numRuns: {numRuns}, iterations: {listIterations}")
 
-        optimizeSeats(filename_opponents, filename_seats,
-                      numRuns, listIterations)
+        commands.optimizeSeats(filename_opponents, filename_seats,
+                               numRuns, listIterations)
 
     if command == "participants":
         filename_participants = sys.argv[2] if len(
             sys.argv) > 2 else default_participants
-        generateParticipants(conf, filename_participants)
+        commands.generateParticipants(conf, filename_participants)
 
     if command == "show":
         filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
         filename_participants = sys.argv[3] if len(
             sys.argv) > 3 else default_participants
-        showSchedule(filename_schedule, filename_participants)
+        commands.showSchedule(filename_schedule, filename_participants)
+
+    if command == "load_mwt":
+        filename_mwt = sys.argv[2] if len(sys.argv) > 2 else default_mwt
+        filename_schedule = sys.argv[3] if len(
+            sys.argv) > 3 else default_schedule
+        commands.loadMwt(conf, filename_mwt, filename_schedule)
 
 
 if __name__ == '__main__':
