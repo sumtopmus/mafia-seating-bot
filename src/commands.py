@@ -23,6 +23,7 @@ def callbackPrintOpponents(s: Schedule, path: str):
     Print.print(Print.scheduleByPlayers(s))
     Print.print(Print.opponentsMatrix(s))
     Print.print(Print.pairsMatrix(s))
+
     Print.print(Print.minMaxPairs(s, [0, 1]))
     Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
 
@@ -96,12 +97,17 @@ def showSchedule(filename, filename_participants):
     Print.print(Print.scheduleByGames(s))
     Print.print(Print.scheduleByPlayers(s))
 
-    Print.print(Print.playerTableHistogram(s))
+    # temp only - for rendez-vouz
+    # Print.print(Print.scheduleByGender(s))
+
+    if s.numTables > 1:
+        Print.print(Print.playerTableHistogram(s))
+
     Print.print(Print.opponentsMatrix(s))
 
     Print.print(Print.pairsMatrix(s))
-    Print.print(Print.minMaxPairs(s, [0, 1]))
-    Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
+    # Print.print(Print.minMaxPairs(s, [0, 1]))
+    # Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
 
     Print.print(Print.seatsMatrix(s))
 

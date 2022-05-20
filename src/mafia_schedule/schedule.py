@@ -52,6 +52,10 @@ class Schedule:
     def numAttempts(self) -> int:
         return self._configuration.numAttempts
 
+    @property
+    def numTeams(self) -> int:
+        return self._configuration.numTeams
+
     def __init__(self, conf: Configuration = None, rounds: list = [], games: list = []):
         self._configuration = conf
         self._participants = None

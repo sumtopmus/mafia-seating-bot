@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Callable
 
+from .format import Format
 from .schedule import Schedule
 from .metrics import Metrics
 
@@ -10,36 +11,6 @@ class Print:
     def print(func: Callable):
         for line in func:
             print(line)
-
-    @staticmethod
-    def pretty_player_id(player_id: int) -> str:
-        # just for TEAMS - revert it back!!!
-        # return f"{(player_id+1): >03d}"
-
-        # just temp for RendezVouz
-        numTeams = 20
-        team_id = player_id % numTeams
-        player_in_team = player_id // numTeams
-        player_str = chr(ord('x') + player_in_team)
-        return f"{(team_id+1):>2d}-{player_str}"
-
-    @ staticmethod
-    def pretty_team_id(player_id: int, numTeams: int) -> str:
-        team_id = (player_id // numTeams) + 1
-        team_shift = (player_id % numTeams) + 1
-        return f"{team_id+1}{team_shift}"
-
-    @ staticmethod
-    def pretty_round_id(round_id: int) -> str:
-        return f"{(round_id+1):>02d}"
-
-    @ staticmethod
-    def pretty_game_id(game_id: int) -> str:
-        return f"{(game_id+1):>02d}"
-
-    @staticmethod
-    def pretty_table_id(table_id: int) -> str:
-        return chr(ord('A') + table_id)
 
     @ staticmethod
     def slots(schedule: Schedule):
@@ -53,6 +24,7 @@ class Print:
 
     @ staticmethod
     def opponentsMatrix(schedule: Schedule):
+        f = Format(schedule)
         m = Metrics(schedule)
         matrix = m.calcOpponentsMatrix()
 
@@ -61,10 +33,11 @@ class Print:
         for playerId in range(len(matrix)):
             line = matrix[playerId]
             s = ''.join([f"{v:3d}" for v in line])
-            yield f"{Print.pretty_player_id(playerId)}: {s}"
+            yield f"{f.pretty_player_id(playerId):<20}: {s}"
 
     @ staticmethod
     def pairsMatrix(schedule: Schedule):
+        f = Format(schedule)
         m = Metrics(schedule)
 
         yield ''
@@ -72,7 +45,7 @@ class Print:
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairsHistogram(playerId)
             penalty = m.penaltyPlayer(playerId)
-            header = f"Player {Print.pretty_player_id(playerId)}: err={penalty:6.2f}: "
+            header = f"{f.pretty_player_id(playerId):<20}: err={penalty:6.2f}: "
             str = ''.join([f"{numPairs:4d}" for numPairs in pairs.values()])
 
             yield f"{header:25s}{str}"
@@ -90,6 +63,7 @@ class Print:
         yield f"{header:25s}{str}"
 
     def minMaxPairs(schedule: Schedule, numGames: list[int]):
+        f = Format(schedule)
         m = Metrics(schedule)
 
         yield ''
@@ -97,7 +71,7 @@ class Print:
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairs(playerId)
 
-            header = f"Player {Print.pretty_player_id(playerId)}: "
+            header = f"{f.pretty_player_id(playerId):<20}: "
             str = ""
             for idx in numGames:
                 if idx >= len(pairs) or len(pairs[idx]) == 0:
@@ -120,23 +94,37 @@ class Print:
 
     @ staticmethod
     def scheduleByGames(schedule: Schedule):
+        f = Format(schedule)
         yield ''
         yield "Schedule by games:"
         for round in schedule.rounds:
-            yield f"\nRound: {Print.pretty_round_id(round.id)}"
-            for gameId in round.gameIds:
-                game = schedule.games[gameId]
+            yield f"\nRound: {f.pretty_round_id(round.id)}"
+            for table_id, game_id in enumerate(round.gameIds):
+                game = schedule.games[game_id]
+
+                # with seat num
+                # s = [
+                #    f"{(num+1):>2d}:{f.pretty_player_id(id):<12} " for num, id in enumerate(game.players)]
+
+                # without seat num
+                width = 12 if schedule.participants is not None else 2
                 s = [
-                    f"{Print.pretty_player_id(id)} " for id in game.players]
+                    f"{f.pretty_player_id(id):<2} " for num, id in enumerate(game.players)]
+
                 str = ''.join(s)
-                yield f"Game {Print.pretty_game_id(game.id)}: {str}"
+                if schedule.numTables > 1:
+                    yield f"{f.pretty_table_id(table_id)}: {str}"
+                else:
+                    yield f"{str}"
 
     @ staticmethod
     def scheduleByGender(schedule: Schedule):
+        f = Format(schedule)
+
         yield ''
         yield "Schedule by gender:"
         for round in schedule.rounds:
-            yield f"\nRound: {Print.pretty_round_id(round.id)}"
+            yield f"\nRound: {f.pretty_round_id(round.id)}"
             for gameId in round.gameIds:
                 game = schedule.games[gameId]
                 # just for test!
@@ -153,9 +141,11 @@ class Print:
                     team_dict[idx] += 1
                 str += f"Boys: {team_dict[0]:2d} Girls: {team_dict[1]:2d}"
 
-                yield f"Game {Print.pretty_game_id(game.id)}: {str}"
+                yield f"Game {f.pretty_game_id(game.id)}: {str}"
 
     def playerTableHistogram(schedule: Schedule):
+        f = Format(schedule)
+
         # init statistics: tables of every player
         player_tables = {}
         for player_id in range(schedule.numPlayers):
@@ -166,9 +156,8 @@ class Print:
 
         # calc table histogram for every player
         for round in schedule.rounds:
-            for game_id in round.gameIds:
+            for table_id, game_id in enumerate(round.gameIds):
                 game = schedule.games[game_id]
-                table_id = game_id % schedule.configuration.numTables
                 for player_id in game.players:
                     player_tables[player_id][table_id] += 1
 
@@ -176,7 +165,7 @@ class Print:
         yield "Player table histogram:"
 
         for player_id in range(schedule.numPlayers):
-            line = f"Player {Print.pretty_player_id(player_id)}:  "
+            line = f"{f.pretty_player_id(player_id):<20}:  "
             tables = player_tables[player_id]
             for table_id, table_games in enumerate(tables):
                 # line += f"{Print.pretty_table_id(table_id)}: {table_games:<2d} "
@@ -186,6 +175,7 @@ class Print:
 
     @ staticmethod
     def scheduleByPlayers(schedule: Schedule):
+        f = Format(schedule)
         yield ''
         yield "Schedule by players:"
         for playerId in range(schedule.numPlayers):
@@ -201,15 +191,12 @@ class Print:
                             break
                 str += roundStr
 
-            if schedule.participants is None:
-                header = f"Player {Print.pretty_player_id(playerId)}: "
-            else:
-                playerName = schedule.participants[playerId].name
-                header = f"{playerName:20}:"
+            header = f"{f.pretty_player_id(playerId):<20}: "
             yield f"{header}{str}"
 
     @ staticmethod
     def seatsMatrix(schedule: Schedule):
+        f = Format(schedule)
         m = Metrics(schedule)
         matrix = m.calcSeatsMatrix()
 
@@ -218,21 +205,17 @@ class Print:
         for playerId in range(len(matrix)):
             line = matrix[playerId]
             s = ''.join([f"{v:3d}" for v in line])
-            yield f"{Print.pretty_player_id(playerId)}: {s}"
+            yield f"{f.pretty_player_id(playerId):<20}: {s}"
 
     @ staticmethod
     def mwtSchedule(schedule: Schedule):
+        f = Format(schedule)
         for round in schedule.rounds:
             for seat in range(10):
                 ids = [schedule.games[gameId].players[seat]
                        for gameId in round.gameIds]
 
-                # output player IDs or player names
-                if not schedule.participants:
-                    line = [f"{id:>3d}," for id in ids]
-                else:
-                    line = [
-                        f" {schedule.participants.find(id).name}," for id in ids]
+                line = [f"{f.pretty_player_id(id):<12}," for id in ids]
 
                 # print without last comma
                 str = ''.join(line)
