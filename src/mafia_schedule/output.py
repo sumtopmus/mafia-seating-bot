@@ -71,12 +71,12 @@ class Print:
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairs(playerId)
 
-            header = f"{f.pretty_player_id(playerId):<20}: "
+            header = f"{f.pretty_player_id(playerId):<2}: "
             str = ""
             for idx in numGames:
                 if idx >= len(pairs) or len(pairs[idx]) == 0:
                     continue
-                s = ''.join([f"{id:2d} " for id in pairs[idx]]
+                s = ''.join([f"{f.pretty_player_id(id):<2} " for id in pairs[idx]]
                             ) if len(pairs[idx]) < 5 else "..."
                 str += f"g = {idx} with: [{s}]; "
             yield f"{header}{str}"
