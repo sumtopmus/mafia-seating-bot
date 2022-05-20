@@ -61,7 +61,7 @@ def main():
         print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "rendezvouz-2022"
+    conf_name = "bigapple-2022"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
