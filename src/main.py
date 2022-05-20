@@ -47,6 +47,10 @@ Configurations = {
     "rendezvouz-2022":
         Configuration(numPlayers=40, numTables=4, numRounds=15,
                       numGames=60, numAttempts=15, numTeams=20),
+
+    "bigapple-2022":
+        Configuration(numPlayers=25, numTables=2, numRounds=13,
+                      numGames=25, numAttempts=10),
 }
 
 
