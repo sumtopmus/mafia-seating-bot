@@ -51,6 +51,11 @@ Configurations = {
     "bigapple-2022":
         Configuration(numPlayers=25, numTables=2, numRounds=13,
                       numGames=25, numAttempts=10),
+
+    "millenium-2022":
+        Configuration(numPlayers=33, numTables=3, numRounds=11,
+                      numGames=33, numAttempts=10),
+
 }
 
 
@@ -61,7 +66,7 @@ def main():
         print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "bigapple-2022"
+    conf_name = "millenium-2022"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 

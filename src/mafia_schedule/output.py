@@ -48,19 +48,19 @@ class Print:
             header = f"{f.pretty_player_id(playerId):<20}: err={penalty:6.2f}: "
             str = ''.join([f"{numPairs:4d}" for numPairs in pairs.values()])
 
-            yield f"{header:25s}{str}"
+            yield f"{header: <35s}{str}"
 
         # ideal line
         hist = m.penaltyIdealHistogram()
         header = f"*** Ideal: "
         str = ''.join([f"{round(numPairs):4d}" for numPairs in hist.values()])
-        yield f"{header:25s}{str}"
+        yield f"{header: <35s}{str}"
 
         # last line
         allPairs = m.calcPairsHistogram()
         header = f"*** Overall: "
         str = ''.join([f"{numPairs:4d}" for numPairs in allPairs.values()])
-        yield f"{header:25s}{str}"
+        yield f"{header: <35s}{str}"
 
     def minMaxPairs(schedule: Schedule, numGames: list[int]):
         f = Format(schedule)
