@@ -52,9 +52,9 @@ Configurations = {
         Configuration(numPlayers=25, numTables=2, numRounds=13,
                       numGames=25, numAttempts=10),
 
-    "millenium-2022":
-        Configuration(numPlayers=33, numTables=3, numRounds=11,
-                      numGames=33, numAttempts=10),
+    "millenium-2022-32":
+        Configuration(numPlayers=32, numTables=3, numRounds=11,
+                      numGames=32, numAttempts=10),
 
 }
 
@@ -66,7 +66,7 @@ def main():
         print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "millenium-2022"
+    conf_name = "millenium-2022-32"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
@@ -85,14 +85,14 @@ def main():
             sys.argv) > 2 else default_opponents
         print(f"Output opponents: {filename_opponents}")
 
-        default_numRuns = 10
+        default_numRuns = 20
         default_numIterations = 10 * 1000
         numRuns = int(sys.argv[3]) if len(sys.argv) > 3 else default_numRuns
         numIterations = int(sys.argv[4]) if len(
             sys.argv) > 4 else default_numIterations
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
-        default_zeroPairs = 0
+        default_zeroPairs = 5  # 0
         default_singlePairs = 0
         expectedZeroPairs = int(sys.argv[5]) if len(
             sys.argv) > 5 else default_zeroPairs
@@ -111,7 +111,7 @@ def main():
         print(f"Input opponents: {filename_opponents}")
         print(f"Output seats: {filename_seats}")
 
-        default_numRuns = 10
+        default_numRuns = 20
         default_numIterationsStageOne = 10 * 1000
         default_numIterationsStageTwo = 10 * 1000
         numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns

@@ -67,7 +67,7 @@ class Print:
         m = Metrics(schedule)
 
         yield ''
-        yield "*** Min-Max opponents:"
+        yield f"*** Min-Max opponents: {numGames}"
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairs(playerId)
 
@@ -78,7 +78,9 @@ class Print:
                     continue
                 s = ''.join([f"{f.pretty_player_id(id):<2} " for id in pairs[idx]]
                             ) if len(pairs[idx]) < 5 else "..."
-                str += f"g = {idx} with: [{s}]; "
+                element = f"g = {idx} with: [{s}]; " if len(
+                    numGames) > 1 else f"with: [{s}]"
+                str += element
             yield f"{header}{str}"
 
     @ staticmethod

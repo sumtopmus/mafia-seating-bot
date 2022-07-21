@@ -21,7 +21,7 @@ def callbackPrintShortOpponents(s: Schedule):
 def callbackPrintOpponents(s: Schedule, path: str):
     Print.print(Print.scheduleByGames(s))
     Print.print(Print.scheduleByPlayers(s))
-    Print.print(Print.opponentsMatrix(s))
+    # Print.print(Print.opponentsMatrix(s))
     Print.print(Print.pairsMatrix(s))
 
     Print.print(Print.minMaxPairs(s, [0, 1]))
