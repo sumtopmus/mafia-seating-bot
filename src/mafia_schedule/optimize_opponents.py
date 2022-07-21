@@ -1,4 +1,5 @@
 import random
+import statistics
 
 from .configuration import Configuration
 from .schedule_factory import ScheduleFactory
@@ -207,9 +208,15 @@ class OptimizeOpponents:
     def scoreFunc(self) -> float:
         metrics = Metrics(self.schedule)
 
-        basePenalty = 0.0
+        penalties = []
         for playerId in range(self.schedule.numPlayers):
-            basePenalty += metrics.penaltyPlayer(playerId)
+            penalties.append(metrics.penaltyPlayer(playerId))
+
+        ''' 
+        Here we sum penalties for every player.
+        We can take median of penalties, or calc penalty for all players
+        '''
+        basePenalty = sum(penalties)
 
         zeroPlayers = 0
         singlePlayers = 0
@@ -226,13 +233,11 @@ class OptimizeOpponents:
         zeroPenalty = 0
         if self.expectedZeroPairs > 0:
             expectedZeroPlayers = 2 * self.expectedZeroPairs
-            zeroPenalty = penaltyCoefficient * \
-                (zeroPlayers - expectedZeroPlayers) ** 2
+            zeroPenalty = (zeroPlayers - expectedZeroPlayers) ** 2
 
         singlePenalty = 0
         if self.expectedSinglePairs > 0:
             expectedSinglePlayers = 2 * self.expectedSinglePairs
-            singlePenalty = penaltyCoefficient * \
-                (singlePlayers - expectedSinglePlayers) ** 2
+            singlePenalty = (singlePlayers - expectedSinglePlayers) ** 2
 
-        return basePenalty + zeroPenalty + singlePenalty
+        return basePenalty + penaltyCoefficient*(zeroPenalty + singlePenalty)
