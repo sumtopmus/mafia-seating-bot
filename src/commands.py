@@ -19,13 +19,13 @@ def callbackPrintShortOpponents(s: Schedule):
 
 
 def callbackPrintOpponents(s: Schedule, path: str):
-    Print.print(Print.scheduleByGames(s))
-    Print.print(Print.scheduleByPlayers(s))
+    # Print.print(Print.scheduleByGames(s))
+    # Print.print(Print.scheduleByPlayers(s))
     # Print.print(Print.opponentsMatrix(s))
     Print.print(Print.pairsMatrix(s))
 
-    Print.print(Print.minMaxPairs(s, [0, 1]))
-    Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
+    Print.print(Print.minMaxPairs(s, [0]))
+    Print.print(Print.minMaxPairs(s, [5, 6, 7, 8, 9]))
 
     if path is not None:
         saveSchedule(s, path)
@@ -107,8 +107,8 @@ def showSchedule(filename, filename_participants):
 
     Print.print(Print.pairsMatrix(s))
     Print.print(Print.minMaxPairs(s, [0]))
-    Print.print(Print.minMaxPairs(s, [1]))
-    Print.print(Print.minMaxPairs(s, [6, 7, 8, 9]))
+    # Print.print(Print.minMaxPairs(s, [1]))
+    Print.print(Print.minMaxPairs(s, [5, 6, 7, 8, 9]))
 
     Print.print(Print.seatsMatrix(s))
 
