@@ -71,6 +71,14 @@ Configurations = {
     "sacramento-2022-39":
         Configuration(numPlayers=39, numTables=3, numRounds=13,
                       numGames=39, numAttempts=10),
+
+    "evergreen-2022":
+        Configuration(numPlayers=20, numTables=2, numRounds=10,
+                      numGames=20, numAttempts=10),
+
+    "blackfriday-2022":
+        Configuration(numPlayers=26, numTables=2, numRounds=13,
+                      numGames=26, numAttempts=10),
 }
 
 
@@ -81,7 +89,7 @@ def main():
         print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "sacramento-2022-39"
+    conf_name = "blackfriday-2022"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
@@ -101,13 +109,13 @@ def main():
         print(f"Output opponents: {filename_opponents}")
 
         default_numRuns = 20
-        default_numIterations = 10 * 1000
+        default_numIterations = 20 * 1000
         numRuns = int(sys.argv[3]) if len(sys.argv) > 3 else default_numRuns
         numIterations = int(sys.argv[4]) if len(
             sys.argv) > 4 else default_numIterations
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
-        default_zeroPairs = 5  # 0
+        default_zeroPairs = 3  # 0
         default_singlePairs = 0
         expectedZeroPairs = int(sys.argv[5]) if len(
             sys.argv) > 5 else default_zeroPairs

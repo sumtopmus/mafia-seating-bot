@@ -108,7 +108,10 @@ def showSchedule(filename, filename_participants):
     Print.print(Print.pairsMatrix(s))
     Print.print(Print.minMaxPairs(s, [0]))
     # Print.print(Print.minMaxPairs(s, [1]))
-    Print.print(Print.minMaxPairs(s, [5, 6, 7, 8, 9]))
+    # Print.print(Print.minMaxPairs(s, [5, 6, 7, 8, 9]))
+
+    Print.print(Print.minMaxPairs(s, [2]))
+    Print.print(Print.minMaxPairs(s, [8, 9]))
 
     Print.print(Print.seatsMatrix(s))
 
