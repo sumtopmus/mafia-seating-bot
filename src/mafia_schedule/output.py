@@ -136,10 +136,9 @@ class Print:
                 str = ''
 
                 # for Boys/Girls only
-                numTeams = 20
                 team_dict = defaultdict(int)
                 for id in game.players:
-                    idx = id // numTeams
+                    idx = id // schedule.numTeams
                     team_dict[idx] += 1
                 str += f"Boys: {team_dict[0]:2d} Girls: {team_dict[1]:2d}"
 

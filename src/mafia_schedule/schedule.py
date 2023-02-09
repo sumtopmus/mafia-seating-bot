@@ -136,7 +136,7 @@ class Schedule:
                 if team_id in teams:
                     raise ScheduleException(
                         f"Players of the same team: {team_id} can not play in a single game #{game.id}!")
-            teams.add(team_id)
+                teams.add(team_id)
 
     def validateRound(self, round):
         players = set[int]()
@@ -160,6 +160,11 @@ class Schedule:
         if len(self._games) != self.numGames:
             raise ScheduleException(
                 f"Game count: {self._games} must match configuration: {self.numGames}")
+
+        # check equal number of players in every team
+        if self.numTeams > 0 and self.numPlayers % self.numTeams != 0:
+            raise ScheduleException(
+                f"Not equal number of players in each team (players: {self.numPlayers}, teams: {self.numTeams}")
 
         # check game count in rounds
         for i, round in enumerate(self._rounds):
