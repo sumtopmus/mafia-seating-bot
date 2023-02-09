@@ -19,7 +19,8 @@ class TestSerialization(unittest.TestCase):
                              'numTables': 2,
                              'numRounds': 10,
                              'numGames': 20,
-                             'numAttempts': 8})
+                             'numAttempts': 8,
+                             'numTeams': 0})
 
     def test_configuration_fromJson(self):
         d = {'numPlayers': 25,
