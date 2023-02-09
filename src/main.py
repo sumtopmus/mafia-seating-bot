@@ -77,8 +77,12 @@ Configurations = {
                       numGames=20, numAttempts=10),
 
     "blackfriday-2022":
-        Configuration(numPlayers=26, numTables=2, numRounds=13,
-                      numGames=26, numAttempts=10),
+        Configuration(numPlayers=24, numTables=2, numRounds=12,
+                      numGames=24, numAttempts=10),
+
+    "rv-2023":
+        Configuration(numPlayers=30, numTables=3, numRounds=1,
+                      numGames=3, numAttempts=1),
 }
 
 
@@ -89,7 +93,7 @@ def main():
         print("Expected opponents|seats|show|load_mwt")
         return
 
-    conf_name = "blackfriday-2022"
+    conf_name = "rv-2023"
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
 
@@ -115,7 +119,7 @@ def main():
             sys.argv) > 4 else default_numIterations
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
-        default_zeroPairs = 3  # 0
+        default_zeroPairs = 2  # 0
         default_singlePairs = 0
         expectedZeroPairs = int(sys.argv[5]) if len(
             sys.argv) > 5 else default_zeroPairs
@@ -153,11 +157,17 @@ def main():
             sys.argv) > 2 else default_participants
         commands.generateParticipants(conf, filename_participants)
 
-    if command == "show":
+    if command == "show" or command == "show_short":
+
         filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
         filename_participants = sys.argv[3] if len(
             sys.argv) > 3 else default_participants
-        commands.showSchedule(filename_schedule, filename_participants)
+
+        show_full = command == "show"
+        if show_full:
+            commands.showSchedule(filename_schedule, filename_participants)
+        else:
+            commands.shortSchedule(filename_schedule, filename_participants)
 
     if command == "show_mwt":
         filename_schedule = sys.argv[2] if len(

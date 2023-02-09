@@ -84,6 +84,34 @@ def generateParticipants(conf: Configuration, filename_participants):
     saveParticipants(p, path_participants)
 
 
+def shortSchedule(filename, filename_participants):
+    path_schedule = getFilePath(filename)
+    s = loadSchedule(path_schedule)
+    s.validate()
+
+    if filename_participants is not None:
+        path_participants = getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+        s.setParticipants(participants)
+
+    Print.print(Print.scheduleByGames(s))
+    Print.print(Print.scheduleByPlayers(s))
+
+    # temp only - for rendez-vouz
+    Print.print(Print.scheduleByGender(s))
+
+    if s.numTables > 1:
+        Print.print(Print.playerTableHistogram(s))
+
+    Print.print(Print.opponentsMatrix(s))
+
+    Print.print(Print.pairsMatrix(s))
+    Print.print(Print.minMaxPairs(s, [0]))
+    Print.print(Print.minMaxPairs(s, [1]))
+    Print.print(Print.minMaxPairs(s, [2]))
+    Print.print(Print.minMaxPairs(s, [7, 8, 9]))
+
+
 def showSchedule(filename, filename_participants):
     path_schedule = getFilePath(filename)
     s = loadSchedule(path_schedule)
