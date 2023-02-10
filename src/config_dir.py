@@ -79,6 +79,6 @@ Configurations = {
                       numGames=24, numAttempts=10),
 
     "rv-2023":
-        Configuration(numPlayers=30, numTables=3, numRounds=1,
-                      numGames=3, numAttempts=1),
+        Configuration(numPlayers=30, numTables=3, numRounds=14,
+                      numGames=42, numAttempts=14, numTeams=15),
 }
