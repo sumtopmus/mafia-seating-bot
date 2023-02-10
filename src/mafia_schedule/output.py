@@ -3,6 +3,7 @@ from typing import Callable
 
 from .format import Format
 from .schedule import Schedule
+from .round import Round
 from .metrics import Metrics
 
 
@@ -118,6 +119,25 @@ class Print:
                     yield f"{f.pretty_table_id(table_id)}: {str}"
                 else:
                     yield f"{str}"
+
+    @ staticmethod
+    def roundByGames(schedule: Schedule, round: Round):
+        f = Format(schedule)
+
+        yield f"\nRound: {f.pretty_round_id(round.id)}"
+        for table_id, game_id in enumerate(round.gameIds):
+            game = schedule.games[game_id]
+
+            # without seat num
+            width = 12 if schedule.participants is not None else 2
+            s = [
+                f"{f.pretty_player_id(id):<2} " for num, id in enumerate(game.players)]
+
+            str = ''.join(s)
+            if schedule.numTables > 1:
+                yield f"{f.pretty_table_id(table_id)}: {str}"
+            else:
+                yield f"{str}"
 
     @ staticmethod
     def scheduleByGender(schedule: Schedule):

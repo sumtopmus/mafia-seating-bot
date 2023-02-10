@@ -39,12 +39,22 @@ def execute_command(actions: Actions, command_string) -> bool:
         actions.saveSchedule(params)
     elif command == "show_all":
         actions.showSchedule(params)
+    elif command == "show_all_rounds":
+        actions.showAllRounds(params)
+    elif command == "show_round":
+        actions.showRound(params)
     elif command == "show_stats":
         actions.showStats(params)
     elif command == "show_seats":
         actions.showSeats(params)
     elif command == "show_mwt":
         actions.showMwt(params)
+    elif command == "check":
+        actions.checkSchedule(params)
+    elif command == "copy_round":
+        actions.copyRound(params)
+    elif command == "switch_players":
+        actions.switchPlayers(params)
     else:
         print(f"### Unknown command: {command}")
 
@@ -59,5 +69,5 @@ def main_loop(conf):
 
     exit = False
     while not exit:
-        command_string = input(">> ")
+        command_string = input("\n>> ")
         exit = execute_command(actions, command_string)
