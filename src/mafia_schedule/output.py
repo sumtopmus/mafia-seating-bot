@@ -121,6 +121,8 @@ class Print:
 
     @ staticmethod
     def scheduleByGender(schedule: Schedule):
+        if schedule.numTeams == 0:
+            return
         f = Format(schedule)
 
         yield ''
