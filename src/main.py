@@ -1,30 +1,22 @@
 import sys
 import commands
 import interactive
+from mafia_schedule.helpers import *
 from config_dir import Configurations
 from mafia_schedule import Configuration
 
 
-def main():
-    if len(sys.argv) < 2:
-        # TODO: implement dictionary with function pointer to every command
-        # Output all command in a generic way: from dictionary keys, not manually like here
-        print("Expected opponents|seats|show|load_mwt")
-        return
+conf_name = "rv-2023"
+default_opponents = f"{conf_name}_opponents.txt"
+default_seats = f"{conf_name}_seats.txt"
+default_participants = None  # f"{conf_name}_participants.txt"
+default_schedule = f"{conf_name}.txt"
+default_mwt = f"{conf_name}_mwt.txt"
 
-    conf_name = "rv-2023"
+
+def execute_command(command):
     conf = Configurations[conf_name]
     print(f"Configuration name: {conf_name}\n{conf}")
-
-    default_opponents = f"{conf_name}_opponents.txt"
-    default_seats = f"{conf_name}_seats.txt"
-    default_participants = None  # f"{conf_name}_participants.txt"
-
-    default_schedule = f"{conf_name}.txt"
-    default_mwt = f"{conf_name}_mwt.txt"
-
-    command = sys.argv[1]
-    print(f"Command: {command}")
 
     if command == "interactive":
         interactive.main_loop(conf)
@@ -79,24 +71,55 @@ def main():
             sys.argv) > 2 else default_participants
         commands.generateParticipants(conf, filename_participants)
 
-    if command == "show" or command == "show_short":
-
+    if command == "show":
         filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
         filename_participants = sys.argv[3] if len(
             sys.argv) > 3 else default_participants
 
-        show_full = command == "show"
-        if show_full:
-            commands.showSchedule(filename_schedule, filename_participants)
-        else:
-            commands.shortSchedule(filename_schedule, filename_participants)
+        path_schedule = commands.getFilePath(filename_schedule)
+        schedule = loadSchedule(path_schedule)
+        schedule.validate()
+
+        participants = None
+        if filename_participants is not None:
+            path_participants = commands.getFilePath(filename_participants)
+            participants = loadParticipants(path_participants)
+
+        commands.showSchedule(schedule, participants)
 
     if command == "show_mwt":
         filename_schedule = sys.argv[2] if len(
             sys.argv) > 2 else default_schedule
         filename_participants = sys.argv[3] if len(
             sys.argv) > 3 else default_participants
-        commands.showMwt(filename_schedule, filename_participants)
+
+        path_schedule = commands.getFilePath(filename_schedule)
+        schedule = loadSchedule(path_schedule)
+        schedule.validate()
+
+        participants = None
+        if filename_participants is not None:
+            path_participants = commands.getFilePath(filename_participants)
+            participants = loadParticipants(path_participants)
+
+        commands.showMwt(schedule, participants)
+
+    if command == "show_seats":
+        filename_schedule = sys.argv[2] if len(
+            sys.argv) > 2 else default_schedule
+        filename_participants = sys.argv[3] if len(
+            sys.argv) > 3 else default_participants
+
+        path_schedule = commands.getFilePath(filename_schedule)
+        schedule = loadSchedule(path_schedule)
+        schedule.validate()
+
+        participants = None
+        if filename_participants is not None:
+            path_participants = commands.getFilePath(filename_participants)
+            participants = loadParticipants(path_participants)
+
+        commands.showSeats(schedule, participants)
 
     if command == "show_team":
         filename_schedule = sys.argv[2] if len(
@@ -121,6 +144,18 @@ def main():
         filename_schedule = sys.argv[2] if len(
             sys.argv) > 2 else default_schedule
         commands.createRendezVouz(conf, filename_schedule)
+
+
+def main():
+    if len(sys.argv) < 2:
+        # TODO: implement dictionary with function pointer to every command
+        # Output all command in a generic way: from dictionary keys, not manually like here
+        print("Expected opponents|seats|show|load_mwt")
+        return
+
+    command = sys.argv[1]
+    print(f"Command: {command}")
+    execute_command(command)
 
 
 if __name__ == '__main__':

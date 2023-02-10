@@ -84,81 +84,57 @@ def generateParticipants(conf: Configuration, filename_participants):
     saveParticipants(p, path_participants)
 
 
-def shortSchedule(filename, filename_participants):
-    path_schedule = getFilePath(filename)
-    s = loadSchedule(path_schedule)
-    s.validate()
+def showSchedule(schedule: Schedule, participants: Participants):
+    if participants:
+        schedule.setParticipants(participants)
 
-    if filename_participants is not None:
-        path_participants = getFilePath(filename_participants)
-        participants = loadParticipants(path_participants)
-        s.setParticipants(participants)
+    Print.print(Print.scheduleByGames(schedule))
+    Print.print(Print.scheduleByPlayers(schedule))
 
-    Print.print(Print.scheduleByGames(s))
-    Print.print(Print.scheduleByPlayers(s))
+    Print.print(Print.opponentsMatrix(schedule))
 
-    # temp only - for rendez-vouz
-    Print.print(Print.scheduleByGender(s))
+    Print.print(Print.pairsMatrix(schedule))
+    Print.print(Print.minMaxPairs(schedule, [0]))
+    # Print.print(Print.minMaxPairs(schedule, [1]))
+    # Print.print(Print.minMaxPairs(schedule, [5, 6, 7, 8, 9]))
 
-    if s.numTables > 1:
-        Print.print(Print.playerTableHistogram(s))
+    Print.print(Print.minMaxPairs(schedule, [2]))
+    Print.print(Print.minMaxPairs(schedule, [8, 9]))
 
-    Print.print(Print.opponentsMatrix(s))
-
-    Print.print(Print.pairsMatrix(s))
-    Print.print(Print.minMaxPairs(s, [0]))
-    Print.print(Print.minMaxPairs(s, [1]))
-    Print.print(Print.minMaxPairs(s, [2]))
-    Print.print(Print.minMaxPairs(s, [7, 8, 9]))
+    # Print.print(Print.seatsMatrix(schedule))
 
 
-def showSchedule(filename, filename_participants):
-    path_schedule = getFilePath(filename)
-    s = loadSchedule(path_schedule)
-    s.validate()
-
-    if filename_participants is not None:
-        path_participants = getFilePath(filename_participants)
-        participants = loadParticipants(path_participants)
-        s.setParticipants(participants)
-
-    Print.print(Print.scheduleByGames(s))
-    Print.print(Print.scheduleByPlayers(s))
+def showStats(schedule: Schedule, participants: Participants):
+    if participants:
+        schedule.setParticipants(participants)
 
     # temp only - for rendez-vouz
-    # Print.print(Print.scheduleByGender(s))
+    Print.print(Print.scheduleByGender(schedule))
 
-    if s.numTables > 1:
-        Print.print(Print.playerTableHistogram(s))
+    if schedule.numTables > 1:
+        Print.print(Print.playerTableHistogram(schedule))
 
-    Print.print(Print.opponentsMatrix(s))
+    Print.print(Print.minMaxPairs(schedule, [0]))
+    # Print.print(Print.minMaxPairs(schedule, [1]))
+    # Print.print(Print.minMaxPairs(schedule, [5, 6, 7, 8, 9]))
 
-    Print.print(Print.pairsMatrix(s))
-    Print.print(Print.minMaxPairs(s, [0]))
-    # Print.print(Print.minMaxPairs(s, [1]))
-    # Print.print(Print.minMaxPairs(s, [5, 6, 7, 8, 9]))
-
-    Print.print(Print.minMaxPairs(s, [2]))
-    Print.print(Print.minMaxPairs(s, [8, 9]))
-
-    Print.print(Print.seatsMatrix(s))
-
-    print("\n*** MWT-compatible schedule:")
-    Print.print(Print.mwtSchedule(s))
+    Print.print(Print.minMaxPairs(schedule, [2]))
+    Print.print(Print.minMaxPairs(schedule, [8, 9]))
 
 
-def showMwt(filename_schedule: str, filename_participants: str):
-    path_schedule = getFilePath(filename_schedule)
-    s = loadSchedule(path_schedule)
-    s.validate()
+def showSeats(schedule: Schedule, participants: Participants):
+    if participants:
+        schedule.setParticipants(participants)
 
-    if filename_participants is not None:
-        path_participants = getFilePath(filename_participants)
-        participants = loadParticipants(path_participants)
-        s.setParticipants(participants)
+    Print.print(Print.seatsMatrix(schedule))
+
+
+def showMwtSchedule(schedule: Schedule, participants: Participants):
+    if participants:
+        schedule.setParticipants(participants)
 
     print("\n*** MWT-compatible schedule:")
-    Print.print(Print.mwtSchedule(s))
+    Print.print(Print.mwtSchedule(schedule))
 
 
 def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
