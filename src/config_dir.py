@@ -81,4 +81,11 @@ Configurations = {
     "rv-2023":
         Configuration(numPlayers=30, numTables=3, numRounds=14,
                       numGames=42, numAttempts=14, numTeams=15),
+
+    "foreva-2023":
+        Configuration(numPlayers=20, numTables=2, numRounds=10,
+                      numGames=20, numAttempts=10),
+
+
+
 }

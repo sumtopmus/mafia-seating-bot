@@ -6,7 +6,7 @@ from config_dir import Configurations
 from mafia_schedule import Configuration
 
 
-conf_name = "rv-2023"
+conf_name = "foreva-2023"
 default_opponents = f"{conf_name}_opponents.txt"
 default_seats = f"{conf_name}_seats.txt"
 default_participants = None  # f"{conf_name}_participants.txt"
