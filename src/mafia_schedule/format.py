@@ -3,12 +3,21 @@ from .schedule import Schedule
 
 class Format:
     def pretty_round_id(self, round_id: int) -> str:
+        ''' 
+        Show round starting with 1, not with 0
+        '''
         return f"{(round_id+1):>02d}"
 
     def pretty_game_id(self, game_id: int) -> str:
+        ''' 
+        Show game starting with 1, not with 0
+        '''
         return f"{(game_id+1):>02d}"
 
     def pretty_table_id(self, table_id: int) -> str:
+        '''
+        Show table as A, B, C; not 0,1,2
+        '''
         return chr(ord('A') + table_id)
 
     def pretty_player_id(self, player_id: int) -> str:

@@ -151,7 +151,6 @@ def showMwtSchedule(schedule: Schedule, participants: Participants):
     if participants:
         schedule.setParticipants(participants)
 
-    print("\n*** MWT-compatible schedule:")
     Print.print(Print.mwtSchedule(schedule))
 
 

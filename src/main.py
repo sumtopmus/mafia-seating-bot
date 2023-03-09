@@ -102,7 +102,7 @@ def execute_command(command):
             path_participants = commands.getFilePath(filename_participants)
             participants = loadParticipants(path_participants)
 
-        commands.showMwt(schedule, participants)
+        commands.showMwtSchedule(schedule, participants)
 
     if command == "show_seats":
         filename_schedule = sys.argv[2] if len(

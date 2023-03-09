@@ -238,9 +238,11 @@ class Print:
                 ids = [schedule.games[gameId].players[seat]
                        for gameId in round.gameIds]
 
-                line = [f"{f.pretty_player_id(id):<12}," for id in ids]
+                mwt_delimiter = ";"
+                line = [
+                    f"{f.pretty_player_id(id):<12}{mwt_delimiter}" for id in ids]
 
-                # print without last comma
+                # print without the last symbol - it is mwt_delimiter after last item
                 str = ''.join(line)
-                yield str[:-1]
+                yield str[:-len(mwt_delimiter)]
             yield ''
