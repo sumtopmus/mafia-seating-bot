@@ -49,6 +49,18 @@ class Actions:
         path = commands.getFilePath(filename)
         self.schedule = commands.loadSchedule(path)
 
+    def loadParticipants(self, params):
+        if not params:
+            print("### File name expected!")
+            return
+
+        filename_participants = params[0]
+        path_participants = commands.getFilePath(filename_participants)
+        self.participants = commands.loadParticipants(path_participants)
+
+        if self.schedule:
+            self.schedule.setParticipants(self.participants)
+
     def saveSchedule(self, params):
         if not self.schedule:
             print("### No schedule, nothing to save")
@@ -68,15 +80,31 @@ class Actions:
     def showAllRounds(self, params):
         commands.showAllRounds(self.schedule, self.participants)
 
+    def showAllPlayers(self, params):
+        commands.showAllPlayers(self.schedule, self.participants)
+
     def showRound(self, params):
+        if not params:
+            print("### Round index expected")
+            return
+
         round_idx = int(params[0]) - 1
         commands.showRound(self.schedule, self.participants, round_idx)
 
     def showStats(self, params):
         commands.showStats(self.schedule, self.participants)
 
+    def showTables(self, params):
+        commands.showTables(self.schedule)
+
     def showSeats(self, params):
         commands.showSeats(self.schedule, self.participants)
+
+    def showScheduleGender(self, params):
+        commands.showScheduleGender(self.schedule)
+
+    def showScheduleMatrix(self, params):
+        commands.showScheduleMatrix(self.schedule)
 
     def showMwt(self, params):
         commands.showMwtSchedule(self.schedule, self.participants)
@@ -100,7 +128,7 @@ class Actions:
         source_idx = int(params[0]) - 1
         dest_idx = int(params[1]) - 1
 
-        print("Before")
+        print("\nBefore")
         commands.showRound(self.schedule, self.participants, source_idx)
         commands.showRound(self.schedule, self.participants, dest_idx)
 
@@ -117,7 +145,7 @@ class Actions:
             for j, id in enumerate(source_game.players):
                 dest_game.players[j] = id
 
-        print("After")
+        print("\nAfter")
         commands.showRound(self.schedule, self.participants, source_idx)
         commands.showRound(self.schedule, self.participants, dest_idx)
 
@@ -126,18 +154,48 @@ class Actions:
         else:
             print("### Schedule is NOT valid")
 
-    def switchPlayers(self, params):
-        round_index = int(params[0]) - 1
-        table_one = ord(params[1]) - ord('A')
-        player_one = int(params[2]) - 1
-        table_two = ord(params[3]) - ord('A')
-        player_two = int(params[4]) - 1
+    def switchTables(self, params):
+        try:
+            round_index = int(params[0]) - 1
+            table_one = ord(params[1]) - ord('A')
+            table_two = ord(params[2]) - ord('A')
+        except:
+            print("Wrong params")
+            return
 
-        print(f"Round {round_index}. Tables: {table_one} and {table_two}")
-        print(f"Switching players: {player_one} and {player_two}")
+        round = self.schedule.rounds[round_index]
+        game_one_id = round.gameIds[table_one]
+        game_two_id = round.gameIds[table_two]
+        game_one = self.schedule.games[game_one_id]
+        game_two = self.schedule.games[game_two_id]
 
         print("\n*** Before")
         commands.showRound(self.schedule, self.participants, round_index)
+
+        # switch players in game_one and game_two
+        temp = game_one.players.copy()
+        game_one.players = game_two.players.copy()
+        game_two.players = temp.copy()
+
+        # print("\n*** After")
+        commands.showRound(self.schedule, self.participants, round_index)
+
+    def switchPlayers(self, params):
+        try:
+            round_index = int(params[0]) - 1
+            table_one = ord(params[1]) - ord('A')
+            player_one = int(params[2]) - 1
+            table_two = ord(params[3]) - ord('A')
+            player_two = int(params[4]) - 1
+        except:
+            print("Wrong params")
+            return
+
+        # print(f"Round {round_index}. Tables: {table_one} and {table_two}")
+        # print(f"Switching players: {player_one} and {player_two}")
+
+        # print("\n*** Before")
+        # commands.showRound(self.schedule, self.participants, round_index)
 
         round = self.schedule.rounds[round_index]
         game_one_id = round.gameIds[table_one]
@@ -164,7 +222,7 @@ class Actions:
         game_one.players[one_idx] = player_two
         game_two.players[two_idx] = player_one
 
-        print("\n*** After")
+        # print("\n*** After")
         commands.showRound(self.schedule, self.participants, round_index)
 
         if self.schedule.isValid():

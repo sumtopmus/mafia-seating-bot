@@ -35,26 +35,38 @@ def execute_command(actions: Actions, command_string) -> bool:
         actions.initSchedule(params)
     elif command == "load":
         actions.loadSchedule(params)
+    elif command == "participants":
+        actions.loadParticipants(params)
     elif command == "save":
         actions.saveSchedule(params)
     elif command == "show_all":
         actions.showSchedule(params)
-    elif command == "show_all_rounds":
+    elif command == "show_rounds":
         actions.showAllRounds(params)
+    elif command == "show_players":
+        actions.showAllPlayers(params)
     elif command == "show_round":
         actions.showRound(params)
     elif command == "show_stats":
         actions.showStats(params)
+    elif command == "show_tables":
+        actions.showTables(params)
     elif command == "show_seats":
         actions.showSeats(params)
     elif command == "show_mwt":
         actions.showMwt(params)
+    elif command == "show_matrix":
+        actions.showScheduleMatrix(params)
+    elif command == "show_gender":
+        actions.showScheduleGender(params)
     elif command == "check":
         actions.checkSchedule(params)
     elif command == "copy_round":
         actions.copyRound(params)
     elif command == "switch_players":
         actions.switchPlayers(params)
+    elif command == "switch_tables":
+        actions.switchTables(params)
     else:
         print(f"### Unknown command: {command}")
 
