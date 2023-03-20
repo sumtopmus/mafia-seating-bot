@@ -6,7 +6,7 @@ from config_dir import Configurations
 from mafia_schedule import Configuration
 
 
-conf_name = "foreva-2023"
+conf_name = "kaa-16-2023"
 default_opponents = f"{conf_name}_opponents.txt"
 default_seats = f"{conf_name}_seats.txt"
 default_participants = None  # f"{conf_name}_participants.txt"
@@ -150,7 +150,7 @@ def main():
     if len(sys.argv) < 2:
         # TODO: implement dictionary with function pointer to every command
         # Output all command in a generic way: from dictionary keys, not manually like here
-        print("Expected opponents|seats|show|load_mwt")
+        print("Expected opponents | seats | participants | interactive | show | show_seats | show_mwt")
         return
 
     command = sys.argv[1]
