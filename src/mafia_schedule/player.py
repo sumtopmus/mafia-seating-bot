@@ -59,7 +59,7 @@ class Participants:
 
         names = []
         for id in range(count):
-            name = f"{s}{id:02d}"
+            name = f"{s}{(id+1):02d}"
             names.append(name)
         return names
 

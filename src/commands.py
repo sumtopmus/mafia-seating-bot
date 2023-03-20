@@ -78,7 +78,7 @@ def optimizeSeats(filename_opponents, filename_seats, numRuns, iterations: list[
 
 def generateParticipants(conf: Configuration, filename_participants):
     print(f"Creating participants: {conf.numPlayers}")
-    p = Participants.create(conf.numPlayers)
+    p = Participants.create(conf.numPlayers, "Player_")
 
     path_participants = getFilePath(filename_participants)
     saveParticipants(p, path_participants)
