@@ -1,6 +1,9 @@
 from mafia_schedule.configuration import Configuration
 
 Configurations = {
+    "test_tournament":
+        Configuration(numPlayers=25, numTables=2, numRounds=10,
+                      numGames=20, numAttempts=8),
     "VaWaCa-2017":
         Configuration(numPlayers=25, numTables=2, numRounds=10,
                       numGames=20, numAttempts=8),
