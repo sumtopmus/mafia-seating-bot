@@ -6,7 +6,7 @@ from config_dir import Configurations
 from mafia_schedule import Configuration
 
 
-conf_name = "kaa-16-2023"
+conf_name = "kaa-20-2023"
 default_opponents = f"{conf_name}_opponents.txt"
 default_seats = f"{conf_name}_seats.txt"
 default_participants = None  # f"{conf_name}_participants.txt"
@@ -33,7 +33,7 @@ def execute_command(command):
             sys.argv) > 4 else default_numIterations
         print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
-        default_zeroPairs = 2  # 0
+        default_zeroPairs = 0
         default_singlePairs = 0
         expectedZeroPairs = int(sys.argv[5]) if len(
             sys.argv) > 5 else default_zeroPairs

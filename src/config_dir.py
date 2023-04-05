@@ -86,8 +86,15 @@ Configurations = {
         Configuration(numPlayers=20, numTables=2, numRounds=10,
                       numGames=20, numAttempts=10),
 
+    "kaa-15-2023":
+        Configuration(numPlayers=15, numTables=1, numRounds=15,
+                      numGames=15, numAttempts=10),
     "kaa-16-2023":
         Configuration(numPlayers=16, numTables=1, numRounds=16,
                       numGames=16, numAttempts=10),
+
+    "kaa-20-2023":
+        Configuration(numPlayers=20, numTables=2, numRounds=8,
+                      numGames=16, numAttempts=8),
 
 }
