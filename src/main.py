@@ -146,6 +146,8 @@ def execute_command_show(main_parser):
     schedule = loadSchedule(path_schedule)
     schedule.validate()
 
+    # NB: now participants filename is in default, so you MUST have participants filename to show schedule
+    # This might be inconvenient
     participants = None
     if filename_participants is not None:
         path_participants = commands.getFilePath(filename_participants)
