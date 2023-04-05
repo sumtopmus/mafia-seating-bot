@@ -100,4 +100,8 @@ Configurations = {
         Configuration(numPlayers=20, numTables=2, numRounds=8,
                       numGames=16, numAttempts=8),
 
+    "goldengate-2023":
+        Configuration(numPlayers=30, numTables=3, numRounds=10,
+                      numGames=30, numAttempts=10),
+
 }
