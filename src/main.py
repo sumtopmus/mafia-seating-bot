@@ -1,3 +1,4 @@
+import argparse
 import sys
 import commands
 import interactive
@@ -6,156 +7,258 @@ from config_dir import Configurations
 from mafia_schedule import Configuration
 
 
-conf_name = "kaa-20-2023"
-default_opponents = f"{conf_name}_opponents.txt"
-default_seats = f"{conf_name}_seats.txt"
-default_participants = None  # f"{conf_name}_participants.txt"
-default_schedule = f"{conf_name}.txt"
-default_mwt = f"{conf_name}_mwt.txt"
+class Defaults:
+    def __init__(self, conf_name):
+        self.conf_name = conf_name
+        if conf_name:
+            self.conf = Configurations[conf_name]
+        else:
+            self.conf = None
+
+        self.default_opponents = f"{conf_name}_opponents.txt"
+        self.default_seats = f"{conf_name}_seats.txt"
+        self.default_participants = None  # f"{conf_name}_participants.txt"
+        self.default_schedule = f"{conf_name}.txt"
+        self.default_mwt = f"{conf_name}_mwt.txt"
 
 
-def execute_command(command):
-    conf = Configurations[conf_name]
-    print(f"Configuration name: {conf_name}\n{conf}")
+def generate_defaults(conf_name: str) -> Defaults:
+    defaults = Defaults(conf_name)
+    return defaults
 
-    if command == "interactive":
-        interactive.main_loop(conf)
 
-    if command == "opponents":
-        filename_opponents = sys.argv[2] if len(
-            sys.argv) > 2 else default_opponents
-        print(f"Output opponents: {filename_opponents}")
+def execute_command_help(parser):
+    parser.print_help()
 
-        default_numRuns = 20
-        default_numIterations = 20 * 1000
-        numRuns = int(sys.argv[3]) if len(sys.argv) > 3 else default_numRuns
-        numIterations = int(sys.argv[4]) if len(
-            sys.argv) > 4 else default_numIterations
-        print(f"numRuns: {numRuns}, numIterations: {numIterations}")
 
-        default_zeroPairs = 0
-        default_singlePairs = 0
-        expectedZeroPairs = int(sys.argv[5]) if len(
-            sys.argv) > 5 else default_zeroPairs
-        expectedSinglePairs = int(sys.argv[6]) if len(
-            sys.argv) > 6 else default_singlePairs
-        print(f"ExpectedZeroPairs: {expectedZeroPairs}")
-        print(f"ExpectedSinglePairs: {expectedSinglePairs}")
+def execute_command_interactive(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <interactive> - allows to do advanced processing of schedule in interactive mode", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
 
-        commands.optimizeOpponents(conf, filename_opponents, numRuns, numIterations, [
-            expectedZeroPairs, expectedSinglePairs])
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
+    interactive.main_loop(defaults.conf)
 
-    if command == "seats":
-        filename_opponents = sys.argv[2] if len(
-            sys.argv) > 2 else default_opponents
-        filename_seats = sys.argv[3] if len(sys.argv) > 3 else default_seats
-        print(f"Input opponents: {filename_opponents}")
-        print(f"Output seats: {filename_seats}")
 
-        default_numRuns = 30
-        default_numIterationsStageOne = 10 * 1000
-        default_numIterationsStageTwo = 10 * 1000
-        numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns
-        numIterationsStageOne = int(sys.argv[5]) if len(
-            sys.argv) > 5 else default_numIterationsStageOne
-        numIterationsStageTwo = int(sys.argv[6]) if len(
-            sys.argv) > 6 else default_numIterationsStageTwo
-        listIterations = [numIterationsStageOne, numIterationsStageTwo]
-        print(f"numRuns: {numRuns}, iterations: {listIterations}")
+def execute_command_opponents(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <opponents> - the first step of schedule generation: optimize player opponents", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration", required=True,
+        help="Configuration name from file .configurations")
 
-        commands.optimizeSeats(filename_opponents, filename_seats,
-                               numRuns, listIterations)
+    parser.add_argument("--output", default=None,
+                        help="Filename to save schedule to")
 
-    if command == "participants":
-        filename_participants = sys.argv[2] if len(
-            sys.argv) > 2 else default_participants
-        commands.generateParticipants(conf, filename_participants)
+    parser.add_argument("--numRuns", type=int, default=20)
+    parser.add_argument("--numIterations", type=int, default=20 * 1000)
+    parser.add_argument("--zeroPairs", type=int, default=0)
+    parser.add_argument("--singlePairs", type=int, default=0)
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
 
-    if command == "show":
-        filename_schedule = sys.argv[2] if len(sys.argv) > 2 else default_seats
-        filename_participants = sys.argv[3] if len(
-            sys.argv) > 3 else default_participants
+    filename_opponents = args.output if args.output else defaults.default_opponents
+    print(f"Output opponents: {filename_opponents}")
 
-        path_schedule = commands.getFilePath(filename_schedule)
-        schedule = loadSchedule(path_schedule)
-        schedule.validate()
+    print(f"numRuns: {args.numRuns}, numIterations: {args.numIterations}")
+    print(f"ExpectedZeroPairs: {args.zeroPairs}")
+    print(f"ExpectedSinglePairs: {args.singlePairs}")
 
-        participants = None
-        if filename_participants is not None:
-            path_participants = commands.getFilePath(filename_participants)
-            participants = loadParticipants(path_participants)
+    commands.optimizeOpponents(defaults.conf, filename_opponents, args.numRuns, args.numIterations, [
+        args.zeroPairs, args.singlePairs])
 
-        commands.showSchedule(schedule, participants)
 
-    if command == "show_mwt":
-        filename_schedule = sys.argv[2] if len(
-            sys.argv) > 2 else default_schedule
-        filename_participants = sys.argv[3] if len(
-            sys.argv) > 3 else default_participants
+def execute_command_seats(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <seats> - the second step of schedule generation: optimize player seats", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
 
-        path_schedule = commands.getFilePath(filename_schedule)
-        schedule = loadSchedule(path_schedule)
-        schedule.validate()
+    filename_opponents = sys.argv[2] if len(
+        sys.argv) > 2 else defaults.default_opponents
+    filename_seats = sys.argv[3] if len(
+        sys.argv) > 3 else defaults.default_seats
+    print(f"Input opponents: {filename_opponents}")
+    print(f"Output seats: {filename_seats}")
 
-        participants = None
-        if filename_participants is not None:
-            path_participants = commands.getFilePath(filename_participants)
-            participants = loadParticipants(path_participants)
+    default_numRuns = 30
+    default_numIterationsStageOne = 10 * 1000
+    default_numIterationsStageTwo = 10 * 1000
+    numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns
+    numIterationsStageOne = int(sys.argv[5]) if len(
+        sys.argv) > 5 else default_numIterationsStageOne
+    numIterationsStageTwo = int(sys.argv[6]) if len(
+        sys.argv) > 6 else default_numIterationsStageTwo
+    listIterations = [numIterationsStageOne, numIterationsStageTwo]
+    print(f"numRuns: {numRuns}, iterations: {listIterations}")
 
-        commands.showMwtSchedule(schedule, participants)
+    commands.optimizeSeats(filename_opponents, filename_seats,
+                           numRuns, listIterations)
 
-    if command == "show_seats":
-        filename_schedule = sys.argv[2] if len(
-            sys.argv) > 2 else default_schedule
-        filename_participants = sys.argv[3] if len(
-            sys.argv) > 3 else default_participants
 
-        path_schedule = commands.getFilePath(filename_schedule)
-        schedule = loadSchedule(path_schedule)
-        schedule.validate()
+def execute_command_participants(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <participants> - generate participants file based on configuration", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
 
-        participants = None
-        if filename_participants is not None:
-            path_participants = commands.getFilePath(filename_participants)
-            participants = loadParticipants(path_participants)
+    filename_participants = sys.argv[2] if len(
+        sys.argv) > 2 else defaults.default_participants
+    commands.generateParticipants(defaults.conf, filename_participants)
 
-        commands.showSeats(schedule, participants)
 
-    if command == "show_team":
-        filename_schedule = sys.argv[2] if len(
-            sys.argv) > 2 else default_schedule
-        filename_participants = sys.argv[3] if len(
-            sys.argv) > 3 else default_participants
-        commands.showTeamSchedule(filename_schedule, filename_participants)
+def execute_command_show(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <show> - shows schedule", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
 
-    if command == "mwt_to_schedule":
-        filename_mwt = sys.argv[2] if len(sys.argv) > 2 else default_mwt
-        filename_schedule = sys.argv[3] if len(
-            sys.argv) > 3 else default_schedule
-        commands.loadMwt(conf, filename_mwt, filename_schedule)
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else defaults.default_seats
+    filename_participants = sys.argv[3] if len(
+        sys.argv) > 3 else defaults.default_participants
 
-    if command == "schedule_to_mwt":
-        filename_schedule = sys.argv[2] if len(
-            sys.argv) > 2 else default_schedule
-        filename_mwt = sys.argv[3] if len(sys.argv) > 3 else default_mwt
-        commands.saveMwt(filename_schedule, filename_mwt)
+    path_schedule = commands.getFilePath(filename_schedule)
+    schedule = loadSchedule(path_schedule)
+    schedule.validate()
 
-    if command == "rv":
-        filename_schedule = sys.argv[2] if len(
-            sys.argv) > 2 else default_schedule
-        commands.createRendezVouz(conf, filename_schedule)
+    participants = None
+    if filename_participants is not None:
+        path_participants = commands.getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+
+    commands.showSchedule(schedule, participants)
+
+
+def execute_command_show_mwt(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <show_mwt> - shows schedule in MWT (comma-based) format", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
+
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else defaults.default_schedule
+    filename_participants = sys.argv[3] if len(
+        sys.argv) > 3 else defaults.default_participants
+
+    path_schedule = commands.getFilePath(filename_schedule)
+    schedule = loadSchedule(path_schedule)
+    schedule.validate()
+
+    participants = None
+    if filename_participants is not None:
+        path_participants = commands.getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+
+    commands.showMwtSchedule(schedule, participants)
+
+
+def execute_command_show_seats(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <show_seats>", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
+
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else defaults.default_schedule
+    filename_participants = sys.argv[3] if len(
+        sys.argv) > 3 else defaults.default_participants
+
+    path_schedule = commands.getFilePath(filename_schedule)
+    schedule = loadSchedule(path_schedule)
+    schedule.validate()
+
+    participants = None
+    if filename_participants is not None:
+        path_participants = commands.getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+
+    commands.showSeats(schedule, participants)
+
+
+def execute_command_show_team(main_parser):
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else default_schedule
+    filename_participants = sys.argv[3] if len(
+        sys.argv) > 3 else default_participants
+    commands.showTeamSchedule(filename_schedule, filename_participants)
+
+
+def execute_command_mwt2schedule(main_parser):
+    filename_mwt = sys.argv[2] if len(sys.argv) > 2 else default_mwt
+    filename_schedule = sys.argv[3] if len(
+        sys.argv) > 3 else default_schedule
+    commands.loadMwt(conf, filename_mwt, filename_schedule)
+
+
+def execute_command_schedule2mwt(main_parser):
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else default_schedule
+    filename_mwt = sys.argv[3] if len(sys.argv) > 3 else default_mwt
+    commands.saveMwt(filename_schedule, filename_mwt)
+
+
+def execute_command_rv(main_parser):
+    filename_schedule = sys.argv[2] if len(
+        sys.argv) > 2 else default_schedule
+    commands.createRendezVouz(conf, filename_schedule)
+
+
+command_handlers = {
+    "help": execute_command_help,
+    "interactive": execute_command_interactive,
+    "opponents": execute_command_opponents,
+    "seats": execute_command_seats,
+    "participants": execute_command_participants,
+    "show": execute_command_show,
+    "show_mwt": execute_command_show_mwt,
+    "show_seats": execute_command_seats,
+    "show_team": execute_command_show_team,
+    "mwt_to_schedule": execute_command_mwt2schedule,
+    "schedule_to_mwt": execute_command_schedule2mwt,
+    "rv": execute_command_rv,
+}
 
 
 def main():
-    if len(sys.argv) < 2:
-        # TODO: implement dictionary with function pointer to every command
-        # Output all command in a generic way: from dictionary keys, not manually like here
-        print("Expected opponents | seats | participants | interactive | show | show_seats | show_mwt")
-        return
+    commands_list = [
+        f"{command_name}" for command_name in command_handlers]
 
-    command = sys.argv[1]
-    print(f"Command: {command}")
-    execute_command(command)
+    parser = argparse.ArgumentParser(
+        prog="MafSchedule", description='Mafia schedule processor.',
+        epilog="Available commands: " + " ".join(commands_list))
+    parser.add_argument("command",
+                        help=f"List of avaiable commands: {parser.prog} help")
+
+    # parse command only, nothing more!
+    cmd_line = sys.argv[1:2]
+    args = parser.parse_args(cmd_line)
+    command_name = args.command
+
+    if command_name not in command_handlers:
+        print(f"Unknown command: {command_name}")
+        execute_command_help(parser)
+    else:
+        handler = command_handlers[command_name]
+        handler(parser)
 
 
 if __name__ == '__main__':
