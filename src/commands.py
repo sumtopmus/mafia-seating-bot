@@ -106,10 +106,6 @@ def showSingleRound(schedule: Schedule, participants: Participants, round_index:
     Print.print(Print.roundByGames(schedule, round))
 
 
-def showScheduleGender(schedule: Schedule):
-    Print.print(Print.scheduleByGender(schedule))
-
-
 def showStats(schedule: Schedule, participants: Participants,
               showOpponentMatrix: bool, showOpponentHistogram: bool, showPairs: bool, showSeats: bool, showTables: bool):
     if participants:
@@ -136,7 +132,7 @@ def showStats(schedule: Schedule, participants: Participants,
         Print.print(Print.playerTableHistogram(schedule))
 
 
-def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
+def mwtToSchedule(conf: Configuration, filename_mwt: str, filename_schedule: str):
     path_mwt = getFilePath(filename_mwt)
     path_schedule = getFilePath(filename_schedule)
 
@@ -145,11 +141,17 @@ def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
     saveSchedule(schedule, path_schedule)
 
 
-def saveMwt(filename_schedule: str, filename_mwt: str):
+def scheduleToMwt(filename_schedule: str, filename_participants: str, filename_mwt: str):
     path_schedule = getFilePath(filename_schedule)
     path_mwt = getFilePath(filename_mwt)
 
     s = loadSchedule(path_schedule)
     s.validate()
+
+    participants = None
+    if filename_participants is not None:
+        path_participants = getFilePath(filename_participants)
+        participants = loadParticipants(path_participants)
+        s.setParticipants(participants)
 
     saveScheduleToMwt(s, path_mwt)
