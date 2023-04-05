@@ -2,7 +2,6 @@ import os
 
 from mafia_schedule import *
 from mafia_schedule.helpers import *
-import rendezvouz
 
 
 def getFilePath(filename: str) -> str:
@@ -84,24 +83,22 @@ def generateParticipants(conf: Configuration, filename_participants):
     saveParticipants(p, path_participants)
 
 
-def showSchedule(schedule: Schedule, participants: Participants):
+def showSchedule(schedule: Schedule, participants: Participants,
+                 scheduleByRounds: bool, scheduleByPlayers: bool, scheduleMwt: bool):
     if participants:
         schedule.setParticipants(participants)
 
-    Print.print(Print.scheduleByGames(schedule))
-    Print.print(Print.scheduleByPlayers(schedule))
+    if scheduleByRounds:
+        Print.print(Print.scheduleByGames(schedule))
+
+    if scheduleByPlayers:
+        Print.print(Print.scheduleByPlayers(schedule))
+
+    if scheduleMwt:
+        Print.print(Print.mwtSchedule(schedule))
 
 
-def showScheduleMatrix(schedule: Schedule):
-    Print.print(Print.opponentsMatrix(schedule))
-    Print.print(Print.pairsMatrix(schedule))
-
-
-def showScheduleGender(schedule: Schedule):
-    Print.print(Print.scheduleByGender(schedule))
-
-
-def showRound(schedule: Schedule, participants: Participants, round_index: int):
+def showSingleRound(schedule: Schedule, participants: Participants, round_index: int):
     if participants:
         schedule.setParticipants(participants)
 
@@ -109,49 +106,34 @@ def showRound(schedule: Schedule, participants: Participants, round_index: int):
     Print.print(Print.roundByGames(schedule, round))
 
 
-def showAllRounds(schedule: Schedule, participants: Participants):
+def showScheduleGender(schedule: Schedule):
+    Print.print(Print.scheduleByGender(schedule))
+
+
+def showStats(schedule: Schedule, participants: Participants,
+              showOpponentMatrix: bool, showOpponentHistogram: bool, showPairs: bool, showSeats: bool, showTables: bool):
     if participants:
         schedule.setParticipants(participants)
 
-    Print.print(Print.scheduleByGames(schedule))
+    if showOpponentMatrix:
+        Print.print(Print.opponentsMatrix(schedule))
 
+    if showOpponentHistogram:
+        Print.print(Print.pairsMatrix(schedule))
 
-def showAllPlayers(schedule: Schedule, participants: Participants):
-    if participants:
-        schedule.setParticipants(participants)
+    if showPairs:
+        Print.print(Print.minMaxPairs(schedule, [0]))
+        # Print.print(Print.minMaxPairs(schedule, [1]))
+        # Print.print(Print.minMaxPairs(schedule, [5, 6, 7, 8, 9]))
 
-    Print.print(Print.scheduleByPlayers(schedule))
+        Print.print(Print.minMaxPairs(schedule, [2]))
+        Print.print(Print.minMaxPairs(schedule, [8, 9]))
 
+    if showSeats:
+        Print.print(Print.seatsMatrix(schedule))
 
-def showTables(schedule: Schedule):
-    if schedule.numTables > 1:
+    if showTables and schedule.numTables > 1:
         Print.print(Print.playerTableHistogram(schedule))
-
-
-def showStats(schedule: Schedule, participants: Participants):
-    if participants:
-        schedule.setParticipants(participants)
-
-    Print.print(Print.minMaxPairs(schedule, [0]))
-    # Print.print(Print.minMaxPairs(schedule, [1]))
-    # Print.print(Print.minMaxPairs(schedule, [5, 6, 7, 8, 9]))
-
-    Print.print(Print.minMaxPairs(schedule, [2]))
-    Print.print(Print.minMaxPairs(schedule, [8, 9]))
-
-
-def showSeats(schedule: Schedule, participants: Participants):
-    if participants:
-        schedule.setParticipants(participants)
-
-    Print.print(Print.seatsMatrix(schedule))
-
-
-def showMwtSchedule(schedule: Schedule, participants: Participants):
-    if participants:
-        schedule.setParticipants(participants)
-
-    Print.print(Print.mwtSchedule(schedule))
 
 
 def loadMwt(conf: Configuration, filename_mwt: str, filename_schedule: str):
@@ -171,38 +153,3 @@ def saveMwt(filename_schedule: str, filename_mwt: str):
     s.validate()
 
     saveScheduleToMwt(s, path_mwt)
-
-
-def createRendezVouz(conf: Configuration, filename_schedule: str):
-    """
-    This is a very special schedule semi-manually created using flip and swap commands
-    Works only for RV-2022 tournament
-
-    "rendezvouz-2022":
-            Configuration(numPlayers=40, numTables=4, numRounds=15,
-                        numGames=60, numAttempts=15, numTeams=20),
-
-    """
-    path_schedule = getFilePath(filename_schedule)
-    schedule = rendezvouz.createRendezVouzSchedule(conf)
-
-    # required for opponents matrix
-    schedule.generateSlotsFromGames()
-
-    schedule.validate()
-
-    Print.print(Print.scheduleByPlayers(schedule))
-    # Print.print(Print.scheduleByGames(schedule))
-
-    Print.print(Print.scheduleByGender(schedule))
-    Print.print(Print.playerTableHistogram(schedule))
-
-    Print.print(Print.opponentsMatrix(schedule))
-    Print.print(Print.pairsMatrix(schedule))
-
-    opt = OptimizeOpponents(schedule)
-    opt.schedule = schedule
-    opt.expectedZeroPairs = 0
-    opt.expectedSinglePairs = 0
-    print(f"\nScore: {opt.scoreFunc():.2f}")
-    saveSchedule(schedule, path_schedule)

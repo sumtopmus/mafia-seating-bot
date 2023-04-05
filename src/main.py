@@ -122,91 +122,98 @@ def execute_command_participants(main_parser):
 
 def execute_command_show(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <show> - shows schedule", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
+        description="Command <show> - loads and prints the schedule", parents=[main_parser], add_help=False)
+
     parser.add_argument("--schedule", default=None,
                         help="Schedule filename to show")
     parser.add_argument("--participants", default=None,
                         help="Participants filename")
 
+    parser.add_argument("--show_rounds",
+                        action="store_true",
+                        help="Show schedule by rounds")
+    parser.add_argument("--show_players",
+                        action="store_true",
+                        help="Show schedule by players")
+    parser.add_argument("--show_mwt",
+                        action="store_true",
+                        help="Show schedule in MWT format")
+    parser.add_argument("--all",
+                        action="store_true",
+                        help="Show everything")
     args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
 
-    filename_schedule = args.schedule if args.schedule else defaults.default_seats
-    filename_participants = args.participants if args.participants else defaults.default_participants
+    # if nothing to show - then show all
+    if (not args.show_rounds
+        and not args.show_players
+            and not args.show_mwt):
+        args.all = True
 
-    path_schedule = commands.getFilePath(filename_schedule)
+    path_schedule = commands.getFilePath(args.schedule)
     schedule = loadSchedule(path_schedule)
     schedule.validate()
 
-    # NB: now participants filename is in default, so you MUST have participants filename to show schedule
-    # This might be inconvenient
     participants = None
-    if filename_participants is not None:
-        path_participants = commands.getFilePath(filename_participants)
+    if args.participants is not None:
+        path_participants = commands.getFilePath(args.participants)
         participants = loadParticipants(path_participants)
 
-    commands.showSchedule(schedule, participants)
+    commands.showSchedule(schedule, participants,
+                          args.all or args.show_rounds, args.all or args.show_players, args.all or args.show_mwt)
 
 
-def execute_command_show_mwt(main_parser):
+def execute_command_stats(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <show_mwt> - shows schedule in MWT (comma-based) format", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
+        description="Command <stats> - loads and prints statistics on the schedule", parents=[main_parser], add_help=False)
     parser.add_argument("--schedule", default=None,
                         help="Schedule filename to show")
     parser.add_argument("--participants", default=None,
                         help="Participants filename")
+
+    parser.add_argument("--show_opponent_matrix",
+                        action="store_true",
+                        help="Show opponent matrix")
+    parser.add_argument("--show_opponent_histogram",
+                        action="store_true",
+                        help="Show pairs histogram")
+    parser.add_argument("--show_pairs",
+                        action="store_true",
+                        help="Show pairs that play too few or too many games")
+    parser.add_argument("--show_seats",
+                        action="store_true",
+                        help="Show seats histogram for every player")
+    parser.add_argument("--show_tables",
+                        action="store_true",
+                        help="Show tables histogram for every player")
+    parser.add_argument("--all",
+                        action="store_true",
+                        help="Show all stats")
+
     args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
 
-    filename_schedule = args.schedule if args.schedule else defaults.default_seats
-    filename_participants = args.participants if args.participants else defaults.default_participants
+    # if nothing to show - then show all
+    if (not args.show_opponent_matrix
+        and not args.show_opponent_histogram
+        and not args.show_pairs
+        and not args.show_seats
+            and not args.show_tables):
+        args.all = True
 
-    path_schedule = commands.getFilePath(filename_schedule)
-    schedule = loadSchedule(path_schedule)
-    schedule.validate()
-
-    # NB: now participants filename is in default, so you MUST have participants filename to show schedule
-    # This might be inconvenient
-    participants = None
-    if filename_participants is not None:
-        path_participants = commands.getFilePath(filename_participants)
-        participants = loadParticipants(path_participants)
-
-    commands.showMwtSchedule(schedule, participants)
-
-
-def execute_command_show_seats(main_parser):
-    parser = argparse.ArgumentParser(
-        description="Command <show_seats>", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
-    parser.add_argument("--schedule", default=None,
-                        help="Schedule filename to show")
-    parser.add_argument("--participants", default=None,
-                        help="Participants filename")
-    args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
-
-    filename_schedule = args.schedule if args.schedule else defaults.default_seats
-    filename_participants = args.participants if args.participants else defaults.default_participants
-
-    path_schedule = commands.getFilePath(filename_schedule)
+    path_schedule = commands.getFilePath(args.schedule)
     schedule = loadSchedule(path_schedule)
     schedule.validate()
 
     participants = None
-    if filename_participants is not None:
-        path_participants = commands.getFilePath(filename_participants)
+    if args.participants is not None:
+        path_participants = commands.getFilePath(args.participants)
         participants = loadParticipants(path_participants)
 
-    commands.showSeats(schedule, participants)
+    commands.showStats(schedule, participants,
+                       showOpponentMatrix=args.all or args.show_opponent_matrix,
+                       showOpponentHistogram=args.all or args.show_opponent_histogram,
+                       showPairs=args.all or args.show_pairs,
+                       showSeats=args.all or args.show_seats,
+                       showTables=args.all or args.show_tables)
 
 
 def execute_command_mwt2schedule(main_parser):
@@ -229,8 +236,7 @@ command_handlers = {
     "seats": execute_command_seats,
     "participants": execute_command_participants,
     "show": execute_command_show,
-    "show_mwt": execute_command_show_mwt,
-    "show_seats": execute_command_seats,
+    "stats": execute_command_stats,
     "mwt_to_schedule": execute_command_mwt2schedule,
     "schedule_to_mwt": execute_command_schedule2mwt,
 }
@@ -239,10 +245,11 @@ command_handlers = {
 def main():
     commands_list = [
         f"{command_name}" for command_name in command_handlers]
+    command_list_str = " ".join(commands_list)
 
     parser = argparse.ArgumentParser(
         prog="MafSchedule", description='Mafia schedule processor.',
-        epilog="Available commands: " + " ".join(commands_list))
+        epilog=f"Available commands: {command_list_str}.")
     parser.add_argument("command",
                         help=f"List of avaiable commands: {parser.prog} help")
 
@@ -253,7 +260,7 @@ def main():
 
     if command_name not in command_handlers:
         print(f"Unknown command: {command_name}")
-        execute_command_help(parser)
+        parser.print_help()
     else:
         handler = command_handlers[command_name]
         handler(parser)

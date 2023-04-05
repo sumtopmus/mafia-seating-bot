@@ -4,11 +4,39 @@ from mafia_schedule.helpers import *
 from actions import Actions
 
 
+action_handlers = {
+    "config": Actions.setConfig,
+    "init": Actions.initSchedule,
+    "load": Actions.loadSchedule,
+    "save": Actions.saveSchedule,
+    "participants": Actions.loadParticipants,
+
+    "show": Actions.showSchedule,
+    "show_rounds": Actions.showScheduleByRounds,
+    "show_players": Actions.showScheduleByPlayers,
+    "show_mwt": Actions.showScheduleMwt,
+    "show_one_round": Actions.showOneRound,
+
+    "stats": Actions.showStats,
+    "stats_opponents": Actions.showStatsOpponents,
+    "stats_pairs": Actions.showStatsPairs,
+    "stats_tables": Actions.showStatsTables,
+    "stats_seats": Actions.showStatsSeats,
+
+    "check": Actions.checkSchedule,
+    "copy_round": Actions.copyRound,
+    "switch_players": Actions.switchPlayers,
+    "switch_tables": Actions.switchTables,
+}
+
+
 def print_help():
-    print("Commands: config init load save show_all show_stat show_mwt exit")
+    print("Available commands:")
+    for command in action_handlers:
+        print(f"\t{command}")
 
 
-def execute_command(actions: Actions, command_string) -> bool:
+def execute_action(actions: Actions, command_string) -> bool:
     if not command_string:
         return False
 
@@ -18,48 +46,14 @@ def execute_command(actions: Actions, command_string) -> bool:
 
     if command == "exit":
         return True
-    elif command == "help":
+
+    if command == "help":
         print_help()
-    elif command == "config":
-        actions.setConfig(params)
-    elif command == "init":
-        actions.initSchedule(params)
-    elif command == "load":
-        actions.loadSchedule(params)
-    elif command == "participants":
-        actions.loadParticipants(params)
-    elif command == "save":
-        actions.saveSchedule(params)
-    elif command == "show_all":
-        actions.showSchedule(params)
-    elif command == "show_rounds":
-        actions.showAllRounds(params)
-    elif command == "show_players":
-        actions.showAllPlayers(params)
-    elif command == "show_round":
-        actions.showRound(params)
-    elif command == "show_stats":
-        actions.showStats(params)
-    elif command == "show_tables":
-        actions.showTables(params)
-    elif command == "show_seats":
-        actions.showSeats(params)
-    elif command == "show_mwt":
-        actions.showMwt(params)
-    elif command == "show_matrix":
-        actions.showScheduleMatrix(params)
-    elif command == "show_gender":
-        actions.showScheduleGender(params)
-    elif command == "check":
-        actions.checkSchedule(params)
-    elif command == "copy_round":
-        actions.copyRound(params)
-    elif command == "switch_players":
-        actions.switchPlayers(params)
-    elif command == "switch_tables":
-        actions.switchTables(params)
+    elif command not in action_handlers:
+        print("### Unknown command: {command}. Type 'help' for details.")
     else:
-        print(f"### Unknown command: {command}")
+        handler = action_handlers[command]
+        handler(actions, params)
 
     return False
 
@@ -72,4 +66,4 @@ def main_loop():
     exit = False
     while not exit:
         command_string = input("\n>> ")
-        exit = execute_command(actions, command_string)
+        exit = execute_action(actions, command_string)

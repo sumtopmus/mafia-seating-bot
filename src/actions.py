@@ -29,9 +29,9 @@ class Actions:
             return
 
         conf_name = params[0]
-        g_conf = Configurations[conf_name]
-        print(f"Configuration name: {conf_name}\n{g_conf}")
-        print(g_conf)
+        self.conf = Configurations[conf_name]
+        print(f"Configuration name: {conf_name}")
+        print(self.conf)
 
     def initSchedule(self, params):
         if not self.conf:
@@ -75,15 +75,42 @@ class Actions:
         commands.saveSchedule(self.schedule, path)
 
     def showSchedule(self, params):
-        commands.showSchedule(self.schedule, self.participants)
+        if not self.schedule:
+            print("### No schedule!")
+            return
 
-    def showAllRounds(self, params):
-        commands.showAllRounds(self.schedule, self.participants)
+        commands.showSchedule(self.schedule, self.participants,
+                              scheduleByRounds=True, scheduleByPlayers=True, scheduleMwt=False)
 
-    def showAllPlayers(self, params):
-        commands.showAllPlayers(self.schedule, self.participants)
+    def showScheduleByRounds(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
 
-    def showRound(self, params):
+        commands.showSchedule(self.schedule, self.participants,
+                              scheduleByRounds=True, scheduleByPlayers=False, scheduleMwt=False)
+
+    def showScheduleByPlayers(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
+        commands.showSchedule(self.schedule, self.participants,
+                              scheduleByRounds=False, scheduleByPlayers=True, scheduleMwt=False)
+
+    def showScheduleMwt(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
+        commands.showSchedule(self.schedule, self.participants,
+                              scheduleByRounds=False, scheduleByPlayers=False, scheduleMwt=True)
+
+    def showOneRound(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
         if not params:
             print("### Round index expected")
             return
@@ -92,26 +119,55 @@ class Actions:
         commands.showRound(self.schedule, self.participants, round_idx)
 
     def showStats(self, params):
-        commands.showStats(self.schedule, self.participants)
+        if not self.schedule:
+            print("### No schedule!")
+            return
 
-    def showTables(self, params):
-        commands.showTables(self.schedule)
+        commands.showStats(self.schedule, self.participants,
+                           showOpponentMatrix=True, showOpponentHistogram=True, showPairs=False,
+                           showSeats=True, showTables=True)
 
-    def showSeats(self, params):
-        commands.showSeats(self.schedule, self.participants)
+    def showStatsOpponents(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
 
-    def showScheduleGender(self, params):
-        commands.showScheduleGender(self.schedule)
+        commands.showStats(self.schedule, self.participants,
+                           showOpponentMatrix=True, showOpponentHistogram=True,
+                           showPairs=False,
+                           showSeats=False, showTables=False)
 
-    def showScheduleMatrix(self, params):
-        commands.showScheduleMatrix(self.schedule)
+    def showStatsPairs(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
 
-    def showMwt(self, params):
-        commands.showMwtSchedule(self.schedule, self.participants)
+        commands.showStats(self.schedule, self.participants,
+                           showOpponentMatrix=False, showOpponentHistogram=False,
+                           showPairs=True,
+                           showSeats=False, showTables=False)
+
+    def showStatsTables(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
+        commands.showStats(self.schedule, self.participants,
+                           showOpponentMatrix=False, showOpponentHistogram=False, showPairs=False,
+                           showSeats=False, showTables=True)
+
+    def showStatsSeats(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
+        commands.showStats(self.schedule, self.participants,
+                           showOpponentMatrix=False, showOpponentHistogram=False, showPairs=False,
+                           showSeats=True, showTables=False)
 
     def checkSchedule(self, params):
         if not self.schedule:
-            print("### No schedule, nothing to validate")
+            print("### No schedule!")
             return
 
         if self.schedule.isValid():
@@ -121,7 +177,7 @@ class Actions:
 
     def copyRound(self, params):
         if not self.schedule:
-            print("### No schedule")
+            print("### No schedule!")
             return
 
         # zero-based round
@@ -155,6 +211,10 @@ class Actions:
             print("### Schedule is NOT valid")
 
     def switchTables(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
         try:
             round_index = int(params[0]) - 1
             table_one = ord(params[1]) - ord('A')
@@ -181,6 +241,10 @@ class Actions:
         commands.showRound(self.schedule, self.participants, round_index)
 
     def switchPlayers(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+
         try:
             round_index = int(params[0]) - 1
             table_one = ord(params[1]) - ord('A')
