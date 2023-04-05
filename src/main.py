@@ -217,25 +217,6 @@ def execute_command_show_seats(main_parser):
     commands.showSeats(schedule, participants)
 
 
-def execute_command_show_team(main_parser):
-    parser = argparse.ArgumentParser(
-        description="Command <show_team>", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
-    parser.add_argument("--schedule", default=None,
-                        help="Schedule filename to show")
-    parser.add_argument("--participants", default=None,
-                        help="Participants filename")
-    args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
-
-    filename_schedule = args.schedule if args.schedule else defaults.default_seats
-    filename_participants = args.participants if args.participants else defaults.default_participants
-
-    commands.showTeamSchedule(filename_schedule, filename_participants)
-
-
 def execute_command_mwt2schedule(main_parser):
     filename_mwt = sys.argv[2] if len(sys.argv) > 2 else default_mwt
     filename_schedule = sys.argv[3] if len(
@@ -250,21 +231,6 @@ def execute_command_schedule2mwt(main_parser):
     commands.saveMwt(filename_schedule, filename_mwt)
 
 
-def execute_command_rv(main_parser):
-    parser = argparse.ArgumentParser(
-        description="Command <show_team>", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
-    parser.add_argument("--output", default=None,
-                        help="Schedule filename to save the result to")
-    args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
-
-    filename_schedule = args.output if args.output else defaults.default_schedule
-    commands.createRendezVouz(defaults.conf, filename_schedule)
-
-
 command_handlers = {
     "help": execute_command_help,
     "interactive": execute_command_interactive,
@@ -274,12 +240,8 @@ command_handlers = {
     "show": execute_command_show,
     "show_mwt": execute_command_show_mwt,
     "show_seats": execute_command_seats,
-    "show_team": execute_command_show_team,
     "mwt_to_schedule": execute_command_mwt2schedule,
     "schedule_to_mwt": execute_command_schedule2mwt,
-
-    # only works for "rendezvouz-2022"
-    # "rv": execute_command_rv,
 }
 
 
