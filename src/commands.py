@@ -174,6 +174,15 @@ def saveMwt(filename_schedule: str, filename_mwt: str):
 
 
 def createRendezVouz(conf: Configuration, filename_schedule: str):
+    """
+    This is a very special schedule semi-manually created using flip and swap commands
+    Works only for RV-2022 tournament
+
+    "rendezvouz-2022":
+            Configuration(numPlayers=40, numTables=4, numRounds=15,
+                        numGames=60, numAttempts=15, numTeams=20),
+
+    """
     path_schedule = getFilePath(filename_schedule)
     schedule = rendezvouz.createRendezVouzSchedule(conf)
 

@@ -195,13 +195,15 @@ def execute_command_show_seats(main_parser):
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
+    parser.add_argument("--schedule", default=None,
+                        help="Schedule filename to show")
+    parser.add_argument("--participants", default=None,
+                        help="Participants filename")
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    filename_schedule = sys.argv[2] if len(
-        sys.argv) > 2 else defaults.default_schedule
-    filename_participants = sys.argv[3] if len(
-        sys.argv) > 3 else defaults.default_participants
+    filename_schedule = args.schedule if args.schedule else defaults.default_seats
+    filename_participants = args.participants if args.participants else defaults.default_participants
 
     path_schedule = commands.getFilePath(filename_schedule)
     schedule = loadSchedule(path_schedule)
@@ -216,10 +218,21 @@ def execute_command_show_seats(main_parser):
 
 
 def execute_command_show_team(main_parser):
-    filename_schedule = sys.argv[2] if len(
-        sys.argv) > 2 else default_schedule
-    filename_participants = sys.argv[3] if len(
-        sys.argv) > 3 else default_participants
+    parser = argparse.ArgumentParser(
+        description="Command <show_team>", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    parser.add_argument("--schedule", default=None,
+                        help="Schedule filename to show")
+    parser.add_argument("--participants", default=None,
+                        help="Participants filename")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
+
+    filename_schedule = args.schedule if args.schedule else defaults.default_seats
+    filename_participants = args.participants if args.participants else defaults.default_participants
+
     commands.showTeamSchedule(filename_schedule, filename_participants)
 
 
@@ -238,9 +251,18 @@ def execute_command_schedule2mwt(main_parser):
 
 
 def execute_command_rv(main_parser):
-    filename_schedule = sys.argv[2] if len(
-        sys.argv) > 2 else default_schedule
-    commands.createRendezVouz(conf, filename_schedule)
+    parser = argparse.ArgumentParser(
+        description="Command <show_team>", parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--configuration",
+        help="Configuration name from file .configurations")
+    parser.add_argument("--output", default=None,
+                        help="Schedule filename to save the result to")
+    args = parser.parse_args()
+    defaults = generate_defaults(args.configuration)
+
+    filename_schedule = args.output if args.output else defaults.default_schedule
+    commands.createRendezVouz(defaults.conf, filename_schedule)
 
 
 command_handlers = {
@@ -255,7 +277,9 @@ command_handlers = {
     "show_team": execute_command_show_team,
     "mwt_to_schedule": execute_command_mwt2schedule,
     "schedule_to_mwt": execute_command_schedule2mwt,
-    "rv": execute_command_rv,
+
+    # only works for "rendezvouz-2022"
+    # "rv": execute_command_rv,
 }
 
 
