@@ -17,7 +17,7 @@ class Defaults:
 
         self.default_opponents = f"{conf_name}_opponents.txt"
         self.default_seats = f"{conf_name}_seats.txt"
-        self.default_participants = None  # f"{conf_name}_participants.txt"
+        self.default_participants = f"{conf_name}_participants.txt"
         self.default_schedule = f"{conf_name}.txt"
         self.default_mwt = f"{conf_name}_mwt.txt"
 
@@ -118,11 +118,13 @@ def execute_command_participants(main_parser):
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
+    parser.add_argument("--output", default=None,
+                        help="Output participants filename")
+
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    filename_participants = sys.argv[2] if len(
-        sys.argv) > 2 else defaults.default_participants
+    filename_participants = args.output if args.output else defaults.default_participants
     commands.generateParticipants(defaults.conf, filename_participants)
 
 
