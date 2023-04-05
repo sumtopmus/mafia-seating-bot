@@ -51,12 +51,19 @@ def execute_command_opponents(main_parser):
         help="Configuration name from file .configurations")
 
     parser.add_argument("--output", default=None,
-                        help="Filename to save schedule to")
+                        help="Opponents schedule filename to save the result to")
 
-    parser.add_argument("--numRuns", type=int, default=20)
-    parser.add_argument("--numIterations", type=int, default=20 * 1000)
-    parser.add_argument("--zeroPairs", type=int, default=0)
-    parser.add_argument("--singlePairs", type=int, default=0)
+    parser.add_argument("--numRuns", type=int,
+                        help="Number of optimization attempts",
+                        default=20)
+    parser.add_argument("--numIterations", type=int,
+                        help="Number of iterations in every attempt",
+                        default=20 * 1000)
+    parser.add_argument("--zeroPairs", type=int,
+                        help="Number of pairs that should not play with each other",
+                        default=0)
+    parser.add_argument("--singlePairs", type=int,
+                        help="Number of pairs that should play with each other only once", default=0)
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
@@ -77,29 +84,32 @@ def execute_command_seats(main_parser):
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
+    parser.add_argument("--input", default=None,
+                        help="Opponents schedule filename to start with")
+    parser.add_argument("--output", default=None,
+                        help="Seats schedule filename to save the result to")
+    parser.add_argument("--numRuns", type=int,
+                        help="Number of optimization attempts",
+                        default=20)
+    parser.add_argument("--numIterationsStageOne", type=int,
+                        help="Number of optimization attempts",
+                        default=10 * 1000)
+    parser.add_argument("--numIterationsStageTwo", type=int,
+                        help="Number of optimization attempts",
+                        default=10 * 1000)
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    filename_opponents = sys.argv[2] if len(
-        sys.argv) > 2 else defaults.default_opponents
-    filename_seats = sys.argv[3] if len(
-        sys.argv) > 3 else defaults.default_seats
+    filename_opponents = args.input if args.input else defaults.default_opponents
+    filename_seats = args.output if args.output else defaults.default_seats
     print(f"Input opponents: {filename_opponents}")
     print(f"Output seats: {filename_seats}")
 
-    default_numRuns = 30
-    default_numIterationsStageOne = 10 * 1000
-    default_numIterationsStageTwo = 10 * 1000
-    numRuns = int(sys.argv[4]) if len(sys.argv) > 4 else default_numRuns
-    numIterationsStageOne = int(sys.argv[5]) if len(
-        sys.argv) > 5 else default_numIterationsStageOne
-    numIterationsStageTwo = int(sys.argv[6]) if len(
-        sys.argv) > 6 else default_numIterationsStageTwo
-    listIterations = [numIterationsStageOne, numIterationsStageTwo]
-    print(f"numRuns: {numRuns}, iterations: {listIterations}")
+    listIterations = [args.numIterationsStageOne, args.numIterationsStageTwo]
+    print(f"numRuns: {args.numRuns}, iterations: {listIterations}")
 
     commands.optimizeSeats(filename_opponents, filename_seats,
-                           numRuns, listIterations)
+                           args.numRuns, listIterations)
 
 
 def execute_command_participants(main_parser):
