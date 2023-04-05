@@ -134,13 +134,16 @@ def execute_command_show(main_parser):
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
+    parser.add_argument("--schedule", default=None,
+                        help="Schedule filename to show")
+    parser.add_argument("--participants", default=None,
+                        help="Participants filename")
+
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    filename_schedule = sys.argv[2] if len(
-        sys.argv) > 2 else defaults.default_seats
-    filename_participants = sys.argv[3] if len(
-        sys.argv) > 3 else defaults.default_participants
+    filename_schedule = args.schedule if args.schedule else defaults.default_seats
+    filename_participants = args.participants if args.participants else defaults.default_participants
 
     path_schedule = commands.getFilePath(filename_schedule)
     schedule = loadSchedule(path_schedule)
@@ -162,18 +165,22 @@ def execute_command_show_mwt(main_parser):
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
+    parser.add_argument("--schedule", default=None,
+                        help="Schedule filename to show")
+    parser.add_argument("--participants", default=None,
+                        help="Participants filename")
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    filename_schedule = sys.argv[2] if len(
-        sys.argv) > 2 else defaults.default_schedule
-    filename_participants = sys.argv[3] if len(
-        sys.argv) > 3 else defaults.default_participants
+    filename_schedule = args.schedule if args.schedule else defaults.default_seats
+    filename_participants = args.participants if args.participants else defaults.default_participants
 
     path_schedule = commands.getFilePath(filename_schedule)
     schedule = loadSchedule(path_schedule)
     schedule.validate()
 
+    # NB: now participants filename is in default, so you MUST have participants filename to show schedule
+    # This might be inconvenient
     participants = None
     if filename_participants is not None:
         path_participants = commands.getFilePath(filename_participants)
