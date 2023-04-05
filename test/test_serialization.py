@@ -50,25 +50,25 @@ class TestSerialization(unittest.TestCase):
         participants = Participants.create(3, "Player_")
         d = participants.toJson()
         self.assertEqual(d, {'people': [
-            {'id': 0, 'name': 'Player_00'},
-            {'id': 1, 'name': 'Player_01'},
-            {'id': 2, 'name': 'Player_02'}]
+            {'id': 0, 'name': 'Player_01'},
+            {'id': 1, 'name': 'Player_02'},
+            {'id': 2, 'name': 'Player_03'}]
         })
 
     def test_participants_fromJson(self):
         d = {'people': [
-            {'id': 0, 'name': 'Player_0'},
-            {'id': 1, 'name': 'Player_1'},
-            {'id': 2, 'name': 'Player_2'}]
+            {'id': 0, 'name': 'Player_XX'},
+            {'id': 1, 'name': 'Player_YY'},
+            {'id': 2, 'name': 'Player_ZZ'}]
         }
 
         p = Participants.fromJson(d)
         self.assertEqual(p[0].id, 0)
-        self.assertEqual(p[0].name, 'Player_0')
+        self.assertEqual(p[0].name, 'Player_XX')
         self.assertEqual(p[1].id, 1)
-        self.assertEqual(p[1].name, 'Player_1')
+        self.assertEqual(p[1].name, 'Player_YY')
         self.assertEqual(p[2].id, 2)
-        self.assertEqual(p[2].name, 'Player_2')
+        self.assertEqual(p[2].name, 'Player_ZZ')
 
     def test_game_toJson(self):
         ids = [5, 9, 3, 6, 1, 4, 7, 8, 2, 0]
