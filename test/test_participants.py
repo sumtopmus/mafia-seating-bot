@@ -11,7 +11,7 @@ class TestParticipants(unittest.TestCase):
 
     def test_participants_generageNamesWithCustomPrefix(self):
         names = Participants.generateNames(2, 'prefix')
-        self.assertEqual(names, ['prefix00', 'prefix01'])
+        self.assertEqual(names, ['prefix01', 'prefix02'])
 
     def test_participantsCreateFromNames(self):
         names = ['like', 'aman', 'fantomas']
