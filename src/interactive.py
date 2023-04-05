@@ -1,7 +1,6 @@
-from config_dir import Configurations
+from all_configurations import Configurations
 from mafia_schedule.helpers import *
 
-import commands
 from actions import Actions
 
 
@@ -16,14 +15,6 @@ def execute_command(actions: Actions, command_string) -> bool:
     params = command_string.split()
     command = params[0]
     params = params[1:] if len(params) > 1 else None
-
-    # This is debug - delete it
-    #print(f"Command string: '{command_string}'")
-    #print(f"Command: {command}")
-    # if params:
-    #    print(f"Params ({len(params)}): {params}")
-    # else:
-    #    print("No params")
 
     if command == "exit":
         return True
@@ -73,11 +64,10 @@ def execute_command(actions: Actions, command_string) -> bool:
     return False
 
 
-def main_loop(conf):
+def main_loop():
     print("Welcome to interactive mode")
 
     actions = Actions()
-    actions.conf = conf
 
     exit = False
     while not exit:

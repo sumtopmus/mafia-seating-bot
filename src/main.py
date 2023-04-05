@@ -3,17 +3,14 @@ import sys
 import commands
 import interactive
 from mafia_schedule.helpers import *
-from config_dir import Configurations
+from all_configurations import Configurations
 from mafia_schedule import Configuration
 
 
 class Defaults:
-    def __init__(self, conf_name):
+    def __init__(self, conf_name, conf):
         self.conf_name = conf_name
-        if conf_name:
-            self.conf = Configurations[conf_name]
-        else:
-            self.conf = None
+        self.conf = conf
 
         self.default_opponents = f"{conf_name}_opponents.txt"
         self.default_seats = f"{conf_name}_seats.txt"
@@ -23,24 +20,19 @@ class Defaults:
 
 
 def generate_defaults(conf_name: str) -> Defaults:
-    defaults = Defaults(conf_name)
+    conf = Configurations[conf_name] if conf_name in Configurations else None
+    defaults = Defaults(conf_name, conf)
     return defaults
-
-
-def execute_command_help(parser):
-    parser.print_help()
 
 
 def execute_command_interactive(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <interactive> - allows to do advanced processing of schedule in interactive mode", parents=[main_parser], add_help=False)
-    parser.add_argument(
-        "--configuration",
-        help="Configuration name from file .configurations")
+        description="Command <interactive> - allows to do advanced processing of schedule in interactive mode",
+        parents=[main_parser],
+        add_help=False)
 
     args = parser.parse_args()
-    defaults = generate_defaults(args.configuration)
-    interactive.main_loop(defaults.conf)
+    interactive.main_loop()
 
 
 def execute_command_opponents(main_parser):
@@ -232,7 +224,6 @@ def execute_command_schedule2mwt(main_parser):
 
 
 command_handlers = {
-    "help": execute_command_help,
     "interactive": execute_command_interactive,
     "opponents": execute_command_opponents,
     "seats": execute_command_seats,

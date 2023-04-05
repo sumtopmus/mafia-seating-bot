@@ -1,5 +1,5 @@
 
-from config_dir import Configurations
+from all_configurations import Configurations
 from mafia_schedule.configuration import Configuration
 from mafia_schedule.schedule import Schedule
 from mafia_schedule.player import Participants
