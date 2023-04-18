@@ -89,6 +89,9 @@ def optimizeTables(filename_input: str, filename_output: str, numRuns: int, iter
     s = loadSchedule(path_input)
     s.validate()
 
+    print("\n*** Schedule before tables optimization:")
+    callbackPrintTables(s, path_output)
+
     tables = OptimizeTables(s, verbose=False)
     tables.callbackBetterSchedule = lambda s: callbackPrintTables(
         s, path_output)

@@ -180,6 +180,21 @@ class Metrics:
                     player_tables[player_id][table_id] += 1
         return player_tables
 
+    def calcPlayerTablePenalties(self):
+        '''
+        Calculates penalty for every player - should seat at all tables uniformely
+        '''
+        target = self.schedule.numAttempts / self.schedule.numTables
+
+        penalty = 0.0
+        player_tables = self.calcTablesMatrix()
+
+        player_penalties = []
+        for player, tables in player_tables.items():
+            score = self.calcSquareDeviation(tables, target)
+            player_penalties.append(score)
+        return player_penalties
+
     def calcSquareDeviationExclude(self, data: list, target: float, exclude_idx: int):
         '''
         Calculates standard deviation between values in <data> and <target>, 

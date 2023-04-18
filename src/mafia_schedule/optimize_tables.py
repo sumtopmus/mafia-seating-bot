@@ -1,4 +1,5 @@
 import random
+import statistics
 
 from .schedule import Schedule
 from .metrics import Metrics
@@ -69,32 +70,46 @@ class OptimizeTables:
     def randomTableChange(self) -> bool:
         round = random.choice(self.schedule.rounds)
         table_one = random.randrange(self.schedule.numTables)
-        table_two = random.randrange(self.schedule.numTables-1)
+        table_two = 1 + random.randrange(self.schedule.numTables-1)
         table_two = (table_one + table_two) % self.schedule.numTables
 
-        # swap two tables in a round
+        game_one_id = round.gameIds[table_one]
+        game_two_id = round.gameIds[table_two]
+        game_one = self.schedule.games[game_one_id]
+        game_two = self.schedule.games[game_two_id]
+
+        # switch games in a round
+        temp = game_one.players.copy()
+        game_one.players = game_two.players.copy()
+        game_two.players = temp.copy()
 
         # check score
-        '''if score < self.currentScore:
+        score = self.scoreFunc()
+
+        if score < self.currentScore:
+            # debug
+            '''
+            print(
+                f"\nSwithing tables. Round: {round.id}. Tables: {table_one} <-> {table_two}. Games: {game_one_id} <-> {game_two_id}")
+            print(f"Score before: {self.currentScore}")
+            print(f"Score after: {score}")
+
+            print(f"Game1: {game_two.players}")
+            print(f"Game2: {game_one.players}")
+            '''
+
             self.currentScore = score
             return True
         else:
-            game.players = oldPlayers
+            # switch games back
+            temp = game_one.players.copy()
+            game_one.players = game_two.players.copy()
+            game_two.players = temp.copy()
             return False
-        '''
-        return False
 
     def scoreFunc(self) -> float:
         m = Metrics(self.schedule)
-        target = self.schedule.numAttempts / self.schedule.numTables
+        penalties = m.calcPlayerTablePenalties()
 
-        penalty = 0.0
-        player_tables = m.calcTablesMatrix()
-
-        player_scores = []
-        for player, tables in player_tables.items():
-            score = m.calcSquareDeviation(tables, target)
-            player_scores.append(score)
-
-        penalty = sum(player_scores)
-        return penalty
+        score = statistics.mean(penalties) + max(penalties)
+        return score

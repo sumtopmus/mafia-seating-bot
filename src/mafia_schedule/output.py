@@ -171,6 +171,7 @@ class Print:
 
         m = Metrics(schedule)
         player_tables = m.calcTablesMatrix()
+        player_tables_penalties = m.calcPlayerTablePenalties()
 
         yield ''
         yield "Tables histogram:"
@@ -181,6 +182,9 @@ class Print:
             for table_id, table_games in enumerate(tables):
                 # line += f"{Print.pretty_table_id(table_id)}: {table_games:<2d} "
                 line += f"{table_games:<2d}  "
+
+            # also output score for the player (the less the better)
+            line += f"\tscore: {player_tables_penalties[player_id]:.2f}"
 
             yield line
 
