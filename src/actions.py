@@ -287,7 +287,7 @@ class Actions:
         game_two.players[two_idx] = player_one
 
         # print("\n*** After")
-        commands.showRound(self.schedule, self.participants, round_index)
+        commands.showSingleRound(self.schedule, self.participants, round_index)
 
         if self.schedule.isValid():
             print("Schedule is valid")
