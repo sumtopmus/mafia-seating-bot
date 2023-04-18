@@ -294,10 +294,9 @@ def main():
     command_list_str = " ".join(commands_list)
 
     parser = argparse.ArgumentParser(
-        prog="MafSchedule", description='Mafia schedule processor.',
-        epilog=f"Available commands: {command_list_str}.")
+        prog="MafSchedule", description="Mafia schedule processor. Version: April 2023.")
     parser.add_argument("command",
-                        help=f"List of avaiable commands: {parser.prog} help")
+                        help=f"List of available commands: {command_list_str}")
 
     # parse command only, nothing more!
     cmd_line = sys.argv[1:2]

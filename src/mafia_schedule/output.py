@@ -42,7 +42,7 @@ class Print:
         m = Metrics(schedule)
 
         yield ''
-        yield "Pairs matrix:"
+        yield "Opponents histogram:"
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairsHistogram(playerId)
             penalty = m.penaltyPlayer(playerId)
@@ -185,7 +185,7 @@ class Print:
                     player_tables[player_id][table_id] += 1
 
         yield ''
-        yield "Player table histogram:"
+        yield "Tables histogram:"
 
         for player_id in range(schedule.numPlayers):
             line = f"{f.pretty_player_id(player_id):<20}:  "
@@ -224,7 +224,7 @@ class Print:
         matrix = m.calcSeatsMatrix()
 
         yield ''
-        yield "*** Seats matrix:"
+        yield "*** Seats histogram:"
         for playerId in range(len(matrix)):
             line = matrix[playerId]
             s = ''.join([f"{v:3d}" for v in line])
