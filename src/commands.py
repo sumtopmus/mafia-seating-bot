@@ -38,7 +38,14 @@ def callbackPrintSeats(s: Schedule, path: str):
         saveSchedule(s, path)
 
 
-def optimizeOpponents(conf, filename_opponents, numRuns: int, numIterations: int, expectedPairs: list[int] = [0, 0]):
+def callbackPrintTables(s: Schedule, path: str):
+    Print.print(Print.playerTableHistogram(s))
+
+    if path is not None:
+        saveSchedule(s, path)
+
+
+def optimizeOpponents(conf, filename_opponents: str, numRuns: int, numIterations: int, expectedPairs: list[int] = [0, 0]):
     path_opponents = getFilePath(filename_opponents)
     conf.validate()
 
@@ -56,7 +63,7 @@ def optimizeOpponents(conf, filename_opponents, numRuns: int, numIterations: int
     callbackPrintOpponents(s, path_opponents)
 
 
-def optimizeSeats(filename_opponents, filename_seats, numRuns, iterations: list[int]):
+def optimizeSeats(filename_opponents: str, filename_seats: str, numRuns: int, iterations: list[int]):
     path_opponents = getFilePath(filename_opponents)
     path_seats = getFilePath(filename_seats)
 
@@ -73,6 +80,22 @@ def optimizeSeats(filename_opponents, filename_seats, numRuns, iterations: list[
 
     print("\n*** Schedule after seats optimization:")
     callbackPrintSeats(s, path_seats)
+
+
+def optimizeTables(filename_input: str, filename_output: str, numRuns: int, iterations: int):
+    path_input = getFilePath(filename_input)
+    path_output = getFilePath(filename_output)
+
+    s = loadSchedule(path_input)
+    s.validate()
+
+    tables = OptimizeTables(s, verbose=False)
+    tables.callbackBetterSchedule = lambda s: callbackPrintTables(
+        s, path_output)
+    tables.optimize(numRuns, iterations)
+
+    print("\n*** Schedule after tables optimization:")
+    callbackPrintTables(s, path_output)
 
 
 def showAllConfigurations(configurations):

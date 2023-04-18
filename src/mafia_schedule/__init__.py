@@ -14,6 +14,7 @@ from .player import Player
 from .metrics import Metrics
 from .optimize_seats import OptimizeSeats
 from .optimize_opponents import OptimizeOpponents
+from .optimize_tables import OptimizeTables
 
 from .output import Print
 # from .mafia_schedule.helpers import *

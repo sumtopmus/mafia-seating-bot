@@ -162,6 +162,24 @@ class Metrics:
             matrix.append(line)
         return matrix
 
+    def calcTablesMatrix(self):
+        '''Calculates tables histogram for all players'''
+        # init statistics: tables of every player
+        player_tables = {}
+        for player_id in range(self.schedule.numPlayers):
+            zero_list = []
+            for _ in range(self.schedule.numTables):
+                zero_list.append(0)
+            player_tables[player_id] = zero_list
+
+        # calc table histogram for every player
+        for round in self.schedule.rounds:
+            for table_id, game_id in enumerate(round.gameIds):
+                game = self.schedule.games[game_id]
+                for player_id in game.players:
+                    player_tables[player_id][table_id] += 1
+        return player_tables
+
     def calcSquareDeviationExclude(self, data: list, target: float, exclude_idx: int):
         '''
         Calculates standard deviation between values in <data> and <target>, 

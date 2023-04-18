@@ -45,7 +45,7 @@ def execute_command_configurations(main_parser):
 
 def execute_command_interactive(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <interactive> - allows to do advanced processing of schedule in interactive mode",
+        description="Command <interactive> - allows to do advanced processing of schedule in interactive mode.",
         parents=[main_parser],
         add_help=False)
 
@@ -55,7 +55,7 @@ def execute_command_interactive(main_parser):
 
 def execute_command_opponents(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <opponents> - the first step of schedule generation: optimize player opponents",
+        description="Command <opponents> - the first step of schedule generation: optimize player opponents.",
         parents=[main_parser], add_help=False)
     parser.add_argument(
         "--configuration", required=True,
@@ -95,7 +95,7 @@ def execute_command_opponents(main_parser):
 
 def execute_command_seats(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <seats> - the second step of schedule generation: optimize player seats",
+        description="Command <seats> - the second step of schedule generation: optimize player seats.",
         parents=[main_parser], add_help=False)
     parser.add_argument(
         "--configuration",
@@ -133,9 +133,34 @@ def execute_command_seats(main_parser):
                            args.numRuns, listIterations)
 
 
+def execute_command_tables(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <tables> - the third step of schedule generation: optimize player tables.",
+        parents=[main_parser], add_help=False)
+    parser.add_argument(
+        "--input", required=True,
+        help="Schedule filename to start with")
+    parser.add_argument(
+        "--output", required=True,
+        help="Schedule filename to save the result to")
+    parser.add_argument(
+        "--numRuns", type=int,
+        help="Number of optimization attempts",
+        default=10)
+    parser.add_argument(
+        "--numIterations", type=int,
+        help="Number of optimization attempts",
+        default=1000)
+    args = parser.parse_args()
+
+    commands.optimizeTables(args.input, args.output,
+                            args.numRuns, args.numIterations)
+
+
 def execute_command_participants(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <participants> - generate participants file based on configuration", parents=[main_parser], add_help=False)
+        description="Command <participants> - generate participants file based on configuration.",
+        parents=[main_parser], add_help=False)
     parser.add_argument(
         "--configuration",
         help="Configuration name from file .configurations")
@@ -151,7 +176,7 @@ def execute_command_participants(main_parser):
 
 def execute_command_show(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <show> - loads and prints the schedule",
+        description="Command <show> - loads and prints the schedule.",
         parents=[main_parser], add_help=False)
 
     parser.add_argument(
@@ -200,7 +225,7 @@ def execute_command_show(main_parser):
 
 def execute_command_stats(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <stats> - loads and prints statistics on the schedule",
+        description="Command <stats> - loads and prints statistics of the schedule.",
         parents=[main_parser], add_help=False)
     parser.add_argument(
         "--schedule", default=None,
@@ -263,7 +288,8 @@ def execute_command_stats(main_parser):
 
 def execute_command_mwt2schedule(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <mwt_to_schedule> - loads MWT schedule and saves it into JSON format", parents=[main_parser], add_help=False)
+        description="Command <mwt_to_schedule> - loads MWT schedule and saves it into JSON format.",
+        parents=[main_parser], add_help=False)
     parser.add_argument(
         "--configuration", required=True,
         help="Configuration name from file .configurations")
@@ -281,7 +307,8 @@ def execute_command_mwt2schedule(main_parser):
 
 def execute_command_schedule2mwt(main_parser):
     parser = argparse.ArgumentParser(
-        description="Command <schedule_to_mwt> - exports to MWT schedule", parents=[main_parser], add_help=False)
+        description="Command <schedule_to_mwt> - exports to MWT schedule.",
+        parents=[main_parser], add_help=False)
     parser.add_argument("--schedule", default=None,
                         help="Schedule filename to load")
     parser.add_argument("--participants", default=None,
@@ -299,6 +326,7 @@ command_handlers = {
     "interactive": execute_command_interactive,
     "opponents": execute_command_opponents,
     "seats": execute_command_seats,
+    "tables": execute_command_tables,
     "participants": execute_command_participants,
     "show": execute_command_show,
     "stats": execute_command_stats,

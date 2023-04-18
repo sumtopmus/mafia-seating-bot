@@ -169,20 +169,8 @@ class Print:
     def playerTableHistogram(schedule: Schedule):
         f = Format(schedule)
 
-        # init statistics: tables of every player
-        player_tables = {}
-        for player_id in range(schedule.numPlayers):
-            zero_list = []
-            for _ in range(schedule.numTables):
-                zero_list.append(0)
-            player_tables[player_id] = zero_list
-
-        # calc table histogram for every player
-        for round in schedule.rounds:
-            for table_id, game_id in enumerate(round.gameIds):
-                game = schedule.games[game_id]
-                for player_id in game.players:
-                    player_tables[player_id][table_id] += 1
+        m = Metrics(schedule)
+        player_tables = m.calcTablesMatrix()
 
         yield ''
         yield "Tables histogram:"

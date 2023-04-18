@@ -56,6 +56,7 @@ class OptimizeSeats:
                     self.schedule.updateGamePlayers(self.bestGamePlayers)
                     self.callbackBetterSchedule(self.schedule)
 
+        # in the end set schedule to best one
         self.schedule.updateGamePlayers(self.bestGamePlayers)
 
     def optimizeStage(self, iterations: int):
