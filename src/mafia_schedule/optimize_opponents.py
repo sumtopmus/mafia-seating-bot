@@ -217,11 +217,16 @@ class OptimizeOpponents:
         We can take median of penalties, or calc penalty for all players
         '''
 
-        # sum of penalties in not what we want
-        # basePenalty = sum(penalties)
-
+        # sum of penalties is not what we want
         # we want to minimize the worst player
-        basePenalty = max(penalties)
+
+        # Reverted to sum as often using max()
+        # does not lead to successful changes
+        # basePenalty = max(penalties)
+
+        # TODO: think of better metric:
+        # options: sum() + max() or median()
+        basePenalty = sum(penalties)
 
         zeroPlayers = 0
         singlePlayers = 0
