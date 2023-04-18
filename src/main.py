@@ -25,6 +25,24 @@ def generate_defaults(conf_name: str) -> Defaults:
     return defaults
 
 
+def execute_command_configurations(main_parser):
+    parser = argparse.ArgumentParser(
+        description="Command <configurations> - show all configurations.",
+        parents=[main_parser],
+        add_help=False)
+
+    parser.add_argument(
+        "--name",
+        help="Show info on just one configuration")
+
+    args = parser.parse_args()
+
+    if not args.name:
+        commands.showAllConfigurations(Configurations)
+    else:
+        commands.showOneConfiguration(Configurations, args.name)
+
+
 def execute_command_interactive(main_parser):
     parser = argparse.ArgumentParser(
         description="Command <interactive> - allows to do advanced processing of schedule in interactive mode",
@@ -277,6 +295,7 @@ def execute_command_schedule2mwt(main_parser):
 
 
 command_handlers = {
+    "configurations": execute_command_configurations,
     "interactive": execute_command_interactive,
     "opponents": execute_command_opponents,
     "seats": execute_command_seats,

@@ -75,6 +75,20 @@ def optimizeSeats(filename_opponents, filename_seats, numRuns, iterations: list[
     callbackPrintSeats(s, path_seats)
 
 
+def showAllConfigurations(configurations):
+    print("*** List of all configurations:")
+    for name, config in configurations.items():
+        print(name)
+
+
+def showOneConfiguration(configurations, name):
+    if name in configurations:
+        print(name)
+        print(configurations[name])
+    else:
+        print(f"Configuration not found: {name}")
+
+
 def generateParticipants(conf: Configuration, filename_participants):
     print(f"Creating participants: {conf.numPlayers}")
     p = Participants.create(conf.numPlayers, "Player_")
