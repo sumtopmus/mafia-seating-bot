@@ -230,7 +230,7 @@ class Actions:
         game_two = self.schedule.games[game_two_id]
 
         print("\n*** Before")
-        commands.showRound(self.schedule, self.participants, round_index)
+        commands.showSingleRound(self.schedule, self.participants, round_index)
 
         # switch players in game_one and game_two
         temp = game_one.players.copy()
@@ -238,7 +238,7 @@ class Actions:
         game_two.players = temp.copy()
 
         # print("\n*** After")
-        commands.showRound(self.schedule, self.participants, round_index)
+        commands.showSingleRound(self.schedule, self.participants, round_index)
 
     def switchPlayers(self, params):
         if not self.schedule:
