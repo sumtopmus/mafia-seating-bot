@@ -159,10 +159,13 @@ def showStats(schedule: Schedule, participants: Participants,
 
     if showPairs:
         Print.print(Print.minMaxPairs(schedule, [0]))
-        # Print.print(Print.minMaxPairs(schedule, [1]))
+        Print.print(Print.minMaxPairs(schedule, [1]))
+        Print.print(Print.minMaxPairs(schedule, [2]))
+
         # Print.print(Print.minMaxPairs(schedule, [5, 6, 7, 8, 9]))
 
-        Print.print(Print.minMaxPairs(schedule, [2]))
+        Print.print(Print.minMaxPairs(schedule, [5]))
+        Print.print(Print.minMaxPairs(schedule, [6]))
         Print.print(Print.minMaxPairs(schedule, [8, 9]))
 
     if showSeats:

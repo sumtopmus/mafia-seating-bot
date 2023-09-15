@@ -46,22 +46,23 @@ class Print:
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairsHistogram(playerId)
             penalty = m.penaltyPlayer(playerId)
-            header = f"{f.pretty_player_id(playerId):<20}: err={penalty:6.2f}: "
+            header = f"{f.pretty_player_id(playerId):<20}: "
             str = ''.join([f"{numPairs:4d}" for numPairs in pairs.values()])
+            footer = f" (score: {penalty:6.2f})"
 
-            yield f"{header: <35s}{str}"
+            yield f"{header: <25s}{str}{footer}"
 
         # ideal line
         hist = m.penaltyIdealHistogram()
         header = f"*** Ideal: "
         str = ''.join([f"{round(numPairs):4d}" for numPairs in hist.values()])
-        yield f"{header: <35s}{str}"
+        yield f"{header: <25s}{str}"
 
         # last line
         allPairs = m.calcPairsHistogram()
         header = f"*** Overall: "
         str = ''.join([f"{numPairs:4d}" for numPairs in allPairs.values()])
-        yield f"{header: <35s}{str}"
+        yield f"{header: <25s}{str}"
 
     def minMaxPairs(schedule: Schedule, numGames: list[int]):
         f = Format(schedule)
@@ -72,7 +73,7 @@ class Print:
         for playerId in range(schedule.numPlayers):
             pairs = m.calcPlayerPairs(playerId)
 
-            header = f"{f.pretty_player_id(playerId):<2}: "
+            header = f"{f.pretty_player_id(playerId):<20}: "
             str = ""
             for idx in numGames:
                 if idx >= len(pairs) or len(pairs[idx]) == 0:
@@ -82,7 +83,10 @@ class Print:
                 element = f"g = {idx} with: [{s}]; " if len(
                     numGames) > 1 else f"with: [{s}]"
                 str += element
-            yield f"{header}{str}"
+            
+            # only output non-empty strings
+            if str:
+                yield f"{header}{str}"
 
     @ staticmethod
     def pairsHistogram(schedule: Schedule):
