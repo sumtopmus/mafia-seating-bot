@@ -73,6 +73,14 @@ class OptimizeTables:
         table_two = 1 + random.randrange(self.schedule.numTables-1)
         table_two = (table_one + table_two) % self.schedule.numTables
 
+        # last round MAY have less than numTables items, so we double check that
+        # otherwise it may cause index-out-of-bounds
+        if len(round.gameIds) < self.schedule.numTables:
+            table_one = table_one % len(round.gameIds)
+            table_two = table_two % len(round.gameIds)
+            if table_one == table_two:
+                return
+
         game_one_id = round.gameIds[table_one]
         game_two_id = round.gameIds[table_two]
         game_one = self.schedule.games[game_one_id]
