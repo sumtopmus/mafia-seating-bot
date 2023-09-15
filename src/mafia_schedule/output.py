@@ -236,7 +236,7 @@ class Print:
 
                 mwt_delimiter = ";"
                 line = [
-                    f"{f.pretty_player_id(id):<12}{mwt_delimiter}" for id in ids]
+                    f"{f.pretty_player_id(id)}{mwt_delimiter}" for id in ids]
 
                 # print without the last symbol - it is mwt_delimiter after last item
                 str = ''.join(line)
