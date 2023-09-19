@@ -27,6 +27,7 @@ action_handlers = {
     "copy_round": Actions.copyRound,
     "switch_players": Actions.switchPlayers,
     "switch_tables": Actions.switchTables,
+    "switch_rounds": Actions.switchRounds,
 }
 
 
@@ -50,7 +51,7 @@ def execute_action(actions: Actions, command_string) -> bool:
     if command == "help":
         print_help()
     elif command not in action_handlers:
-        print("### Unknown command: {command}. Type 'help' for details.")
+        print(f"### Unknown command: {command}. Type 'help' for details.")
     else:
         handler = action_handlers[command]
         handler(actions, params)

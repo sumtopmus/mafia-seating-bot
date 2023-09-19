@@ -210,6 +210,40 @@ class Actions:
         else:
             print("### Schedule is NOT valid")
 
+    def switchRounds(self, params):
+        if not self.schedule:
+            print("### No schedule!")
+            return
+        
+        try:
+            round_a_index = int(params[0]) - 1
+            round_b_index = int(params[1]) - 1
+        except:
+            print("Wrong params")
+            return
+        
+        round_a = self.schedule.rounds[round_a_index]
+        round_b = self.schedule.rounds[round_b_index]
+
+        if len(round_a.gameIds) != self.schedule.numTables:
+            print("Round A is not full round!")
+            return
+        
+        if len(round_b.gameIds) != self.schedule.numTables:
+            print("Round B is not full round!")
+            return
+            
+        for i in range(self.schedule.numTables):
+            game_one_id = round_a.gameIds[i]
+            game_two_id = round_b.gameIds[i]
+            game_one = self.schedule.games[game_one_id]
+            game_two = self.schedule.games[game_two_id]
+
+            # switch players in games
+            temp = game_one.players.copy()
+            game_one.players = game_two.players.copy()
+            game_two.players = temp.copy()
+        
     def switchTables(self, params):
         if not self.schedule:
             print("### No schedule!")
