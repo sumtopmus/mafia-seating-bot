@@ -121,6 +121,14 @@ def execute_command_seats(main_parser):
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
+    if not args.input and not args.configuration:
+        print("Either --input or --configuration MUST be specified")
+        return
+    
+    if not args.output and not args.configuration:
+        print("Either --output or --configuration MUST be specified")
+        return
+    
     filename_opponents = args.input if args.input else defaults.default_opponents
     filename_seats = args.output if args.output else defaults.default_seats
     print(f"Input opponents: {filename_opponents}")
@@ -169,6 +177,10 @@ def execute_command_participants(main_parser):
 
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
+
+    if not args.configuration:
+        print("Option --configuration MUST be specified")
+        return 
 
     filename_participants = args.output if args.output else defaults.default_participants
     commands.generateParticipants(defaults.conf, filename_participants)
