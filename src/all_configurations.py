@@ -104,4 +104,7 @@ Configurations = {
         Configuration(numPlayers=30, numTables=3, numRounds=10,
                       numGames=30, numAttempts=10),
 
+    "mafstart-2023":
+        Configuration(numPlayers=24, numTables=2, numRounds=12,
+                      numGames=24, numAttempts=10),
 }
