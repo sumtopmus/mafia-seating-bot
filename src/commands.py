@@ -175,13 +175,23 @@ def showStats(schedule: Schedule, participants: Participants,
         Print.print(Print.playerTableHistogram(schedule))
 
 
-def mwtToSchedule(conf: Configuration, filename_mwt: str, filename_schedule: str):
+def mwtToSchedule(conf: Configuration, filename_mwt: str, filename_schedule: str, filename_participants : str):
     path_mwt = getFilePath(filename_mwt)
     path_schedule = getFilePath(filename_schedule)
+    path_players = getFilePath(filename_participants)
 
     schedule = loadScheduleFromMwt(conf, path_mwt)
     schedule.validate()
-    saveSchedule(schedule, path_schedule)
+
+    if path_schedule is not None:
+        saveSchedule(schedule, path_schedule)
+    else:
+        print("Output schedule filename not specified!")
+
+    if path_players is not None:
+        saveParticipants(schedule.participants, path_players)
+    else:
+        print("Output participants filename not specified!")
 
 
 def scheduleToMwt(filename_schedule: str, filename_participants: str, filename_mwt: str):

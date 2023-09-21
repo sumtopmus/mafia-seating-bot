@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 import math
 
@@ -50,11 +51,43 @@ def loadParticipants(path: str) -> Participants:
     return participants
 
 
-def loadScheduleFromMwt(conf: Configuration, path: str) -> Schedule:
-
+def loadLinesFromMwtFile(path: str) -> list[str]:
     lines = []
     with open(path, "r", encoding="utf-8") as f:
         lines = f.readlines()
+
+    # remove leading/trailing spaces
+    # also remove end of line from string
+    for idx, line in enumerate(lines):
+        s = line.rstrip("\n")
+        s = s.strip()
+        lines[idx] = s
+
+    return lines
+
+def loadPlayersFromLines(lines : list[str]):
+    print("Loading players...")
+    player_to_id = {}
+    player_to_distance = defaultdict(int)
+    for line in lines:
+        # do not process empty lines
+        if not line:
+            continue
+
+        players = line.split(';')
+        for player_name in players:
+            player_to_distance[player_name] += 1
+            if not player_name in player_to_id:
+                player_to_id[player_name] = len(player_to_id)
+    print(f"Loaded players: {len(player_to_id)}")
+    print(player_to_id)
+    print(player_to_distance)
+
+    return player_to_id, player_to_distance
+
+def loadScheduleFromMwt(conf: Configuration, path: str) -> Schedule:
+    lines = loadLinesFromMwtFile(path)
+    player_to_id, player_to_distance = loadPlayersFromLines(lines)
 
     # empty game players
     game_players = []
@@ -72,8 +105,9 @@ def loadScheduleFromMwt(conf: Configuration, path: str) -> Schedule:
             line = lines[idx]
             idx += 1
 
-            players = line.split(',')
-            for num, player_id in enumerate(players):
+            players = line.split(';')
+            for num, player_name in enumerate(players):
+                player_id = player_to_id[player_name]
                 game_id = start_game_id + num
                 game_players[game_id].append(int(player_id))
 
@@ -101,6 +135,8 @@ def loadScheduleFromMwt(conf: Configuration, path: str) -> Schedule:
         rounds.append(round)
 
     schedule = Schedule(conf, rounds, games)
+    participants = Participants.createFromNames(player_to_id.keys())
+    schedule.setParticipants(participants)
     return schedule
 
 

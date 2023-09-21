@@ -311,10 +311,17 @@ def execute_command_mwt2schedule(main_parser):
     parser.add_argument(
         "--output", default=None,
         help="Schedule filename to save to")
+    parser.add_argument(
+        "--participants", default=None,
+        help="Participants filename")
     args = parser.parse_args()
     defaults = generate_defaults(args.configuration)
 
-    commands.mwtToSchedule(defaults.conf, args.input, args.output)
+    if not defaults.conf:
+        print(f"Configuration not found: {args.configuration}")
+        return
+
+    commands.mwtToSchedule(defaults.conf, args.input, args.output, args.participants)
 
 
 def execute_command_schedule2mwt(main_parser):
