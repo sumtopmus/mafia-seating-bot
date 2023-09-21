@@ -107,4 +107,9 @@ Configurations = {
     "mafstart-2023":
         Configuration(numPlayers=24, numTables=2, numRounds=12,
                       numGames=24, numAttempts=10),
+
+    "nikita-3tables":
+        Configuration(numPlayers=30, numTables=3, numRounds=12,
+                      numGames=36, numAttempts=12),
+
 }
