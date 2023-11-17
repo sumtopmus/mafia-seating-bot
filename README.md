@@ -1,8 +1,3 @@
-### Mafia schedule package
+### Mafia seating schedule Telegram bot
 
-This is package to generate and work with schedules of mafia tournaments
-
-Author: [Dmitry Bimatov](mailto:dbimatov@gmail.com)
-
-Code in [Github repository](https://github.com/dimtom/MafSchedule)
-
+This Telegram bot provides the interface to the original [mafia tournament scheduler](https://github.com/dimtom/MafSchedule) written by [Dmitry Bimatov](mailto:dbimatov@gmail.com).
