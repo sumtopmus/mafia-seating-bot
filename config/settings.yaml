@@ -1,0 +1,21 @@
+default:
+  # Dev mode
+  DEBUG: false
+  # Pathes
+  DB_PATH:                        data/db  
+  LOG_PATH:                       logs/bot.log
+  # Internal parameters
+  DATETIME_FORMAT:                '%Y-%m-%d %H:%M:%S'
+  CONVERSATION_TIMEOUT:           300
+  # Notification message
+  TIMEZONE:                       US/Eastern
+  ADMINS:
+    - '@PLACEHOLDER'
+
+production:
+  DEBUG: false
+  TOKEN:              SECRET_PLACEHOLDER
+
+development:
+  DEBUG: true
+  TOKEN:              SECRET_PLACEHOLDER
