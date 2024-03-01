@@ -1,7 +1,9 @@
 import random
 import statistics
+from tqdm import tqdm
 
 from .configuration import Configuration
+from .progress import ProgressBar
 from .schedule_factory import ScheduleFactory
 from .schedule import Schedule
 from .metrics import Metrics
@@ -22,11 +24,17 @@ class OptimizeOpponents:
     expectedZeroPairs: int
     expectedSinglePairs: int
 
+    # progress bar
+    pbar: ProgressBar = None
+
     # this callback is for every Schedule generated on iteration if it is not that good
     callbackCurrSchedule = None
 
     # this callback is for Schedule that is the best at the current moment
     callbackBetterSchedule = None
+
+    # this callback is for the progress bar
+    callbackProgress = None
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
@@ -36,17 +44,18 @@ class OptimizeOpponents:
         self.verbose = verbose
         # self.expectedZeroPairs = expectedZeroPairs
 
-    def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
+    async def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
         print("\n*** Optimize opponents")
 
         self.bestSchedule = None
         self.bestScore = 0
+        self.pbar = ProgressBar(numRuns*numIterations, self.callbackProgress)
         for i in range(numRuns):
             print(f"\n*** Opponents optimization run: {i+1}")
             self.schedule = ScheduleFactory.createInitialSchedule(conf)
             self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
-            self.optimizeStage(numIterations)
+            await self.optimizeStage(numIterations)
 
             self.schedule.updateGamesFromSlots()
 
@@ -67,7 +76,7 @@ class OptimizeOpponents:
 
         return self.bestSchedule
 
-    def optimizeStage(self, numIterations: int):
+    async def optimizeStage(self, numIterations: int):
         goodIterations = 0
         for i in range(0, numIterations):
             # debug
@@ -78,6 +87,8 @@ class OptimizeOpponents:
             success = self.randomOpponentChange()
             if success:
                 goodIterations += 1
+            if i % 100 == 50:
+                await self.pbar.update(100)
 
         # debug
         print(f"Final score: {self.score:8.4f}")

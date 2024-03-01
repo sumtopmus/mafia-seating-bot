@@ -1,20 +1,21 @@
-.PHONY: run debug clean-cache clean-logs clean-data
+.PHONY: run debug test clean-logs clean-data clean-conversations
 
-run: clean-cache
-	@ENV_FOR_DYNACONF=production python src/bot/bot.py
+run:
+	@ENV_FOR_DYNACONF=production python src/main.py
 
-debug: clean-all
-	@python src/bot/bot.py
+debug: clean-logs clean-conversations
+	@python src/main.py
 
-clean-all: clean-cache clean-logs clean-data
+test:
+	@python src/test.py
 
-clean-cache:
-	@rm -rf src/__pycache__
-	@rm -rf src/bot/__pycache__
-	@rm -rf src/bot/handlers/__pycache__
+clean-all: clean-logs clean-data
 
 clean-logs:
 	@rm -rf logs
 
 clean-data:
 	@rm -rf data
+
+clean-conversations:
+	@rm -f data/db_conversations

@@ -5,7 +5,7 @@ import pytz
 from telegram.constants import ParseMode
 from telegram.ext import Application, Defaults, PicklePersistence
 
-import init
+from .init import add_handlers
 
 
 def main() -> None:
@@ -21,12 +21,12 @@ def main() -> None:
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     # Setup the bot.
-    defaults = Defaults(parse_mode=ParseMode.MARKDOWN, tzinfo=pytz.timezone(settings.TIMEZONE))
+    defaults = Defaults(parse_mode=ParseMode.MARKDOWN_V2, tzinfo=pytz.timezone(settings.TIMEZONE))
     persistence = PicklePersistence(filepath=settings.DB_PATH, single_file=False)
     app = Application.builder().token(settings.TOKEN).defaults(defaults)\
         .persistence(persistence).arbitrary_callback_data(True).build()
     # Add handlers.
-    init.add_handlers(app)
+    add_handlers(app)
     # Start the bot.
     app.run_polling()
 

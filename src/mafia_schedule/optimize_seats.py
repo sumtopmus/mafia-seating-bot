@@ -1,5 +1,7 @@
 import random
+from tqdm import tqdm
 
+from .progress import ProgressBar
 from .schedule import Schedule
 from .metrics import Metrics
 from .game import Game
@@ -10,7 +12,13 @@ class OptimizeSeats:
     schedule: Schedule
 
     # this callback is for Schedule that is the best at the current moment
-    callbackBetterSchedule: None
+    callbackBetterSchedule = None
+
+    # this callback is for the progress bar
+    callbackProgress = None
+
+    # progress bar
+    pbar: ProgressBar = None
 
     shuffleGameFunc = None
 
@@ -22,7 +30,7 @@ class OptimizeSeats:
         self.schedule = schedule
         self.verbose = verbose
 
-    def optimize(self, numRuns: int, iterations: list()):
+    async def optimize(self, numRuns: int, iterations: list):
         print("\n*** Optimize seats")
 
         gamePlayers = self.schedule.saveGamePlayers()
@@ -30,6 +38,7 @@ class OptimizeSeats:
         self.bestScore = None
         self.bestGamePlayers = None
 
+        self.pbar = ProgressBar(numRuns*sum(iterations), self.callbackProgress)
         for i in range(numRuns):
             print(f"\n*** Seating optimization run: {i+1}")
             self.schedule.updateGamePlayers(gamePlayers)
@@ -42,7 +51,7 @@ class OptimizeSeats:
                 numIterations = iterations[stage]
                 print(f"\nStage: {stage+1} (iterations: {numIterations})")
                 self.shuffleGameFunc = func[i % len(func)]
-                self.optimizeStage(numIterations)
+                await self.optimizeStage(numIterations)
                 if self.bestScore != None and 2 * self.bestScore < self.currentScore:
                     print("We have better best score, so... don't continue")
                     break
@@ -59,7 +68,7 @@ class OptimizeSeats:
         # in the end set schedule to best one
         self.schedule.updateGamePlayers(self.bestGamePlayers)
 
-    def optimizeStage(self, iterations: int):
+    async def optimizeStage(self, iterations: int):
         self.currentScore = self.scoreFunc()
 
         goodIterations = 0
@@ -70,6 +79,8 @@ class OptimizeSeats:
             success = self.randomSeatChange()
             if success:
                 goodIterations += 1
+            if i % 100 == 50:
+                await self.pbar.update(100)
 
         # debug
         print(f"Final score: {self.currentScore:8.4f}")

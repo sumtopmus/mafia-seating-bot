@@ -7,6 +7,8 @@ default:
   # Internal parameters
   DATETIME_FORMAT:                '%Y-%m-%d %H:%M:%S'
   CONVERSATION_TIMEOUT:           300
+  # Minimal progress to update the progress bar (in percents)
+  MINIMAL_PROGRESS:               1
   # Notification message
   TIMEZONE:                       US/Eastern
   ADMINS:
@@ -14,8 +16,30 @@ default:
 
 production:
   DEBUG: false
-  TOKEN:              SECRET_PLACEHOLDER
+  TOKEN:                          SECRET_PLACEHOLDER
+  OPPONENTS_OPTIMIZATION:
+    NUM_RUNS:                     20
+    NUM_ITERATIONS:               20_000
+  SEATS_OPTIMIZATION:
+    NUM_RUNS:                     20
+    NUM_ITERATIONS:
+      - 10_000
+      - 10_000
+  TABLES_OPTIMIZATION:
+    NUM_RUNS:                     10
+    NUM_ITERATIONS:               1_000
 
 development:
   DEBUG: true
-  TOKEN:              SECRET_PLACEHOLDER
+  TOKEN:                          SECRET_PLACEHOLDER
+  OPPONENTS_OPTIMIZATION:
+    NUM_RUNS:                     2
+    NUM_ITERATIONS:               1_000
+  SEATS_OPTIMIZATION:
+    NUM_RUNS:                     2
+    NUM_ITERATIONS:
+      - 1_000
+      - 1_000
+  TABLES_OPTIMIZATION:
+    NUM_RUNS:                     2
+    NUM_ITERATIONS:               1_000

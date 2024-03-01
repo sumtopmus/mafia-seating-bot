@@ -9,7 +9,7 @@ from .schedule_factory import ScheduleFactory
 
 from .game import Game
 from .round import Round
-from .player import Player
+from .player import Player, Participants
 
 from .metrics import Metrics
 from .optimize_seats import OptimizeSeats
