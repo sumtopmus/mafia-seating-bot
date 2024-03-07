@@ -18,8 +18,7 @@ def create_handlers() -> list:
             State.TOURNAMENTS: [
                 CallbackQueryHandler(find_tournament, pattern="^" + State.FINDING_TOURNAMENT.name + "$")
             ] + edit_handlers(),
-            State.FINDING_TOURNAMENT: [MessageHandler(filters.ALL, get_tournament_by_title)],
-            State.TOURNAMENT: [edit_handlers()] 
+            State.FINDING_TOURNAMENT: edit_handlers(),
         },
         fallbacks=[
             CallbackQueryHandler(back, pattern="^" + State.MAIN_MENU.name + "$"),
@@ -37,6 +36,7 @@ async def show(update: Update, context: CallbackContext) -> None:
     log('show')    
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(**construct_tournaments_menu(context))
+    context.user_data['conversation'] = State.TOURNAMENTS
     return State.TOURNAMENTS
 
 
@@ -47,16 +47,6 @@ async def find_tournament(update: Update, context: CallbackContext) -> None:
     message = 'Please, enter the name of the tournament.'
     await update.callback_query.edit_message_text(message)
     return State.FINDING_TOURNAMENT
-
-
-async def get_tournament_by_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """When a users enters the tournament title."""
-    log('get_tournament_by_title')
-    title = update.message.text
-    context.user_data['tournament'] = title
-    menu = construct_tournament_menu(get_tournament(context))
-    await update.message.reply_text(**menu)
-    return State.TOURNAMENT
 
 
 async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:

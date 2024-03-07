@@ -1,5 +1,6 @@
+from datetime import datetime
 from telegram import Update
-from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
+from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
 
 from ...utils import log
 from .common import get_tournament
@@ -10,27 +11,28 @@ from mafia_schedule import Participants, Schedule
 
 def create_handlers() -> list:
     """Creates handlers that edit a tournament."""
-    button_handlers = [
-        CallbackQueryHandler(upload_participants, pattern="^" + State.EDITING_PARTICIPANTS.name + "$"),
-        CallbackQueryHandler(publish, pattern="^" + State.PUBLISHING_TOURNAMENT.name + "$"),
-        CallbackQueryHandler(delete_request, pattern="^" + State.DELETING_TOURNAMENT.name + "$")
-    ] + configure_handlers()
     return [ConversationHandler(
         entry_points=[
-            CallbackQueryHandler(pick_tournament, pattern="^" + State.TOURNAMENT.name + "/"),
-        ] + button_handlers,
+            MessageHandler(~filters.COMMAND, set_title),
+            CallbackQueryHandler(pick_tournament, pattern="^" + State.TOURNAMENT.name + "/")
+        ],
         states={
-            State.TOURNAMENT: button_handlers,
+            State.TOURNAMENT: [
+                CallbackQueryHandler(upload_participants, pattern="^" + State.EDITING_PARTICIPANTS.name + "$"),
+                CallbackQueryHandler(publish, pattern="^" + State.PUBLISHING_TOURNAMENT.name + "$"),
+                CallbackQueryHandler(delete_request, pattern="^" + State.DELETING_TOURNAMENT.name + "$")
+            ] + configure_handlers(),
             State.WAITING_FOR_PARTICIPANTS: [
                 MessageHandler(filters.ALL, process_participants_list)
             ],
             State.DELETING_TOURNAMENT: [
                 CallbackQueryHandler(delete, pattern="^" + State.DELETING_TOURNAMENT.name + "$"),
                 CallbackQueryHandler(tournament_menu, pattern="^" + State.TOURNAMENT.name + "$")
-            ],
+            ]
         },
         fallbacks=[
             CallbackQueryHandler(back, pattern="^" + State.TOURNAMENTS.name + "$"),
+            CallbackQueryHandler(back_to_main_menu, pattern="^" + State.MAIN_MENU.name + "$"),
             CommandHandler('cancel', cancel)
         ],
         map_to_parent={
@@ -41,10 +43,10 @@ def create_handlers() -> list:
         persistent=True)]
 
 
-async def tournament_menu(update: Update, context: CallbackContext):
+async def tournament_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """When user presses the tournament button."""
     log('tournament_menu')
-    menu = construct_tournament_menu(get_tournament(context))
+    menu = construct_tournament_menu(context)
     if update.callback_query:
         await update.callback_query.edit_message_text(**menu)
     else:
@@ -52,7 +54,7 @@ async def tournament_menu(update: Update, context: CallbackContext):
     return State.TOURNAMENT
 
 
-async def pick_tournament(update: Update, context: CallbackContext):
+async def pick_tournament(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """When user presses a tournament button."""
     log('pick_tournament')
     await update.callback_query.answer()
@@ -62,7 +64,30 @@ async def pick_tournament(update: Update, context: CallbackContext):
     return State.TOURNAMENT
 
 
-async def upload_participants(update: Update, context: CallbackContext):
+async def set_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """When a user adds a title."""
+    log('set_title')
+    title = update.message.text
+    context.user_data['tournament'] = title
+    context.user_data['tournaments'].setdefault(title, {})
+    context.user_data['tournaments'][title]['title'] = title
+    context.user_data['tournaments'][title]['timestamp'] = datetime.now().isoformat()
+    context.user_data['tournaments'][title].setdefault('published', False)
+    await tournament_menu(update, context)
+    return State.TOURNAMENT
+
+
+# async def get_tournament_by_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#     """When a users enters the tournament title."""
+#     log('get_tournament_by_title')
+#     title = update.message.text
+#     context.user_data['tournament'] = title
+#     menu = construct_tournament_menu(get_tournament(context))
+#     await update.message.reply_text(**menu)
+#     return State.TOURNAMENT
+
+
+async def upload_participants(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Processes upload_participants command."""
     log('upload_participants')
     await update.callback_query.answer()
@@ -79,12 +104,11 @@ async def process_participants_list(update: Update, context: ContextTypes.DEFAUL
     log('process_participants_list')
     participants = Participants.createFromNames(update.message.text.split('\n'))
     get_tournament(context)['participants'] = participants.toJson()
-    menu = construct_tournament_menu(get_tournament(context))
-    await update.message.reply_text(**menu)
+    await tournament_menu(update, context)
     return State.TOURNAMENT
 
 
-async def publish(update: Update, context: CallbackContext):
+async def publish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """When user publishes the tournament."""
     log('publish')
     title = context.user_data['tournament']
@@ -95,7 +119,7 @@ async def publish(update: Update, context: CallbackContext):
     return State.TOURNAMENT
 
 
-async def delete_request(update: Update, context: CallbackContext):
+async def delete_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """When user tries to delete the tournament."""
     log('delete_request')
     await update.callback_query.answer()
@@ -104,7 +128,7 @@ async def delete_request(update: Update, context: CallbackContext):
     return State.DELETING_TOURNAMENT
 
 
-async def delete(update: Update, context: CallbackContext):
+async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """When user tries to delete the tournament."""
     log('delete')
     title = context.user_data['tournament']
@@ -112,6 +136,7 @@ async def delete(update: Update, context: CallbackContext):
     del context.user_data['tournaments'][title]
     menu = construct_main_menu()
     await update.callback_query.edit_message_text(**menu)
+    context.user_data['conversation'] = State.MAIN_MENU    
     return State.MAIN_MENU
 
 
@@ -121,6 +146,15 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(**construct_tournaments_menu(context))
     return State.TOURNAMENTS
+
+
+async def back_to_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """When a user presses the back button (to main menu)."""
+    log('back_to_main_menu')
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(**construct_main_menu())
+    context.user_data['conversation'] = State.MAIN_MENU    
+    return State.MAIN_MENU
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:

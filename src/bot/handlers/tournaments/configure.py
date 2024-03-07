@@ -128,7 +128,7 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     else:
         context.user_data['tournaments'][title]['config']['configured'] = False
         context.user_data['tournaments'][title]['config']['valid'] = True
-    menu = construct_tournament_menu(get_tournament(context))
+    menu = construct_tournament_menu(context)
     await update.callback_query.edit_message_text(**menu)
     return State.TOURNAMENT
 

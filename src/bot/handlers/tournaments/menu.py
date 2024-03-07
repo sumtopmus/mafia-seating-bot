@@ -5,7 +5,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from ...utils import log
-from .common import validate_configuration, Validity
+from .common import get_tournament, validate_configuration, Validity
 from mafia_schedule import Configuration, Participants, Schedule
 
 
@@ -74,8 +74,10 @@ def construct_tournaments_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     return {'text': text, 'reply_markup': reply_markup}
 
 
-def construct_tournament_menu(tournament: dict) -> dict:
+def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_tournament_menu')
+    tournament = get_tournament(context)
+    state = State(context.user_data['conversation'])
     text = f'What do you want to do with *{tournament['title']}*?'
     validity = validate_configuration(tournament)
     validity_suffix = '' if validity == Validity.NOT_SET else ' ✅' if validity == Validity.VALID else ' 🚫'
@@ -97,7 +99,7 @@ def construct_tournament_menu(tournament: dict) -> dict:
             InlineKeyboardButton("Delete ❌", callback_data=State.DELETING_TOURNAMENT.name),
         ],
         [
-            InlineKeyboardButton("« Back", callback_data=State.TOURNAMENTS.name)
+            InlineKeyboardButton("« Back", callback_data=state.name)
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
