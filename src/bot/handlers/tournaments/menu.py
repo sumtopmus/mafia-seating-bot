@@ -50,6 +50,9 @@ def construct_tournaments_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_tournaments_menu')
     text = 'Please, pick a tournament:'
     tournaments = context.user_data.get('tournaments', {})
+    log(tournaments)
+    log(tournaments.keys())
+    titles = sorted(tournaments.keys(), key=lambda x: tournaments[x]['timestamp'], reverse=True)
     titles = sorted(tournaments, key=lambda x: tournaments[x]['timestamp'], reverse=True)
     back_button = InlineKeyboardButton('« Back', callback_data=State.MAIN_MENU.name)
     if len(titles) == 0:

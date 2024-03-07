@@ -129,7 +129,7 @@ async def publish(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     """When user publishes the tournament."""
     log('publish')
     title = context.user_data['tournament']
-    context.user_data['tournaments']['published'] = True
+    context.user_data['tournaments'][title]['published'] = True
     context.bot_data['tournaments'][title] = context.user_data['tournaments'][title]
     await update.callback_query.answer(f'{title} is now accessible by everyone.')
     await tournament_menu(update, context)
