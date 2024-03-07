@@ -81,16 +81,6 @@ async def set_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State
     return State.TOURNAMENT
 
 
-# async def get_tournament_by_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     """When a users enters the tournament title."""
-#     log('get_tournament_by_title')
-#     title = update.message.text
-#     context.user_data['tournament'] = title
-#     menu = construct_tournament_menu(get_tournament(context))
-#     await update.message.reply_text(**menu)
-#     return State.TOURNAMENT
-
-
 async def title_edit_request(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     """When a user requests to edit a title."""
     log('edit_title')
