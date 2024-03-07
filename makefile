@@ -7,7 +7,7 @@ debug: clean-logs clean-conversations
 	@python src/main.py
 
 test:
-	@python src/test.py
+	@python test.py
 
 clean-all: clean-logs clean-data
 

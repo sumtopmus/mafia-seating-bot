@@ -1,6 +1,5 @@
 import random
 import statistics
-from tqdm import tqdm
 
 from .progress import ProgressBar
 from .schedule import Schedule

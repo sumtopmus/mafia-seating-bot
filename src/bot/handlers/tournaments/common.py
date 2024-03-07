@@ -1,23 +1,15 @@
+from datetime import datetime
 from enum import Enum
 from telegram.ext import ContextTypes
 
+from ...utils import log
 from mafia_schedule import Configuration, Participants, Schedule
 
-State = Enum('State', [
-    # Meta states:
-    'IDLE',
-    'TITLE_READY',
-    # Particular states:
-    'WAITING_FOR_TITLE',
-    'WAITING_FOR_NUM_PLAYERS',
-    'WAITING_FOR_NUM_TABLES',
-    'WAITING_FOR_NUM_ROUNDS',
-    'WAITING_FOR_NUM_GAMES',
-    'WAITING_FOR_NUM_ATTEMPTS',
-    'WAITING_FOR_NUM_PAIRS',
-    'WAITING_FOR_PARTICIPANTS',
-    # Configuration ready states:
-    'GENERATING_SEATS',
+
+Validity = Enum('Validity', [
+    'NOT_SET',
+    'VALID',
+    'INVALID'
 ])
 
 
@@ -40,6 +32,17 @@ def get_tournament(context: ContextTypes.DEFAULT_TYPE) -> dict:
     return context.user_data['tournaments'][title]
 
 
+def validate_configuration(tournament: dict) -> Validity:
+    result = Validity.VALID
+    if 'config' not in tournament:
+        return Validity.NOT_SET
+    for key in ['num_players', 'num_tables', 'num_rounds', 'num_games', 'num_attempts', 'num_pairs']:
+        if key not in tournament['config']:
+            result = Validity.NOT_SET
+    # TODO: check validity of the values
+    return result
+
+
 def get_participants(context: ContextTypes.DEFAULT_TYPE) -> dict:
     """Gets participants from the bot user data."""
     tournament = get_tournament(context)
@@ -59,3 +62,11 @@ def get_schedule(context: ContextTypes.DEFAULT_TYPE) -> Schedule:
     if participants:
         schedule.setParticipants(Participants.fromJson(participants))
     return schedule
+
+
+def save_schedule(context: ContextTypes.DEFAULT_TYPE, schedule: Schedule) -> None:
+    """Saves the schedule into the bot user data."""
+    tournament = get_tournament(context)
+    timestamp = datetime.now().isoformat()
+    tournament['schedules'] = {timestamp: schedule.toJson()}
+    tournament['schedule'] = timestamp

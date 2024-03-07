@@ -1,11 +1,13 @@
-import copy
-from datetime import datetime, timedelta
-from dynaconf import settings
 from telegram.ext import Application
 
 from .handlers import error
 from .handlers import debug, info
-from .handlers import tournament
+from .handlers import tournaments
+
+
+async def post_init(app: Application) -> None:
+    """Initializes bot with data and its tasks."""
+    app.bot_data.setdefault('tournaments', {})
 
 
 def add_handlers(app: Application) -> None:
@@ -16,5 +18,5 @@ def add_handlers(app: Application) -> None:
     for module in [debug, info]:
         app.add_handlers(module.create_handlers())
     # General chat handling.
-    for module in [tournament]:
+    for module in [tournaments]:
         app.add_handlers(module.create_handlers())
