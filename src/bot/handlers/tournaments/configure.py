@@ -25,13 +25,13 @@ def create_handlers():
                     lambda update, _: set_parameter_request(update, _, 'tables', State.WAITING_FOR_NUM_TABLES),
                     pattern="^" + State.WAITING_FOR_NUM_TABLES.name + "$"),
                 CallbackQueryHandler(
-                    lambda update, _: set_parameter_request(update, _, 'rounds', State.WAITING_FOR_NUM_ROUNDS),
+                    lambda update, _: set_parameter_request(update, _, 'rounds', State.WAITING_FOR_NUM_ROUNDS, 'rounds (per table)'),
                     pattern="^" + State.WAITING_FOR_NUM_ROUNDS.name + "$"),
                 CallbackQueryHandler(
-                    lambda update, _: set_parameter_request(update, _, 'games', State.WAITING_FOR_NUM_GAMES),
+                    lambda update, _: set_parameter_request(update, _, 'games', State.WAITING_FOR_NUM_GAMES, 'games (total)'),
                     pattern="^" + State.WAITING_FOR_NUM_GAMES.name + "$"),
                 CallbackQueryHandler(
-                    lambda update, _: set_parameter_request(update, _, 'attempts', State.WAITING_FOR_NUM_ATTEMPTS),
+                    lambda update, _: set_parameter_request(update, _, 'attempts', State.WAITING_FOR_NUM_ATTEMPTS, 'attempts (per player)'),
                     pattern="^" + State.WAITING_FOR_NUM_ATTEMPTS.name + "$"),
                 CallbackQueryHandler(
                     lambda update, _: set_parameter_request(update, _, 'pairs', State.WAITING_FOR_NUM_PAIRS, 'pairs to split'),
