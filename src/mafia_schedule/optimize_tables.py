@@ -1,6 +1,7 @@
 import random
 import statistics
 
+from utils import log
 from .progress import ProgressBar
 from .schedule import Schedule
 from .metrics import Metrics
@@ -24,17 +25,18 @@ class OptimizeTables:
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
-            print(*kargs, **kwargs)
+            log(*kargs, **kwargs)
 
     def __init__(self, schedule: Schedule, verbose: bool = True):
         self.schedule = schedule
         self.verbose = verbose
 
     async def optimize(self, numRuns: int, numIterations: int):
-        print("\n*** Optimize tables")
+        log("")
+        log("*** Optimize tables")
 
         if self.schedule.numTables == 1:
-            print("Only one table, nothing to optimize")
+            log("Only one table, nothing to optimize")
             self.bestSchedule = self.schedule
             return
 
@@ -43,7 +45,8 @@ class OptimizeTables:
         self.bestScore = 0
         self.pbar = ProgressBar(numRuns*numIterations, self.callbackProgress)
         for i in range(numRuns):
-            print(f"\n*** Table optimization run: {i+1}")
+            log("")
+            log(f"*** Table optimization run: {i+1}")
 
             self.schedule.updateGamePlayers(gamePlayers)
             await self.optimizeStage(numIterations)
@@ -65,8 +68,7 @@ class OptimizeTables:
         goodIterations = 0
         for i in range(iterations):
             if i % 1000 == 0:
-                print(
-                    f"Iteration: {i:8d} of {iterations} (changes: {goodIterations:4d}, score: {self.currentScore:8.4f})")
+                log(f"Iteration: {i:8d} of {iterations} (changes: {goodIterations:4d}, score: {self.currentScore:8.4f})")
             success = self.randomTableChange()
             if success:
                 goodIterations += 1
@@ -74,8 +76,8 @@ class OptimizeTables:
                 await self.pbar.update(100)
 
         # debug
-        print(f"Final score: {self.currentScore:8.4f}")
-        print(f"Good iterations: {goodIterations} of {iterations}")
+        log(f"Final score: {self.currentScore:8.4f}")
+        log(f"Good iterations: {goodIterations} of {iterations}")
 
     def randomTableChange(self) -> bool:
         round = random.choice(self.schedule.rounds)
@@ -107,13 +109,14 @@ class OptimizeTables:
         if score < self.currentScore:
             # debug
             '''
-            print(
-                f"\nSwithing tables. Round: {round.id}. Tables: {table_one} <-> {table_two}. Games: {game_one_id} <-> {game_two_id}")
-            print(f"Score before: {self.currentScore}")
-            print(f"Score after: {score}")
+            log("")
+            log(
+                f"Swithing tables. Round: {round.id}. Tables: {table_one} <-> {table_two}. Games: {game_one_id} <-> {game_two_id}")
+            log(f"Score before: {self.currentScore}")
+            log(f"Score after: {score}")
 
-            print(f"Game1: {game_two.players}")
-            print(f"Game2: {game_one.players}")
+            log(f"Game1: {game_two.players}")
+            log(f"Game2: {game_one.players}")
             '''
 
             self.currentScore = score

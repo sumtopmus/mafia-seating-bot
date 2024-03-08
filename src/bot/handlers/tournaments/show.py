@@ -2,7 +2,7 @@ from dynaconf import settings
 from telegram import Update
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
 
-from ...utils import log
+from utils import log
 from .menu import State, construct_main_menu, construct_tournament_menu, construct_tournaments_menu
 from .common import get_tournament
 from .edit import create_handlers as edit_handlers

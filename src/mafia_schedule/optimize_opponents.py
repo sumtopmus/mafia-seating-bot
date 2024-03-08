@@ -1,6 +1,6 @@
 import random
-import statistics
 
+from utils import log
 from .configuration import Configuration
 from .progress import ProgressBar
 from .schedule_factory import ScheduleFactory
@@ -37,20 +37,22 @@ class OptimizeOpponents:
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
-            print(*kargs, **kwargs)
+            log(*kargs, **kwargs)
 
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
         # self.expectedZeroPairs = expectedZeroPairs
 
     async def optimize(self, conf: Configuration, numRuns: int, numIterations: int):
-        print("\n*** Optimize opponents")
+        log("")
+        log("*** Optimize opponents")
 
         self.bestSchedule = None
         self.bestScore = 0
         self.pbar = ProgressBar(numRuns*numIterations, self.callbackProgress)
         for i in range(numRuns):
-            print(f"\n*** Opponents optimization run: {i+1}")
+            log("")
+            log(f"*** Opponents optimization run: {i+1}")
             self.schedule = ScheduleFactory.createInitialSchedule(conf)
             self.schedule.generateSlotsFromGames()
             self.score = self.scoreFunc()
@@ -80,8 +82,7 @@ class OptimizeOpponents:
         for i in range(0, numIterations):
             # debug
             if i % 1000 == 0:
-                print(
-                    f"Iteration: {i:8d} of {numIterations} (changes: {goodIterations:4d}, score: {self.score:8.4f})")
+                log(f"Iteration: {i:8d} of {numIterations} (changes: {goodIterations:4d}, score: {self.score:8.4f})")
 
             success = self.randomOpponentChange()
             if success:
@@ -90,8 +91,8 @@ class OptimizeOpponents:
                 await self.pbar.update(100)
 
         # debug
-        print(f"Final score: {self.score:8.4f}")
-        print(f"Good iterations: {goodIterations} of {numIterations}")
+        log(f"Final score: {self.score:8.4f}")
+        log(f"Good iterations: {goodIterations} of {numIterations}")
 
     def randomOpponentChange(self) -> bool:
         if self.schedule.configuration.numTables == 1:
@@ -134,7 +135,7 @@ class OptimizeOpponents:
         poolB = busyTwo.intersection(freeOne)
         if len(poolA) == 0 or len(poolB) == 0:
             # can not find substitution as one of player pools is empty
-            # print("empty pool!")
+            # log("empty pool!")
             return False
 
         playerA = random.choice(list(poolA))
@@ -173,7 +174,7 @@ class OptimizeOpponents:
         two = busyTwo.difference(busyBoth)
         if len(one) == 0 or len(two) == 0:
             # no candidates to swap
-            # print("No candidates to swap!")
+            # log("No candidates to swap!")
             return False
 
         playerA = random.choice(list(one))

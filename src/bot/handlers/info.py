@@ -2,7 +2,7 @@ from dynaconf import settings
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, filters
 
-from ..utils import log
+from utils import log
 
 
 def create_handlers() -> list:

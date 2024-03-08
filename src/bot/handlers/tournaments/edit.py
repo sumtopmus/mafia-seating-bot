@@ -2,10 +2,11 @@ from datetime import datetime
 from telegram import Update
 from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
 
-from ...utils import log
+from utils import log
 from .common import get_tournament
 from .menu import State, construct_deletion_menu, construct_main_menu, construct_tournament_menu, construct_tournaments_menu
 from .configure import create_handlers as configure_handlers
+from .seats import create_handlers as seats_handlers
 from mafia_schedule import Participants, Schedule
 
 
@@ -22,7 +23,7 @@ def create_handlers() -> list:
                 CallbackQueryHandler(upload_participants, pattern="^" + State.EDITING_PARTICIPANTS.name + "$"),
                 CallbackQueryHandler(publish, pattern="^" + State.PUBLISHING_TOURNAMENT.name + "$"),
                 CallbackQueryHandler(delete_request, pattern="^" + State.DELETING_TOURNAMENT.name + "$")
-            ] + configure_handlers(),
+            ] + configure_handlers() + seats_handlers(),
             State.EDITING_TITLE: [
                 MessageHandler(filters.ALL, title_edit)
             ],
@@ -94,12 +95,11 @@ async def title_edit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Stat
     log('delete')
     old_title = context.user_data['tournament']
     new_title = update.message.text
-    log(context.user_data['tournaments'])
-    context.user_data['tournaments'][new_title] = context.user_data['tournaments'][old_title]
-    context.user_data['tournaments'][new_title]['title'] = new_title
-    del context.user_data['tournaments'][old_title]
-    context.user_data['tournament'] = new_title
-    log(context.user_data['tournaments'])
+    if new_title != old_title:
+        context.user_data['tournaments'][new_title] = context.user_data['tournaments'][old_title]
+        context.user_data['tournaments'][new_title]['title'] = new_title
+        del context.user_data['tournaments'][old_title]
+        context.user_data['tournament'] = new_title
     await tournament_menu(update, context)
     return State.TOURNAMENT
 
@@ -130,7 +130,7 @@ async def publish(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     log('publish')
     title = context.user_data['tournament']
     context.user_data['tournaments'][title]['published'] = True
-    context.bot_data['tournaments'][title] = context.user_data['tournaments'][title]
+    context.bot_data['tournaments'][title] = get_tournament(context)
     await update.callback_query.answer(f'{title} is now accessible by everyone.')
     await tournament_menu(update, context)
     return State.TOURNAMENT

@@ -1,12 +1,10 @@
-from datetime import datetime
 from dynaconf import settings
 from enum import Enum
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from ...utils import log
+from utils import log
 from .common import get_tournament, validate_configuration, Validity
-from mafia_schedule import Configuration, Participants, Schedule
 
 
 State = Enum('State', [
@@ -15,6 +13,7 @@ State = Enum('State', [
     'TOURNAMENTS',
     'TOURNAMENT',
     'CONFIGURATION',
+    'SEATS',
     # Particular states:
     'ADDING_TOURNAMENT',
     'WAITING_FOR_TITLE',
@@ -28,11 +27,13 @@ State = Enum('State', [
     'FINDING_TOURNAMENT',
     # Editing states:
     'EDITING_TITLE',
-    'EDITING_SEATS',
     'EDITING_PARTICIPANTS',
+    'GENERATING_SEATS',
+    'SHOWING_SEATS',
+    'EXPORTING_SEATS',
+    'SHOWING_STATS',
+    'PUBLISHING_TOURNAMENT',
     'DELETING_TOURNAMENT',
-    # Configuration ready states:
-    'PUBLISHING_TOURNAMENT'
 ])
 
 
@@ -50,9 +51,6 @@ def construct_tournaments_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_tournaments_menu')
     text = 'Please, pick a tournament:'
     tournaments = context.user_data.get('tournaments', {})
-    log(tournaments)
-    log(tournaments.keys())
-    titles = sorted(tournaments.keys(), key=lambda x: tournaments[x]['timestamp'], reverse=True)
     titles = sorted(tournaments, key=lambda x: tournaments[x]['timestamp'], reverse=True)
     back_button = InlineKeyboardButton('« Back', callback_data=State.MAIN_MENU.name)
     if len(titles) == 0:
@@ -94,7 +92,7 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
             InlineKeyboardButton(configure_button_text, callback_data=State.CONFIGURATION.name),
         ],
         [
-            InlineKeyboardButton(seats_button_text, callback_data=State.EDITING_SEATS.name),
+            InlineKeyboardButton(seats_button_text, callback_data=State.SEATS.name),
             InlineKeyboardButton(participants_button_text, callback_data=State.EDITING_PARTICIPANTS.name),
         ],
         [
@@ -109,8 +107,9 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     return {'text': text, 'reply_markup': reply_markup}
 
 
-def construct_configuration_menu(tournament: dict) -> dict:
+def construct_configuration_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_configuration_menu')
+    tournament = get_tournament(context)    
     text = (
         f'Configuration for *{tournament['title']}*:\n\n'
         f'Number of players: {tournament["config"].get("num_players", "not set")}\n'
@@ -140,6 +139,25 @@ def construct_configuration_menu(tournament: dict) -> dict:
             InlineKeyboardButton(num_pairs_button_text, callback_data=State.WAITING_FOR_NUM_PAIRS.name),
         ],
         [
+            InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name)
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    return {'text': text, 'reply_markup': reply_markup}
+
+
+def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
+    log('construct_seats_menu')
+    tournament = get_tournament(context)
+    text = f'What do you want to do with the seating arrangement?'
+    generate_button_text = 'Generate Seats' + (' ✅' if 'schedule' in tournament else '')
+    keyboard = [
+        [
+            InlineKeyboardButton(generate_button_text, callback_data=State.GENERATING_SEATS.name),
+            InlineKeyboardButton("Show Seats", callback_data=State.SHOWING_SEATS.name),
+        ],
+        [
+            InlineKeyboardButton("Download Seats", callback_data=State.EXPORTING_SEATS.name),
             InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name)
         ]
     ]

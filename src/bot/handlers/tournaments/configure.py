@@ -1,10 +1,7 @@
-from tkinter import W
-from dynaconf import settings
-from enum import Enum
 from telegram import Update
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
 
-from ...utils import log
+from utils import log
 from .menu import State, construct_configuration_menu, construct_tournament_menu
 from .common import get_tournament, validate_configuration, Validity
 
@@ -67,7 +64,7 @@ async def configure_tournament(update: Update, context: CallbackContext) -> None
     await update.callback_query.answer()
     title = context.user_data['tournament']
     context.user_data['tournaments'][title].setdefault('config', {'configured': False, 'valid': True})
-    menu = construct_configuration_menu(get_tournament(context))
+    menu = construct_configuration_menu(context)
     await update.callback_query.edit_message_text(**menu)
     return State.CONFIGURATION
 
@@ -76,7 +73,7 @@ async def show_configuration(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """When user wants to see the configuration."""
     log('show_configuration')
     await update.callback_query.answer()
-    menu = construct_configuration_menu(get_tournament(context))
+    menu = construct_configuration_menu(context)
     title = context.user_data['tournament']
     message = (
         f'Configuration for *{title}*:\n\n'
@@ -109,7 +106,7 @@ async def set_parameter(update: Update, context: ContextTypes.DEFAULT_TYPE,
     title = context.user_data['tournament']
     context.user_data['tournaments'][title]['config'][f'num_{parameter}'] = \
         int(update.message.text)
-    menu = construct_configuration_menu(get_tournament(context))
+    menu = construct_configuration_menu(context)
     await update.message.reply_text(**menu)
     return State.CONFIGURATION
 
@@ -119,10 +116,11 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     log('back')
     await update.callback_query.answer()
     title = context.user_data['tournament']
-    if validate_configuration(get_tournament(context)) == Validity.VALID:
+    config_validity = validate_configuration(get_tournament(context))
+    if config_validity == Validity.VALID:
         context.user_data['tournaments'][title]['config']['configured'] = True
         context.user_data['tournaments'][title]['config']['valid'] = True
-    elif validate_configuration(get_tournament(context)) == Validity.INVALID:
+    elif config_validity == Validity.INVALID:
         context.user_data['tournaments'][title]['config']['configured'] = True
         context.user_data['tournaments'][title]['config']['valid'] = False
     else:

@@ -1,5 +1,6 @@
 import random
 
+from utils import log
 from .progress import ProgressBar
 from .schedule import Schedule
 from .metrics import Metrics
@@ -23,14 +24,15 @@ class OptimizeSeats:
 
     def log(self, *kargs, **kwargs):
         if self.verbose:
-            print(*kargs, **kwargs)
+            log(*kargs, **kwargs)
 
     def __init__(self, schedule: Schedule, verbose: bool = True):
         self.schedule = schedule
         self.verbose = verbose
 
     async def optimize(self, numRuns: int, iterations: list):
-        print("\n*** Optimize seats")
+        log("")
+        log("*** Optimize seats")
 
         gamePlayers = self.schedule.saveGamePlayers()
         self.currentScore = None
@@ -39,7 +41,8 @@ class OptimizeSeats:
 
         self.pbar = ProgressBar(numRuns*sum(iterations), self.callbackProgress)
         for i in range(numRuns):
-            print(f"\n*** Seating optimization run: {i+1}")
+            log("")
+            log(f"*** Seating optimization run: {i+1}")
             self.schedule.updateGamePlayers(gamePlayers)
 
             func = [
@@ -48,15 +51,16 @@ class OptimizeSeats:
 
             for stage in range(len(iterations)):
                 numIterations = iterations[stage]
-                print(f"\nStage: {stage+1} (iterations: {numIterations})")
+                log("")
+                log(f"Stage: {stage+1} (iterations: {numIterations})")
                 self.shuffleGameFunc = func[i % len(func)]
                 await self.optimizeStage(numIterations)
                 if self.bestScore != None and 2 * self.bestScore < self.currentScore:
-                    print("We have better best score, so... don't continue")
+                    log("We have better best score, so... don't continue")
                     break
 
             if self.bestGamePlayers == None or self.currentScore < self.bestScore:
-                print(f"Found best seating, score : {self.currentScore:8.4f}")
+                log(f"Found best seating, score : {self.currentScore:8.4f}")
                 self.bestScore = self.currentScore
                 self.bestGamePlayers = self.schedule.saveGamePlayers()
 
@@ -73,8 +77,7 @@ class OptimizeSeats:
         goodIterations = 0
         for i in range(iterations):
             if i % 1000 == 0:
-                print(
-                    f"Iteration: {i:8d} of {iterations} (changes: {goodIterations:4d}, score: {self.currentScore:8.4f})")
+                log(f"Iteration: {i:8d} of {iterations} (changes: {goodIterations:4d}, score: {self.currentScore:8.4f})")
             success = self.randomSeatChange()
             if success:
                 goodIterations += 1
@@ -82,8 +85,8 @@ class OptimizeSeats:
                 await self.pbar.update(100)
 
         # debug
-        print(f"Final score: {self.currentScore:8.4f}")
-        print(f"Good iterations: {goodIterations} of {iterations}")
+        log(f"Final score: {self.currentScore:8.4f}")
+        log(f"Good iterations: {goodIterations} of {iterations}")
 
     def randomSeatChange(self) -> bool:
         game = random.choice(self.schedule.games)

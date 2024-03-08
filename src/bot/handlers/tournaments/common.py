@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from telegram.ext import ContextTypes
 
-from ...utils import log
+from utils import log
 from mafia_schedule import Configuration, Participants, Schedule
 
 
