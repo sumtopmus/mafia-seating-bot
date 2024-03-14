@@ -51,6 +51,12 @@ def get_participants(context: ContextTypes.DEFAULT_TYPE) -> dict:
     return tournament.get('participants', None)
 
 
+def save_participants(context: ContextTypes.DEFAULT_TYPE, participants: Participants) -> None:
+    """Saves participants into the bot user data."""
+    tournament = get_tournament(context)
+    tournament['participants'] = participants.toJson()
+
+
 def get_schedule(context: ContextTypes.DEFAULT_TYPE) -> Schedule:
     """Gets a schedule from the bot user data and transforms dict into the Schedule."""
     tournament = get_tournament(context)

@@ -33,23 +33,23 @@ def create_handlers():
                 CallbackQueryHandler(
                     lambda update, _: set_parameter_request(update, _, 'pairs', State.WAITING_FOR_NUM_PAIRS, 'pairs to split'),
                     pattern="^" + State.WAITING_FOR_NUM_PAIRS.name + "$"),
+                CallbackQueryHandler(back, pattern="^" + State.TOURNAMENT.name + "$")                    
             ],
             State.WAITING_FOR_NUM_PLAYERS: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'players'))],
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'players'))],
             State.WAITING_FOR_NUM_TABLES: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'tables'))],
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'tables'))],
             State.WAITING_FOR_NUM_ROUNDS: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'rounds'))],
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'rounds'))],
             State.WAITING_FOR_NUM_GAMES: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'games'))],
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'games'))],
             State.WAITING_FOR_NUM_ATTEMPTS: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'attempts'))],
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'attempts'))],
             State.WAITING_FOR_NUM_PAIRS: [
-                MessageHandler(filters.ALL, lambda update, context: set_parameter(update, context, 'pairs'))]
+                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'pairs'))]
         },
         fallbacks=[
-            CallbackQueryHandler(back, pattern="^" + State.TOURNAMENT.name + "$"),
-            CommandHandler('cancel', cancel)
+            CommandHandler('cancel', configure_tournament)
         ],
         map_to_parent={
             State.TOURNAMENT: State.TOURNAMENT
@@ -61,11 +61,12 @@ def create_handlers():
 async def configure_tournament(update: Update, context: CallbackContext) -> None:
     """Processes configure tournament button press."""
     log('configure_tournament')
-    await update.callback_query.answer()
-    title = context.user_data['tournament']
-    context.user_data['tournaments'][title].setdefault('config', {'configured': False, 'valid': True})
     menu = construct_configuration_menu(context)
-    await update.callback_query.edit_message_text(**menu)
+    if update.callback_query:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(**menu)
+    else:
+        await update.message.reply_text(**menu)
     return State.CONFIGURATION
 
 
@@ -129,9 +130,3 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     menu = construct_tournament_menu(context)
     await update.callback_query.edit_message_text(**menu)
     return State.TOURNAMENT
-
-
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
-    """When a user cancels the process."""
-    log('cancel')
-    return ConversationHandler.END

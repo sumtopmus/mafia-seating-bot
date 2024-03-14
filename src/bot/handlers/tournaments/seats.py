@@ -1,11 +1,13 @@
 from dynaconf import settings
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, ContextTypes, ConversationHandler, filters, MessageHandler
+from telegram.helpers import escape_markdown
 
 from utils import log
 from mafia_schedule import Configuration, OptimizeOpponents, OptimizeSeats, OptimizeTables, Participants, Schedule
 from .menu import State, construct_seats_menu, construct_tournament_menu
-from .common import generate_configuration, get_tournament, save_schedule
+from .common import generate_configuration, get_participants, get_schedule, get_tournament, save_participants, save_schedule
+from .show_seats import create_handlers as show_seats_handlers
 
 def create_handlers():
     """Creates handlers that process the `Configure Tournament` button press."""
@@ -16,7 +18,14 @@ def create_handlers():
         states={
             State.SEATS: [
                 CallbackQueryHandler(generate_seats, pattern="^" + State.GENERATING_SEATS.name + "$"),
-            ],# + show_seats_handlers() + export_seats_handlers(),,
+                CallbackQueryHandler(avoid_table, pattern="^" + State.AVOIDING_TABLE.name + "$"),
+                CallbackQueryHandler(split_pairs, pattern="^" + State.SPLITTING_PAIRS.name + "$"),
+                CallbackQueryHandler(switch_tables, pattern="^" + State.SWITCHING_TABLES.name + "$"),
+                CallbackQueryHandler(switch_players, pattern="^" + State.SWITCHING_PLAYERS.name + "$")
+            ] + show_seats_handlers(),
+            State.WAITING_FOR_PLAYERS_NUMBERS: [
+                MessageHandler(filters.TEXT, switch_players_set_players_numbers)
+            ]
         },
         fallbacks=[
             CallbackQueryHandler(back, pattern="^" + State.TOURNAMENT.name + "$"),
@@ -30,11 +39,14 @@ def create_handlers():
 
 
 async def edit_seats(update: Update, context: CallbackContext) -> None:
-    """Processes configure tournament button press."""
+    """Processes edit seats button press."""
     log('edit_seats')
-    await update.callback_query.answer()
     menu = construct_seats_menu(context)
-    await update.callback_query.edit_message_text(**menu)
+    if update.callback_query:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(**menu)
+    else:
+        await update.message.reply_text(**menu)
     return State.SEATS
 
 
@@ -45,9 +57,9 @@ async def generate_seats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     message = (
         'I started generating and optimizing the seating assignment. '
         'This can take a while... I will notify you when I am done.')
-    keyboard = [[InlineKeyboardButton("Stop", callback_data=State.GENERATING_SEATS.name)]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    bot_message = await update.callback_query.edit_message_text(message, reply_markup=reply_markup)
+    # keyboard = [[InlineKeyboardButton("Stop", callback_data=State.GENERATING_SEATS.name)]]
+    # reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.callback_query.edit_message_text(message) #, reply_markup=reply_markup)
     
     # Generating and optimizing the schedule.
     tournament = get_tournament(context)
@@ -120,6 +132,71 @@ async def optimize_tables(schedule: Schedule, *args):
     solver.callbackProgress = lambda progress, total: report_progress(progress, total, *args)
     
     await solver.optimize(num_runs, num_iterations)
+
+
+async def avoid_table(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """Processes avoid_table command."""
+    log('avoid_table')
+    await update.callback_query.answer()
+    message = 'This is not supported yet.'
+    menu = construct_seats_menu(context)
+    menu['text'] = message
+    await update.callback_query.edit_message_text(**menu)
+    return State.SEATS
+
+
+async def split_pairs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """Processes split_pairs command."""
+    log('split_pairs')
+    await update.callback_query.answer()
+    # TODO: implement
+    message = 'This is not supported yet.'
+    menu = construct_seats_menu(context)
+    menu['text'] = message
+    await update.callback_query.edit_message_text(**menu)
+    return State.SEATS
+
+
+async def switch_tables(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """Processes switch_tables command."""
+    log('switch_tables')
+    await update.callback_query.answer()
+    # TODO: implement
+    message = 'This is not supported yet.'
+    menu = construct_seats_menu(context)
+    menu['text'] = message
+    await update.callback_query.edit_message_text(**menu)
+    return State.SEATS
+
+
+async def switch_players(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """Processes switch_players command."""
+    log('switch_players')
+    await update.callback_query.answer()
+    participants = [player['name'] for player in get_participants(context)['people']]
+    message = 'Please, enter the numbers of the players that you want to switch (space separated).\n\n' + \
+        '\n'.join([f'{index+1}. {nickname}' for index, nickname in enumerate(participants)])
+    await update.callback_query.edit_message_text(escape_markdown(message))
+    return State.WAITING_FOR_PLAYERS_NUMBERS
+
+
+async def switch_players_set_players_numbers(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
+    """Processes switch_players command."""
+    log('switch_players_set_players_numbers')
+    players_all = get_participants(context)
+    players_to_switch = [int(number)-1 for number in update.message.text.split()]
+    switch_players_in_schedule(players_all, players_to_switch)
+    save_participants(context, players_all)
+    edit_seats(update, context)
+    return State.SEATS
+
+
+def switch_players_in_schedule(players_all, players_to_switch):
+    """Switches players in the schedule."""
+    log('switch_players_in_schedule')
+    temp_id = players_all['people'][players_to_switch[0]]['id']
+    players_all['people'][players_to_switch[0]]['id'] = players_all['people'][players_to_switch[1]]['id']
+    players_all['people'][players_to_switch[1]]['id'] = temp_id
 
 
 async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:

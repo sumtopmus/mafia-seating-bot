@@ -24,10 +24,6 @@ def create_handlers() -> list:
                 CallbackQueryHandler(add_tournament, pattern="^" + State.ADDING_TOURNAMENT.name + "$")
             ] + show_handlers(),
             State.WAITING_FOR_TITLE: edit_handlers()
-            # State.IDLE: add_tournament_handlers() + edit_handlers() # + \
-            #     # configure_tournament_handlers() + upload_participants_handlers() + \
-            #     # generate_seats_handlers() + switch_tables_handlers() + show_seats_handlers() + \
-            #     # show_stats_handlers() + export_to_mwt_handlers(),
         },
         fallbacks=[
             CommandHandler('cancel', cancel)

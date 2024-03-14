@@ -14,6 +14,7 @@ State = Enum('State', [
     'TOURNAMENT',
     'CONFIGURATION',
     'SEATS',
+    'SHOW_SEATS',
     # Particular states:
     'ADDING_TOURNAMENT',
     'WAITING_FOR_TITLE',
@@ -24,16 +25,29 @@ State = Enum('State', [
     'WAITING_FOR_NUM_ATTEMPTS',
     'WAITING_FOR_NUM_PAIRS',
     'WAITING_FOR_PARTICIPANTS',
+    'SETTING_PAIRS',
     'FINDING_TOURNAMENT',
+    'WAITING_FOR_PLAYERS_NUMBERS',
     # Editing states:
     'EDITING_TITLE',
     'EDITING_PARTICIPANTS',
     'GENERATING_SEATS',
-    'SHOWING_SEATS',
-    'EXPORTING_SEATS',
-    'SHOWING_STATS',
+    'AVOIDING_TABLE',
+    'SPLITTING_PAIRS',
+    'SWITCHING_TABLES',
+    'SWITCHING_PLAYERS',
     'PUBLISHING_TOURNAMENT',
     'DELETING_TOURNAMENT',
+    # Viewing states:
+    # 'SHOWING_SEATS',
+    'SHOWING_ROUNDS',
+    'EXPORTING_ROUNDS',
+    'SHOWING_PLAYERS',
+    'EXPORTING_PLAYERS',
+    'SHOWING_MWT',
+    'EXPORTING_MWT',
+    'EXPORTING_SEATS',
+    'SHOWING_STATS',
 ])
 
 
@@ -81,10 +95,12 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     state = State(context.user_data['conversation'])
     text = f'What do you want to do with *{tournament['title']}*?'
     validity = validate_configuration(tournament)
-    validity_suffix = '' if validity == Validity.NOT_SET else ' ✅' if validity == Validity.VALID else ' 🚫'
+    validity_suffix = '' if validity == Validity.NOT_SET else ' ✅' if validity == Validity.VALID else ' ⛔️'
     configure_button_text = 'Configure' + validity_suffix
     seats_button_text = 'Edit Seats' + (' ✅' if 'schedule' in tournament else '')
     participants_button_text = 'Upload Participants' + (' ✅' if 'participants' in tournament else '')
+    set_pairs_button_text = 'Set Split Pairs' + (
+        ' ✅' if len(tournament.get('pairs', [])) == tournament['config']['num_pairs'] else ' ⛔️')
     publish_button_text = 'Publish' + (' ✅' if tournament['published'] else '')
     keyboard = [
         [
@@ -92,14 +108,15 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
             InlineKeyboardButton(configure_button_text, callback_data=State.CONFIGURATION.name),
         ],
         [
-            InlineKeyboardButton(seats_button_text, callback_data=State.SEATS.name),
             InlineKeyboardButton(participants_button_text, callback_data=State.EDITING_PARTICIPANTS.name),
+            InlineKeyboardButton(set_pairs_button_text, callback_data=State.SETTING_PAIRS.name),
         ],
         [
-            InlineKeyboardButton(publish_button_text, callback_data=State.PUBLISHING_TOURNAMENT.name),
+            InlineKeyboardButton(seats_button_text, callback_data=State.SEATS.name),
+            InlineKeyboardButton(publish_button_text, callback_data=State.PUBLISHING_TOURNAMENT.name),  
+        ],
+        [
             InlineKeyboardButton("Delete ❌", callback_data=State.DELETING_TOURNAMENT.name),
-        ],
-        [
             InlineKeyboardButton("« Back", callback_data=state.name)
         ]
     ]
@@ -154,15 +171,53 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     keyboard = [
         [
             InlineKeyboardButton(generate_button_text, callback_data=State.GENERATING_SEATS.name),
-            InlineKeyboardButton("Show Seats", callback_data=State.SHOWING_SEATS.name),
+            InlineKeyboardButton("Display/Export", callback_data=State.SHOW_SEATS.name),
         ],
         [
-            InlineKeyboardButton("Download Seats", callback_data=State.EXPORTING_SEATS.name),
+            InlineKeyboardButton("Avoid Table", callback_data=State.AVOIDING_TABLE.name),
+            InlineKeyboardButton("Split Pairs", callback_data=State.SPLITTING_PAIRS.name),
+        ],
+        [
+            InlineKeyboardButton("Switch Tables", callback_data=State.SWITCHING_TABLES.name),
+            InlineKeyboardButton("Switch Players", callback_data=State.SWITCHING_PLAYERS.name),
+        ],        
+        [
             InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name)
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     return {'text': text, 'reply_markup': reply_markup}
+
+
+def construct_show_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
+    log('construct_show_seats_menu')
+    text = f'Please, choose how you want to display/export the seating arrangement.'
+    keyboard = [
+        [
+            InlineKeyboardButton("📽️ (by rounds)", callback_data=State.SHOWING_ROUNDS.name),
+            InlineKeyboardButton("💾 (by rounds)", callback_data=State.EXPORTING_ROUNDS.name)
+        ],
+        [
+            InlineKeyboardButton("📽️ (by players)", callback_data=State.SHOWING_PLAYERS.name),
+            InlineKeyboardButton("💾 (by players)", callback_data=State.EXPORTING_PLAYERS.name),
+        ],
+        [
+            InlineKeyboardButton("📽️ (MWT format)", callback_data=State.SHOWING_MWT.name),
+            InlineKeyboardButton("💾 (MWT format)", callback_data=State.EXPORTING_MWT.name)
+        ],
+        [
+            InlineKeyboardButton("« Back", callback_data=State.SEATS.name)
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    return {'text': text, 'reply_markup': reply_markup}
+
+
+def construct_showing_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
+    log('construct_showing_seats_menu')
+    keyboard = [[InlineKeyboardButton("« Back", callback_data=State.SHOWING_SEATS.name)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    return {'reply_markup': reply_markup}
 
 
 def construct_deletion_menu(tournament: dict) -> dict:

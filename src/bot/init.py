@@ -8,6 +8,7 @@ from .handlers import tournaments
 async def post_init(app: Application) -> None:
     """Initializes bot with data and its tasks."""
     app.bot_data.setdefault('tournaments', {})
+    app.bot_data.setdefault('version', 1)
 
 
 def add_handlers(app: Application) -> None:
