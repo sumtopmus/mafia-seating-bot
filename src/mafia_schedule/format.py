@@ -31,7 +31,7 @@ class Format:
                 return f"{(player_id+1):2d}"
 
         else:
-            name = self.schedule.participants[player_id].name
+            name = next((player.name for player in self.schedule.participants if player.id == player_id))
             return f"{name}"
 
     def pretty_team_id(self, player_id: int, numTeams: int) -> str:
