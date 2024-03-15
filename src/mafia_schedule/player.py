@@ -1,9 +1,9 @@
 import dataclasses
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Player:
-    '''Single player of torunament. Player has unique <id> and <name>'''
+    '''Single player of tournament. Player has unique <id> and <name>'''
 
     id: int
     name: str

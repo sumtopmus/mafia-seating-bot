@@ -36,17 +36,17 @@ def create_handlers():
                 CallbackQueryHandler(back, pattern="^" + State.TOURNAMENT.name + "$")                    
             ],
             State.WAITING_FOR_NUM_PLAYERS: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'players'))],
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'players'))],
             State.WAITING_FOR_NUM_TABLES: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'tables'))],
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'tables'))],
             State.WAITING_FOR_NUM_ROUNDS: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'rounds'))],
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'rounds'))],
             State.WAITING_FOR_NUM_GAMES: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'games'))],
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'games'))],
             State.WAITING_FOR_NUM_ATTEMPTS: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'attempts'))],
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'attempts'))],
             State.WAITING_FOR_NUM_PAIRS: [
-                MessageHandler(~filters.COMMAND, lambda update, context: set_parameter(update, context, 'pairs'))]
+                MessageHandler(filters.TEXT & ~filters.COMMAND, lambda update, context: set_parameter(update, context, 'pairs'))]
         },
         fallbacks=[
             CommandHandler('cancel', configure_tournament)

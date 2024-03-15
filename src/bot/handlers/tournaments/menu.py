@@ -36,6 +36,7 @@ State = Enum('State', [
     'SPLITTING_PAIRS',
     'SWITCHING_TABLES',
     'SWITCHING_PLAYERS',
+    'RESETTING_IDS',
     'PUBLISHING_TOURNAMENT',
     'DELETING_TOURNAMENT',
     # Viewing states:
@@ -182,8 +183,12 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
             InlineKeyboardButton("Switch Players", callback_data=State.SWITCHING_PLAYERS.name),
         ],        
         [
-            InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name)
-        ]
+            InlineKeyboardButton("Reset Player IDs", callback_data=State.RESETTING_IDS.name),
+            InlineKeyboardButton("Statistics", callback_data=State.SHOWING_STATS.name),
+        ],
+        [
+            InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name),
+        ]        
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     return {'text': text, 'reply_markup': reply_markup}
@@ -216,6 +221,13 @@ def construct_show_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
 def construct_showing_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_showing_seats_menu')
     keyboard = [[InlineKeyboardButton("« Back", callback_data=State.SHOWING_SEATS.name)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    return {'reply_markup': reply_markup}
+
+
+def construct_single_back_button(context: ContextTypes.DEFAULT_TYPE, state: State) -> dict:
+    log('construct_single_back_button')
+    keyboard = [[InlineKeyboardButton("« Back", callback_data=state.name)]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     return {'reply_markup': reply_markup}
 

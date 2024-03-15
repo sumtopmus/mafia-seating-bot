@@ -4,7 +4,7 @@ from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes, Con
 from telegram.helpers import escape_markdown
 
 from utils import log
-from .common import get_participants, get_tournament, save_participants
+from .common import get_participants, get_tournament, format_participants, save_participants
 from .menu import State, construct_deletion_menu, construct_main_menu, construct_tournament_menu, construct_tournaments_menu
 from .configure import create_handlers as configure_handlers
 from .seats import create_handlers as seats_handlers
@@ -15,7 +15,7 @@ def create_handlers() -> list:
     """Creates handlers that edit a tournament."""
     return [ConversationHandler(
         entry_points=[
-            MessageHandler(~filters.COMMAND, set_title),
+            MessageHandler(filters.TEXT & ~filters.COMMAND, set_title),
             CallbackQueryHandler(pick_tournament, pattern="^" + State.TOURNAMENT.name + "/")
         ],
         states={
@@ -27,13 +27,13 @@ def create_handlers() -> list:
                 CallbackQueryHandler(delete_request, pattern="^" + State.DELETING_TOURNAMENT.name + "$")
             ] + configure_handlers() + seats_handlers(),
             State.EDITING_TITLE: [
-                MessageHandler(~filters.COMMAND, title_edit)
+                MessageHandler(filters.TEXT & ~filters.COMMAND, title_edit)
             ],
             State.WAITING_FOR_PARTICIPANTS: [
-                MessageHandler(~filters.COMMAND, upload_participants)
+                MessageHandler(filters.TEXT & ~filters.COMMAND, upload_participants)
             ],
             State.SETTING_PAIRS: [
-                MessageHandler(~filters.COMMAND, set_pairs)
+                MessageHandler(filters.TEXT & ~filters.COMMAND, set_pairs)
             ],
             State.DELETING_TOURNAMENT: [
                 CallbackQueryHandler(delete, pattern="^" + State.DELETING_TOURNAMENT.name + "$"),
@@ -139,16 +139,16 @@ async def set_pairs_request(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     """Processes set_pairs command."""
     log('set_pairs_request')
     await update.callback_query.answer()
-    participants = [player['name'] for player in get_participants(context)['people']]
+    participants = [player.name for player in get_participants(context).people]
     pairs = get_tournament(context)['pairs']
     message = (
         'There are no split pairs currently set. ' if len(pairs) == 0 else \
         'The currently set split pairs are:\n\n' + '\n'.join(
             [f'🚻 👤{participants[pair[0]]} and 👤{participants[pair[1]]}' for pair in pairs]) + '\n\n'
-    ) + (        
+    ) + (
         'Please, enter the pairs of numbers for the players that you want to split '
-        '(one pair per line, space separated).\n\n') + \
-        '\n'.join([f'{index+1}. {nickname}' for index, nickname in enumerate(participants)])
+        '(one pair per line, space separated).\n\n'
+    ) + format_participants(context)
     await update.callback_query.edit_message_text(escape_markdown(message))
     return State.SETTING_PAIRS
 

@@ -9,7 +9,7 @@ from mafia_schedule import Print
 
 from utils import log
 from .common import get_participants, get_schedule, get_tournament
-from .menu import State, construct_seats_menu, construct_show_seats_menu, construct_showing_seats_menu
+from .menu import State, construct_seats_menu, construct_show_seats_menu, construct_single_back_button
 from mafia_schedule import Participants, Schedule
 
 def create_handlers() -> list:
@@ -69,7 +69,7 @@ async def show_seats_after_file(update: Update, context: ContextTypes.DEFAULT_TY
 async def showing_seats(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str) -> None:
     """Showing formatted seating arrangement."""
     log('showing_seats')
-    menu = construct_showing_seats_menu(context)
+    menu = construct_single_back_button(context, State.SHOWING_SEATS)
     menu['text'] = message
     await update.callback_query.edit_message_text(**menu, parse_mode=ParseMode.MARKDOWN_V2)
     return
@@ -88,7 +88,7 @@ async def export_rounds(update: Update, context: ContextTypes.DEFAULT_TYPE) -> S
     """When the user presses export rounds button."""
     log('export_rounds')
     await update.callback_query.answer()
-    menu = construct_showing_seats_menu(context)
+    menu = construct_single_back_button(context, State.SHOWING_SEATS)
     # TODO: implement
     message = 'This is not supported yet. Please, download in the MWT format.'
     menu['text'] = message
@@ -109,7 +109,7 @@ async def export_players(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """When the user presses export players button."""
     log('export_players')
     await update.callback_query.answer()
-    menu = construct_showing_seats_menu(context)
+    menu = construct_single_back_button(context, State.SHOWING_SEATS)
     # TODO: implement
     message = 'This is not supported yet. Please, download in the MWT format.'
     menu['text'] = message

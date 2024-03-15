@@ -43,12 +43,22 @@ def validate_configuration(tournament: dict) -> Validity:
     return result
 
 
-def get_participants(context: ContextTypes.DEFAULT_TYPE) -> dict:
+def get_participants(context: ContextTypes.DEFAULT_TYPE) -> Participants:
     """Gets participants from the bot user data."""
     tournament = get_tournament(context)
     if tournament is None:
         return None
-    return tournament.get('participants', None)
+    participants = tournament.get('participants', None)
+    if participants is None:
+        return None
+    return Participants.fromJson(participants)
+
+
+def format_participants(context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Formats participants into a string."""
+    participants = get_participants(context)
+    players = [f'{index+1}. {player.name}' for index, player in enumerate(participants.people)]
+    return '\n'.join(players)
 
 
 def save_participants(context: ContextTypes.DEFAULT_TYPE, participants: Participants) -> None:
@@ -64,9 +74,6 @@ def get_schedule(context: ContextTypes.DEFAULT_TYPE) -> Schedule:
     if timestamp is None:
         return None
     schedule = Schedule.fromJson(tournament['schedules'][timestamp])
-    participants = get_participants(context)
-    if participants:
-        schedule.setParticipants(Participants.fromJson(participants))
     return schedule
 
 
