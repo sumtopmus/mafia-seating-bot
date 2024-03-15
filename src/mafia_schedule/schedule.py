@@ -229,4 +229,4 @@ class Schedule:
             gamesPlayedById = gamesPlayed[playerId]
             if gamesPlayed[playerId] != self.numAttempts:
                 raise ScheduleException(
-                    f"Player: {player.id} game count: {gamesPlayedById} must match configuration: {self.numAttempts}")
+                    f"Player: {playerId} game count: {gamesPlayedById} must match configuration: {self.numAttempts}")
