@@ -69,7 +69,7 @@ async def show_seats_after_file(update: Update, context: ContextTypes.DEFAULT_TY
 async def showing_seats(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str) -> None:
     """Showing formatted seating arrangement."""
     log('showing_seats')
-    menu = construct_single_back_button(context, State.SHOWING_SEATS)
+    menu = construct_single_back_button(context, State.SHOW_SEATS)
     menu['text'] = message
     await update.callback_query.edit_message_text(**menu, parse_mode=ParseMode.MARKDOWN_V2)
     return
@@ -79,7 +79,8 @@ async def show_rounds(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Sta
     """Processes show_rounds command."""
     log('show_rounds')
     await update.callback_query.answer()
-    message = escape_markdown('\n'.join(Print.scheduleByGames(get_schedule(context))), version=2)
+    message = escape_markdown('\n'.join(Print.scheduleByGames(
+        get_schedule(context, with_participants=True))), version=2)
     await showing_seats(update, context, message)
     return State.SHOW_SEATS
 
@@ -88,7 +89,7 @@ async def export_rounds(update: Update, context: ContextTypes.DEFAULT_TYPE) -> S
     """When the user presses export rounds button."""
     log('export_rounds')
     await update.callback_query.answer()
-    menu = construct_single_back_button(context, State.SHOWING_SEATS)
+    menu = construct_single_back_button(context, State.SHOW_SEATS)
     # TODO: implement
     message = 'This is not supported yet. Please, download in the MWT format.'
     menu['text'] = message
@@ -100,7 +101,8 @@ async def show_players(update: Update, context: ContextTypes.DEFAULT_TYPE) -> St
     """Processes show_players command."""
     log('show_players')
     await update.callback_query.answer()
-    message = escape_markdown('\n'.join(Print.scheduleByPlayers(get_schedule(context))), version=2)
+    message = escape_markdown('\n'.join(Print.scheduleByPlayers(
+        get_schedule(context, with_participants=True))), version=2)
     await showing_seats(update, context, message)  
     return State.SHOW_SEATS
 
@@ -109,7 +111,7 @@ async def export_players(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """When the user presses export players button."""
     log('export_players')
     await update.callback_query.answer()
-    menu = construct_single_back_button(context, State.SHOWING_SEATS)
+    menu = construct_single_back_button(context, State.SHOW_SEATS)
     # TODO: implement
     message = 'This is not supported yet. Please, download in the MWT format.'
     menu['text'] = message
@@ -121,7 +123,8 @@ async def show_mwt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     """Processes show_mwt command."""
     log('show_mwt')
     await update.callback_query.answer()
-    message = escape_markdown('\n'.join(Print.mwtSchedule(get_schedule(context))), version=2)
+    message = escape_markdown('\n'.join(Print.mwtSchedule(
+        get_schedule(context, with_participants=True))), version=2)
     await showing_seats(update, context, message)  
     return State.SHOW_SEATS
 
@@ -130,7 +133,8 @@ async def export_mwt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Stat
     """When the user presses export to MWT format button."""
     log('export_mwt')
     await update.callback_query.answer()
-    message = escape_markdown('\n'.join(Print.mwtSchedule(get_schedule(context))), version=2)
+    message = escape_markdown('\n'.join(Print.mwtSchedule(
+        get_schedule(context, with_participants=True))), version=2)
     text_file = io.StringIO(message)
     filename = get_tournament(context)['title'].lower().replace(' ', '-') + '-seats-mwt.txt'
     await context.bot.send_document(

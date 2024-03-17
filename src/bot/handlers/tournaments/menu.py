@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from utils import log
-from .common import get_tournament, validate_configuration, Validity
+from .common import get_participants, get_tournament, validate_configuration, validate_schedule, Validity
 
 
 State = Enum('State', [
@@ -27,20 +27,24 @@ State = Enum('State', [
     'WAITING_FOR_PARTICIPANTS',
     'SETTING_PAIRS',
     'FINDING_TOURNAMENT',
-    'WAITING_FOR_PLAYERS_NUMBERS',
+    'WAITING_FOR_PLAYER_NUMBER',
+    'PICKING_TABLES',
+    'WAITING_FOR_ROUND_NUMBER_FOR_TABLES',
+    'PICKING_TABLE_PAIR',
+    'WAITING_FOR_ROUND_NUMBER_FOR_PLAYERS',
+    'WAITING_FOR_PLAYER_NUMBERS',
     # Editing states:
     'EDITING_TITLE',
     'EDITING_PARTICIPANTS',
     'GENERATING_SEATS',
-    'AVOIDING_TABLE',
+    'AVOIDING_TABLES',
     'SPLITTING_PAIRS',
-    'SWITCHING_TABLES',
-    'SWITCHING_PLAYERS',
+    'SWAPPING_TABLES',
+    'SWAPPING_PLAYERS',
     'RESETTING_IDS',
     'PUBLISHING_TOURNAMENT',
     'DELETING_TOURNAMENT',
     # Viewing states:
-    # 'SHOWING_SEATS',
     'SHOWING_ROUNDS',
     'EXPORTING_ROUNDS',
     'SHOWING_PLAYERS',
@@ -50,6 +54,15 @@ State = Enum('State', [
     'EXPORTING_SEATS',
     'SHOWING_STATS',
 ])
+
+
+def get_validity_suffix(validity) -> str:
+    result = ''
+    if validity == Validity.INVALID:
+        result = ' ⛔️'
+    elif validity == Validity.VALID:
+        result = ' ✅'
+    return result
 
 
 def construct_main_menu() -> dict:
@@ -98,7 +111,7 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     validity = validate_configuration(tournament)
     validity_suffix = '' if validity == Validity.NOT_SET else ' ✅' if validity == Validity.VALID else ' ⛔️'
     configure_button_text = 'Configure' + validity_suffix
-    seats_button_text = 'Edit Seats' + (' ✅' if 'schedule' in tournament else '')
+    seats_button_text = 'Edit Seats' + get_validity_suffix(validate_schedule(context))
     participants_button_text = 'Upload Participants' + (' ✅' if 'participants' in tournament else '')
     set_pairs_button_text = 'Set Split Pairs' + (
         ' ✅' if len(tournament.get('pairs', [])) == tournament['config']['num_pairs'] else ' ⛔️')
@@ -168,19 +181,20 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_seats_menu')
     tournament = get_tournament(context)
     text = f'What do you want to do with the seating arrangement?'
-    generate_button_text = 'Generate Seats' + (' ✅' if 'schedule' in tournament else '')
+
+    generate_button_text = 'Generate Seats' + get_validity_suffix(validate_schedule(context))
     keyboard = [
         [
             InlineKeyboardButton(generate_button_text, callback_data=State.GENERATING_SEATS.name),
             InlineKeyboardButton("Display/Export", callback_data=State.SHOW_SEATS.name),
         ],
         [
-            InlineKeyboardButton("Avoid Table", callback_data=State.AVOIDING_TABLE.name),
+            InlineKeyboardButton("Avoid Tables", callback_data=State.AVOIDING_TABLES.name),
             InlineKeyboardButton("Split Pairs", callback_data=State.SPLITTING_PAIRS.name),
         ],
         [
-            InlineKeyboardButton("Switch Tables", callback_data=State.SWITCHING_TABLES.name),
-            InlineKeyboardButton("Switch Players", callback_data=State.SWITCHING_PLAYERS.name),
+            InlineKeyboardButton("Swap Tables", callback_data=State.SWAPPING_TABLES.name),
+            InlineKeyboardButton("Swap Players", callback_data=State.SWAPPING_PLAYERS.name),
         ],        
         [
             InlineKeyboardButton("Reset Player IDs", callback_data=State.RESETTING_IDS.name),
@@ -191,6 +205,42 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
         ]        
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
+    return {'text': text, 'reply_markup': reply_markup}
+
+
+def construct_picking_tables_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
+    log('construct_picking_tables_menu')
+    tournament = get_tournament(context)
+    participants = get_participants(context)
+    player_id = tournament['avoided_tables_player_id']
+    avoided_tables = tournament['avoided_tables']
+    table_buttons = []
+    for index in range(tournament['config']['num_tables']):
+        table = chr(ord('A') + index)
+        table_buttons.append(InlineKeyboardButton(
+            table + (' 🚷' if avoided_tables[index] else ''),
+            callback_data=f'{State.PICKING_TABLES.name}/{table}'))
+    keyboard = [table_buttons, [InlineKeyboardButton("Done", callback_data=State.SEATS.name)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    nickname = next(player.name for player in participants.people if player.id == player_id)
+    text = f'Please, pick tables for {nickname} to avoid.'
+    return {'text': text, 'reply_markup': reply_markup}
+
+
+def construct_picking_tables_pair_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
+    log('construct_picking_tables_pair_menu')
+    tournament = get_tournament(context)
+    round_id = tournament['swap_tables_round_id']
+    tables_pair = tournament['swap_tables_pair']
+    table_buttons = []
+    for index in range(tournament['config']['num_tables']):
+        table = chr(ord('A') + index)
+        table_buttons.append(InlineKeyboardButton(
+            table + (' 🔄' if index in tables_pair else ''),
+            callback_data=f'{State.PICKING_TABLE_PAIR.name}/{table}'))
+    keyboard = [table_buttons, [InlineKeyboardButton("Swap", callback_data=State.SEATS.name)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    text = f'Please, pick a pair of tables to swap in Round {round_id+1}.'
     return {'text': text, 'reply_markup': reply_markup}
 
 
@@ -216,13 +266,6 @@ def construct_show_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     return {'text': text, 'reply_markup': reply_markup}
-
-
-def construct_showing_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
-    log('construct_showing_seats_menu')
-    keyboard = [[InlineKeyboardButton("« Back", callback_data=State.SHOWING_SEATS.name)]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    return {'reply_markup': reply_markup}
 
 
 def construct_single_back_button(context: ContextTypes.DEFAULT_TYPE, state: State) -> dict:

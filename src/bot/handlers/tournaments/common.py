@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from utils import log
 from mafia_schedule import Configuration, Participants, Schedule
@@ -43,6 +44,16 @@ def validate_configuration(tournament: dict) -> Validity:
     return result
 
 
+def validate_schedule(context: ContextTypes.DEFAULT_TYPE) -> Validity:
+    tournament = get_tournament(context)
+    if 'schedule' not in tournament:
+        return Validity.NOT_SET
+    schedule = get_schedule(context)
+    if not schedule.isValid():
+        return Validity.INVALID
+    return Validity.VALID
+
+
 def get_participants(context: ContextTypes.DEFAULT_TYPE) -> Participants:
     """Gets participants from the bot user data."""
     tournament = get_tournament(context)
@@ -58,7 +69,7 @@ def format_participants(context: ContextTypes.DEFAULT_TYPE) -> str:
     """Formats participants into a string."""
     participants = get_participants(context)
     players = [f'{index+1}. {player.name}' for index, player in enumerate(participants.people)]
-    return '\n'.join(players)
+    return escape_markdown('\n'.join(players))
 
 
 def save_participants(context: ContextTypes.DEFAULT_TYPE, participants: Participants) -> None:
@@ -67,13 +78,16 @@ def save_participants(context: ContextTypes.DEFAULT_TYPE, participants: Particip
     tournament['participants'] = participants.toJson()
 
 
-def get_schedule(context: ContextTypes.DEFAULT_TYPE) -> Schedule:
+def get_schedule(context: ContextTypes.DEFAULT_TYPE, with_participants=False) -> Schedule:
     """Gets a schedule from the bot user data and transforms dict into the Schedule."""
     tournament = get_tournament(context)
     timestamp = tournament.get('schedule', None)
     if timestamp is None:
         return None
     schedule = Schedule.fromJson(tournament['schedules'][timestamp])
+    if with_participants:
+        participants = get_participants(context)
+        schedule.setParticipants(participants)
     return schedule
 
 
@@ -83,3 +97,17 @@ def save_schedule(context: ContextTypes.DEFAULT_TYPE, schedule: Schedule) -> Non
     timestamp = datetime.now().isoformat()
     tournament['schedules'] = {timestamp: schedule.toJson()}
     tournament['schedule'] = timestamp
+
+
+def get_tables_for_player(player_id: int, schedule: Schedule) -> dict:
+    """Gets tables for a player."""
+    tables = {}
+    for round_id, round in enumerate(schedule.rounds):
+        for table_id, game_id in enumerate(round.gameIds):
+            game = schedule.games[game_id]
+            assert game.id == game_id
+            if player_id in game.players:
+                tables[round_id] = table_id
+                break
+        
+    return tables
