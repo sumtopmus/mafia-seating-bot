@@ -11,7 +11,7 @@ from .show_seats import create_handlers as show_seats_handlers
 
 
 def create_handlers():
-    """Creates handlers that process the `Configure Tournament` button press."""
+    """Creates handlers that process the `Edit Seats` button press."""
     return [ConversationHandler(
         entry_points=[
             CallbackQueryHandler(edit_seats, pattern="^" + State.SEATS.name + "$")
