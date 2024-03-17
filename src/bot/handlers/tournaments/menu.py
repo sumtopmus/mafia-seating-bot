@@ -183,7 +183,6 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     keyboard = [
         [
             InlineKeyboardButton(generate_button_text, callback_data=State.GENERATING_SEATS.name),
-            InlineKeyboardButton("Display/Export", callback_data=State.SHOW_SEATS.name),
         ],
         [
             InlineKeyboardButton("Avoid Tables", callback_data=State.AVOIDING_TABLES.name),
@@ -194,9 +193,12 @@ def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
             InlineKeyboardButton("Swap Players", callback_data=State.SWAPPING_PLAYERS.name),
         ],        
         [
-            InlineKeyboardButton("Reset Player IDs", callback_data=State.RESETTING_IDS.name),
+            InlineKeyboardButton("Display/Export", callback_data=State.SHOW_SEATS.name),
             InlineKeyboardButton("Statistics", callback_data=State.SHOWING_STATS.name),
         ],
+        # [
+        #     InlineKeyboardButton("Reset Player IDs", callback_data=State.RESETTING_IDS.name),
+        # ]
         [
             InlineKeyboardButton("« Back", callback_data=State.TOURNAMENT.name),
         ]        
