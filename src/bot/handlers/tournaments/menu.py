@@ -176,9 +176,7 @@ def construct_configuration_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
 
 def construct_seats_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     log('construct_seats_menu')
-    tournament = get_tournament(context)
     text = f'What do you want to do with the seating arrangement?'
-
     generate_button_text = 'Generate Seats' + get_validity_suffix(validate_schedule(context))
     keyboard = [
         [
