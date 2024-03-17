@@ -119,8 +119,7 @@ async def upload_participants_request(update: Update, context: ContextTypes.DEFA
     await update.callback_query.answer()
     message = ('Please, enter the list of participants in a single message, '
                'one nickname per line. The nicknames should be exactly like '
-               'they are displayed on MWT website. The pairs that you want '
-               'to split should be the first ones (players 1 and 2, 3 and 4, etc.')
+               'they are displayed on MWT website.')
     await update.callback_query.edit_message_text(message)
     return State.WAITING_FOR_PARTICIPANTS
 

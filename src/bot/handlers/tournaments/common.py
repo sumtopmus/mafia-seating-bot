@@ -33,27 +33,6 @@ def get_tournament(context: ContextTypes.DEFAULT_TYPE) -> dict:
     return context.user_data['tournaments'][title]
 
 
-def validate_configuration(tournament: dict) -> Validity:
-    result = Validity.VALID
-    if 'config' not in tournament:
-        return Validity.NOT_SET
-    for key in ['num_players', 'num_tables', 'num_rounds', 'num_games', 'num_attempts', 'num_pairs']:
-        if key not in tournament['config']:
-            result = Validity.NOT_SET
-    # TODO: check validity of the values
-    return result
-
-
-def validate_schedule(context: ContextTypes.DEFAULT_TYPE) -> Validity:
-    tournament = get_tournament(context)
-    if 'schedule' not in tournament:
-        return Validity.NOT_SET
-    schedule = get_schedule(context)
-    if not schedule.isValid():
-        return Validity.INVALID
-    return Validity.VALID
-
-
 def get_participants(context: ContextTypes.DEFAULT_TYPE) -> Participants:
     """Gets participants from the bot user data."""
     tournament = get_tournament(context)
@@ -109,5 +88,36 @@ def get_tables_for_player(player_id: int, schedule: Schedule) -> dict:
             if player_id in game.players:
                 tables[round_id] = table_id
                 break
-        
     return tables
+
+
+def validate_configuration(tournament: dict) -> Validity:
+    result = Validity.VALID
+    if 'config' not in tournament:
+        return Validity.NOT_SET
+    for key in ['num_players', 'num_tables', 'num_rounds', 'num_games', 'num_attempts', 'num_pairs']:
+        if key not in tournament['config']:
+            result = Validity.NOT_SET
+    # TODO: check validity of the values
+    return result
+
+
+def validate_schedule(context: ContextTypes.DEFAULT_TYPE) -> Validity:
+    tournament = get_tournament(context)
+    if 'schedule' not in tournament:
+        return Validity.NOT_SET
+    schedule = get_schedule(context)
+    if not schedule.isValid():
+        return Validity.INVALID
+    return Validity.VALID
+
+
+def validate_participants(context: ContextTypes.DEFAULT_TYPE) -> Validity:
+    tournament = get_tournament(context)
+    participants = get_participants(context)
+    if participants is None:
+        return Validity.NOT_SET
+    if len(participants.people) != tournament['config']['num_players']:
+        return Validity.INVALID
+    else:
+        return Validity.VALID
