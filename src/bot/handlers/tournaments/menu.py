@@ -4,7 +4,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from utils import log
-from .common import get_participants, get_tournament, validate_configuration, validate_participants, validate_schedule, Validity
+from .common import get_participants, get_tournament, validate_configuration, validate_participants, validate_schedule, validate_split_pairs, Validity
 
 
 State = Enum('State', [
@@ -108,13 +108,10 @@ def construct_tournament_menu(context: ContextTypes.DEFAULT_TYPE) -> dict:
     tournament = get_tournament(context)
     state = State(context.user_data['conversation'])
     text = f'What do you want to do with *{tournament['title']}*?'
-    validity = validate_configuration(tournament)
-    validity_suffix = '' if validity == Validity.NOT_SET else ' ✅' if validity == Validity.VALID else ' ⛔️'
-    configure_button_text = 'Configure' + validity_suffix
+    configure_button_text = 'Configure' + get_validity_suffix(validate_configuration(context))
     seats_button_text = 'Edit Seats' + get_validity_suffix(validate_schedule(context))
     participants_button_text = 'Upload Participants' + get_validity_suffix(validate_participants(context))
-    set_pairs_button_text = 'Set Split Pairs' + (
-        ' ✅' if len(tournament.get('pairs', [])) == tournament['config']['num_pairs'] else ' ⛔️')
+    set_pairs_button_text = 'Set Split Pairs' + get_validity_suffix(validate_split_pairs(context))
     publish_button_text = 'Publish' + (' ✅' if tournament['published'] else '')
     keyboard = [
         [

@@ -91,15 +91,20 @@ def get_tables_for_player(player_id: int, schedule: Schedule) -> dict:
     return tables
 
 
-def validate_configuration(tournament: dict) -> Validity:
-    result = Validity.VALID
+def validate_configuration(context: ContextTypes.DEFAULT_TYPE) -> Validity:
+    tournament = get_tournament(context)
     if 'config' not in tournament:
         return Validity.NOT_SET
+    result = Validity.VALID
     for key in ['num_players', 'num_tables', 'num_rounds', 'num_games', 'num_attempts', 'num_pairs']:
         if key not in tournament['config']:
             result = Validity.NOT_SET
-    # TODO: check validity of the values
-    return result
+    if result == Validity.NOT_SET:
+        return Validity.NOT_SET
+    config = generate_configuration(tournament['config'])
+    if not config.isValid():
+        return Validity.INVALID
+    return Validity.VALID
 
 
 def validate_schedule(context: ContextTypes.DEFAULT_TYPE) -> Validity:
@@ -121,3 +126,13 @@ def validate_participants(context: ContextTypes.DEFAULT_TYPE) -> Validity:
         return Validity.INVALID
     else:
         return Validity.VALID
+    
+
+def validate_split_pairs(context: ContextTypes.DEFAULT_TYPE) -> Validity:
+    tournament = get_tournament(context)
+    if 'num_pairs' not in tournament['config']:
+        return Validity.NOT_SET
+    if len(tournament.get('pairs', [])) == tournament['config']['num_pairs']:
+        return Validity.VALID
+    else:
+        return Validity.INVALID

@@ -117,7 +117,7 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     log('back')
     await update.callback_query.answer()
     title = context.user_data['tournament']
-    config_validity = validate_configuration(get_tournament(context))
+    config_validity = validate_configuration(context)
     if config_validity == Validity.VALID:
         context.user_data['tournaments'][title]['config']['configured'] = True
         context.user_data['tournaments'][title]['config']['valid'] = True
