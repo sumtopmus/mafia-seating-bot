@@ -133,8 +133,7 @@ async def export_mwt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Stat
     """When the user presses export to MWT format button."""
     log('export_mwt')
     await update.callback_query.answer()
-    message = escape_markdown('\n'.join(Print.mwtSchedule(
-        get_schedule(context, with_participants=True))), version=2)
+    message = '\n'.join(Print.mwtSchedule(get_schedule(context, with_participants=True)))
     text_file = io.StringIO(message)
     filename = get_tournament(context)['title'].lower().replace(' ', '-') + '-seats-mwt.txt'
     await context.bot.send_document(

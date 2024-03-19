@@ -86,7 +86,6 @@ async def set_title(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State
     tournament.setdefault('published', False)
     tournament.setdefault('config', {'configured': False, 'valid': True})
     tournament.setdefault('pairs', [])
-    get_tournament(context).setdefault('pairs', [])
     await tournament_menu(update, context)
     return State.TOURNAMENT
 
@@ -155,13 +154,8 @@ async def set_pairs_request(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def set_pairs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> State:
     """Adds a pair that the user submitted to split list."""
     log('set_pairs')
-    log(update.message.text)
     pairs = [[int(number)-1 for number in line.split(' ')] for line in update.message.text.split('\n')]
-    
-    log(get_tournament(context))
     get_tournament(context)['pairs'] = pairs
-    log(get_tournament(context))
-    
     await tournament_menu(update, context)
     return State.TOURNAMENT
 

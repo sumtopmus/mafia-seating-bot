@@ -106,8 +106,7 @@ async def generate_seats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Splitting pairs.
     participants = get_participants(context)
     reset_ids(participants)
-    pairs = tournament['pairs']
-    split_pairs(participants, pairs)
+    split_pairs(context)
     save_participants(context, participants)
 
     message = 'Seating assignment has been generated!'
