@@ -18,7 +18,6 @@ def create_handlers():
         ],
         states={
             State.SEATS: [
-                CallbackQueryHandler(edit_seats, pattern="^" + State.SEATS.name + "$"),
                 CallbackQueryHandler(back, pattern="^" + State.TOURNAMENT.name + "$"),
                 CallbackQueryHandler(generate_seats, pattern="^" + State.GENERATING_SEATS.name + "$"),
                 CallbackQueryHandler(split_pairs_request, pattern="^" + State.SPLITTING_PAIRS.name + "$"),
@@ -52,6 +51,7 @@ def create_handlers():
         fallbacks=[
             CommandHandler('cancel', edit_seats)
         ],
+        allow_reentry=True,
         map_to_parent={
             State.TOURNAMENT: State.TOURNAMENT
         },

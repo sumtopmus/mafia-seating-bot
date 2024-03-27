@@ -28,6 +28,7 @@ def create_handlers() -> list:
         fallbacks=[
             CommandHandler('cancel', cancel)
         ],
+        allow_reentry=True,
         name="entry_conversation",
         persistent=True)]
 

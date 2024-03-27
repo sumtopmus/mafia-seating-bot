@@ -20,7 +20,6 @@ def create_handlers() -> list:
         ],
         states={
             State.SHOW_SEATS: [
-                CallbackQueryHandler(show_seats, pattern="^" + State.SHOW_SEATS.name + "$"),
                 CallbackQueryHandler(show_rounds, pattern="^" + State.SHOWING_ROUNDS.name + "$"),
                 CallbackQueryHandler(export_rounds, pattern="^" + State.EXPORTING_ROUNDS.name + "$"),
                 CallbackQueryHandler(show_players, pattern="^" + State.SHOWING_PLAYERS.name + "$"),
@@ -37,7 +36,7 @@ def create_handlers() -> list:
             CallbackQueryHandler(back, pattern="^" + State.SEATS.name + "$"),
             CommandHandler('cancel', cancel)
         ],
-        conversation_timeout=settings.CONVERSATION_TIMEOUT,
+        allow_reentry=True,
         name="show_seats_conversation",
         persistent=True)]
 
